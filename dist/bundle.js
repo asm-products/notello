@@ -401,7 +401,7 @@ module.exports = assign(new Dispatcher(), {
 		}
 	},
 
-	actionList: ['viewBookshelf', 'hideBookshelf']
+	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail']
 });
 
 },{"./Dispatcher":"/var/www/actions/Dispatcher.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){

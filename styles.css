@@ -315,6 +315,95 @@ input {
   }
 }
 
+.input-wrapper {
+  width: 90%;
+  margin: 0 auto;
+}
+.input-container {
+  background-color: #0c2f57;
+  width: 90%;
+  height: 90%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  position: fixed;
+  z-index: 1;
+  border-radius: 3px;
+}
+.span-close {
+  float: right;
+  width: 40px;
+  height: 40px;
+  margin: 10px 10px 0 0;
+}
+.lbl-login {
+  color: white;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  font-family: 'Raleway', sans-serif;
+  padding-top: 20px;
+}
+.hr-white {
+  background-color: white;
+  height: 1px;
+  border: 0;
+}
+.txt-email {
+  width: 100%;
+  padding: 0;
+  margin: 0 auto;
+  height: 50px;
+  position: static;
+  border-radius: 5px;
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+  margin-bottom: 5px;
+  font-family: 'Raleway', sans-serif;
+  font-size: .9em;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+.login-submit-btn {
+  background-color: #488BAE;
+  color: white;
+  outline: none;
+  font-weight: bold;
+  font-size: 0.9em;
+  border: 2px solid white;
+  cursor: pointer;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 5px;
+  padding: 10px;
+  height: 52px;
+}
+.login-submit-btn:hover,
+.login-submit-btn:focus {
+  background-color: #357596;
+}
+@media screen and (min-width: 500px) {
+  .input-container {
+    top: 6px;
+    width: 400px;
+  }
+  .txt-email {
+    border: 2px solid #fff;
+    height: 16px;
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
+    outline: 0;
+    vertical-align: top;
+    font-size: 1em;
+    padding: 10px;
+  }
+  .login-submit-btn {
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+  }
+}
+
 .notepad {
   height: 360px;
   /*width: 600px; TODO: see about getting rid of this */

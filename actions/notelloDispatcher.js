@@ -21,5 +21,5 @@ module.exports = assign(new Dispatcher(), {
 		}
 	},
 
-	actionList: ['viewBookshelf', 'hideBookshelf']
+	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail']
 });
