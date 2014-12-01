@@ -1,0 +1,76 @@
+
+.generic-transition
+{
+    transition: transform 0.3s, all 0.2s;
+}
+
+.blink-me {
+    animation-name: blinker;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes blinker {  
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+.big-screen-login.slide-off-right, .big-screen-login.slide-in-right
+{
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+.big-screen-login.slide-in-right {
+    animation-name: slideInRight;
+}
+
+.big-screen-login.slide-off-right {
+    animation-name: slideOffRight;
+}
+
+@keyframes slideInRight {  
+
+	0% { 
+		width: 0%;
+		height: 0%;
+	}
+
+	100% { 
+		width: 90%;
+		height: 90%;
+	}
+}
+
+@keyframes slideOffRight {  
+	0% { 
+		width: 90%;
+		height: 90%;
+	}
+
+	100% { 
+		width: 0%;
+		height: 0%;
+	}
+}
+
+@media screen and (min-width: 500px)
+{
+	@keyframes slideInRight {  
+		0% { right: -500px; }
+		50% { right: 0; }
+		75% { right: 35px; }
+		100% { right: 15px;}
+	}
+
+	@keyframes slideOffRight {  
+		0% { right: 15px; }
+		50% { right: 35px; }
+		75% { right: 0; }
+		100% { right: -500px;}
+	}
+}

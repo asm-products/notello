@@ -1,0 +1,6 @@
+{
+    "require": {
+        "slim/slim": "2.*",
+        "aws/aws-sdk-php": "2.*"
+    }
+}
