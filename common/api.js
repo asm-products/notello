@@ -1,5 +1,5 @@
 
-var reqwest = require('reqwest');
+var $ = require('jquery');
 
 var api = function (options) {
 
@@ -9,7 +9,9 @@ var api = function (options) {
 		window.location = 'error';
 	};
 
-	reqwest(options);
+	options.type = 'json';
+
+	$.ajax(options);
 };
 
 module.exports = api;

@@ -9,8 +9,8 @@ var sendLoginEmailAction = function (email) {
 		method: 'post',
 		data: { email: email },
 		success: function (resp) {
-	
-			dispatcher.dispatchDiscrete('loggedIn');
+			
+			dispatcher.dispatchDiscrete('attemptedLogin');
 	    }
 	});
 };

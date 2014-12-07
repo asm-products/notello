@@ -1,20 +1,10 @@
 
-.generic-transition
-{
+.generic-transition {
     transition: transform 0.3s, all 0.2s;
 }
 
-.blink-me {
-    animation-name: blinker;
-    animation-duration: 1s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-}
-
-@keyframes blinker {  
-    0% { opacity: 1.0; }
-    50% { opacity: 0.0; }
-    100% { opacity: 1.0; }
+.opacity-transition {
+    transition: display 0.3s, opacity 0.2s;
 }
 
 .big-screen-login.slide-off-right, .big-screen-login.slide-in-right

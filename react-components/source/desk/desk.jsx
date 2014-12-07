@@ -4,6 +4,7 @@ var Bookcase = require('../bookcase/bookcase');
 var hideBookshelf = require('../../../actions/hideBookshelf');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
+var Header = require('../header/header');
 
 var deskComponent = React.createClass({
 
@@ -31,7 +32,7 @@ var deskComponent = React.createClass({
 
 		return 	<div className="desk-container">
 					<div id="divDesk" ref="divDesk" className={classes} onTouchEnd={this.handleClick} onClick={this.handleClick}>
-						<div className="logo">Notello</div>
+						<Header />
 						<Notepad isViewingBookshelf={this.props.isViewingBookshelf} />
 					</div>
 				</div>

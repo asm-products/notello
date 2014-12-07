@@ -22,6 +22,7 @@ var headerComponent = React.createClass({
 
 		return 	<header className="header">
 					<span className={classes} title="View bookshelf" onClick={this.handleClick}><img src="dist/images/bookshelf.png" /></span>
+					<div className="logo">Notello</div>
 					<Login />
 				</header>;
 	}

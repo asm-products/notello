@@ -1,3 +1,5 @@
+'use strict';
+
 var es5Shim = require('../../../node_modules/es5-shim/es5-shim');
 var es5Sham = require('../../../node_modules/es5-shim/es5-sham');
 var React = require('react');
@@ -9,7 +11,6 @@ var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
 // Components
 var Desk = require('../desk/desk');
-var Header = require('../header/header');
 var Bookcase = require('../bookcase/bookcase');
 // Stores
 var bookshelfStore = require('../../../stores/bookshelfStore');
@@ -41,7 +42,6 @@ var App = React.createClass({
 	render: function () {
 
 		return  <div id="divContainer" className="container">
-					<Header isViewingBookshelf={this.state.isViewingBookshelf} />
 					<Bookcase isViewingBookshelf={this.state.isViewingBookshelf} />
 					<Desk isViewingBookshelf={this.state.isViewingBookshelf} />
 			    </div>;

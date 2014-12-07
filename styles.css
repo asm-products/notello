@@ -1,27 +1,3 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  min-height: 100%;
-  background: #3f3f3f;
-  background: linear-gradient(to bottom, #3f3f3f 0%, #2d2d2d 47%, #000000 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3f3f3f', endColorstr='#000000', GradientType=0);
-  /* IE6-9 */
-  height: 100%;
-}
-input {
-  -webkit-appearance: none;
-}
-.container {
-  height: 100%;
-}
-.invisible {
-  opacity: 0;
-}
-.hide {
-  display: none;
-}
-
 .bookcase {
   width: 100%;
   height: 150px;
@@ -75,22 +51,8 @@ input {
 .generic-transition {
   transition: transform 0.3s, all 0.2s;
 }
-.blink-me {
-  animation-name: blinker;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-@keyframes blinker {
-  0% {
-    opacity: 1.0;
-  }
-  50% {
-    opacity: 0.0;
-  }
-  100% {
-    opacity: 1.0;
-  }
+.opacity-transition {
+  transition: display 0.3s, opacity 0.2s;
 }
 .big-screen-login.slide-off-right,
 .big-screen-login.slide-in-right {
@@ -156,6 +118,34 @@ input {
   }
 }
 
+html,
+body {
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+  background: #3f3f3f;
+  background: linear-gradient(to bottom, #3f3f3f 0%, #2d2d2d 47%, #000000 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3f3f3f', endColorstr='#000000', GradientType=0);
+  /* IE6-9 */
+  height: 100%;
+}
+input {
+  -webkit-appearance: none;
+}
+.container {
+  height: 100%;
+}
+.invisible {
+  display: none;
+  opacity: 0;
+}
+.visible {
+  opacity: 1 !important;
+}
+.hide {
+  display: none;
+}
+
 .desk-container {
   perspective: 1000px;
   height: 100%;
@@ -190,11 +180,14 @@ input {
   }
 }
 
+.header {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
 .header .bookshelf-icon {
-  position: absolute;
-  z-index: 3;
-  top: 10px;
-  left: 15px;
+  float: left;
   cursor: pointer;
 }
 .header .bookshelf-icon.visible:hover {
@@ -211,13 +204,17 @@ input {
   }
 }
 
+.login-container {
+  float: right;
+}
+/************************************************************
+	The login button which opens the login form
+*************************************************************/
 .login-btn {
   color: white;
   text-decoration: none;
   cursor: pointer;
   background-color: transparent;
-  position: fixed;
-  top: 22px;
   z-index: 3;
   font-family: 'Raleway', sans-serif;
   font-size: 1em;
@@ -229,69 +226,7 @@ input {
   opacity: 0;
   transition: transform 0.3s, opacity 0.2s;
 }
-.input-container {
-  background-color: #0c2f57;
-  width: 90%;
-  height: 90%;
-  transform: translate(-50%, -50%);
-  left: 50%;
-  top: 50%;
-  position: fixed;
-  z-index: 1;
-  border-radius: 3px;
-}
-.span-close {
-  float: right;
-  width: 40px;
-  height: 40px;
-  margin: 10px 10px 0 0;
-}
-.lbl-login {
-  color: white;
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-  font-family: 'Raleway', sans-serif;
-}
-.txt-email {
-  border-radius: 0;
-  width: 80%;
-  margin: 0 auto;
-  display: block;
-  height: 25px;
-  position: static;
-}
-.login-submit-btn {
-  background-color: #488BAE;
-  color: white;
-  padding: 10px;
-  outline: none;
-  font-weight: bold;
-  font-size: 0.9em;
-  border: 2px solid white;
-  cursor: pointer;
-  width: 80%;
-  margin: 0 auto;
-}
-.login-submit-btn:hover,
-.login-submit-btn:focus {
-  background-color: #357596;
-}
 @media screen and (min-width: 500px) {
-  .input-container {
-    top: 6px;
-    width: 400px;
-  }
-  .txt-email {
-    border: 2px solid #fff;
-    height: 16px;
-    border-top-left-radius: 50px;
-    border-bottom-left-radius: 50px;
-    outline: 0;
-    vertical-align: top;
-    font-size: 1em;
-    padding: 10px;
-  }
   .login-submit-btn {
     border-top-right-radius: 50px;
     border-bottom-right-radius: 50px;
@@ -315,93 +250,126 @@ input {
   }
 }
 
-.input-wrapper {
-  width: 90%;
-  margin: 0 auto;
+/************************************************************
+	The white modalness thingy
+*************************************************************/
+.modal-form-component {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  display: none;
 }
-.input-container {
-  background-color: #0c2f57;
+.modal-background {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+}
+/************************************************************
+	The close button on the form
+*************************************************************/
+.span-close {
+  float: right;
+  width: 50px;
+  height: 50px;
+  margin: 10px 10px 0 0;
+  cursor: pointer;
+  color: #fff;
+  font-size: 48px;
+  display: block;
+  text-align: center;
+  opacity: 1;
+  box-sizing: border-box;
+}
+.span-close:hover::before {
+  opacity: 0.9;
+}
+/************************************************************
+	The label for the form
+*************************************************************/
+.lbl-form {
+  color: #fff;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  font-family: 'Raleway', sans-serif;
+}
+.hr-form {
+  height: 2px;
+  border: 0;
+  background-color: #488BAE;
+}
+/************************************************************
+	The modal form and sub components
+*************************************************************/
+.modal-form-wrapper {
+  background-color: #303e58;
   width: 90%;
   height: 90%;
+  max-width: 600px;
+  max-height: 400px;
   transform: translate(-50%, -50%);
   left: 50%;
   top: 50%;
   position: fixed;
   z-index: 1;
   border-radius: 3px;
+  box-shadow: 0px 0px 19px 5px rgba(0, 0, 0, 0.5);
 }
-.span-close {
-  float: right;
-  width: 40px;
-  height: 40px;
-  margin: 10px 10px 0 0;
-}
-.lbl-login {
-  color: white;
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-  font-family: 'Raleway', sans-serif;
+.modal-form-wrapper form {
   padding-top: 20px;
 }
-.hr-white {
-  background-color: white;
-  height: 1px;
-  border: 0;
+.modal-form-wrapper .input-wrapper {
+  margin-bottom: 20px;
 }
-.txt-email {
-  width: 100%;
-  padding: 0;
+.modal-form-wrapper input[type="text"],
+.modal-form-wrapper input[type="email"] {
+  border: 1px solid black;
+  height: 40px;
+  border-radius: 3px;
+  outline: 0;
+  vertical-align: top;
+  font-size: 1em;
+  padding: 10px;
+  display: block;
   margin: 0 auto;
-  height: 50px;
-  position: static;
-  border-radius: 5px;
-  background-color: transparent;
-  border: 2px solid white;
-  color: white;
-  margin-bottom: 5px;
-  font-family: 'Raleway', sans-serif;
-  font-size: .9em;
-  font-weight: 700;
   box-sizing: border-box;
+  width: 85%;
+  background-color: #dde0e5;
+  color: #303e58;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.75);
 }
-.login-submit-btn {
+.modal-form-wrapper input[type="text"]:focus,
+.modal-form-wrapper input[type="email"]:focus {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+/************************************************************
+	The submit button on the form
+*************************************************************/
+.submit-btn {
   background-color: #488BAE;
   color: white;
+  padding: 10px;
   outline: none;
   font-weight: bold;
   font-size: 0.9em;
-  border: 2px solid white;
+  border: 2px solid #488BAE;
   cursor: pointer;
-  width: 100%;
+  width: 85%;
   margin: 0 auto;
-  border-radius: 5px;
-  padding: 10px;
-  height: 52px;
+  display: block;
+  border-radius: 3px;
+  box-sizing: border-box;
 }
-.login-submit-btn:hover,
-.login-submit-btn:focus {
+.submit-btn:hover,
+.submit-btn:focus {
   background-color: #357596;
 }
-@media screen and (min-width: 500px) {
-  .input-container {
-    top: 6px;
-    width: 400px;
-  }
-  .txt-email {
-    border: 2px solid #fff;
-    height: 16px;
-    border-top-left-radius: 50px;
-    border-bottom-left-radius: 50px;
-    outline: 0;
-    vertical-align: top;
-    font-size: 1em;
-    padding: 10px;
-  }
-  .login-submit-btn {
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
-  }
+.submit-btn:active {
+  margin-top: 24px;
 }
 
 .notepad {
@@ -414,6 +382,7 @@ input {
   margin: 0 auto;
   box-shadow: 0px 0px 60px 10px rgba(0, 0, 0, 0.17);
   border-radius: 5px;
+  max-width: 900px;
 }
 .notepad .notepad-date {
   font-family: Arial;
@@ -500,4 +469,21 @@ input {
 .notepad .caret {
   position: absolute;
   margin-left: -2px;
+}
+.blink-me {
+  animation-name: blinker;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes blinker {
+  0% {
+    opacity: 1.0;
+  }
+  50% {
+    opacity: 0.0;
+  }
+  100% {
+    opacity: 1.0;
+  }
 }
