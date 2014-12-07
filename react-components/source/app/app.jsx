@@ -35,7 +35,7 @@ var App = React.createClass({
 	},
 
 	componentDidMount: function() {
-
+		
 	    bookshelfStore.onChange(this._bookShelfUpdated);
   	},
 

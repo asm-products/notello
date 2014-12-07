@@ -39,7 +39,7 @@ var modalFormComponent = React.createClass({
 		return 	<div ref="modalContainer" className="modal-form-component">
 					<div className="modal-background"></div>
 					<div className="modal-form-wrapper">
-						<span className="span-close ion-ios-close-outline" onClick={this.handleClose}></span>
+						<span className="span-close ion-ios-close-outline" onTouchEnd={this.handleClose} onClick={this.handleClose}></span>
 						<label className="lbl-form" htmlFor="txtEmailAddress">LOGIN</label>
 						<hr className="hr-form" />
 						<form action="" onSubmit={this.handleSubmit} autoCorrect="off">

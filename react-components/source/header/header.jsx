@@ -8,6 +8,8 @@ var headerComponent = React.createClass({
 
 	handleClick: function (event) {
 
+		event.stopPropagation();
+
 		viewBookshelf();
 	},
 
@@ -16,12 +18,11 @@ var headerComponent = React.createClass({
 		var classes = cx({
 			'bookshelf-icon': true,
 			'generic-transition': true,
-			'visible': !this.props.isViewingBookshelf,
 		    'invisible': this.props.isViewingBookshelf
 		});
 
 		return 	<header className="header">
-					<span className={classes} title="View bookshelf" onClick={this.handleClick}><img src="dist/images/bookshelf.png" /></span>
+					<span className={classes} title="View bookshelf" onTouchEnd={this.handleClick} onClick={this.handleClick}><img src="dist/images/bookshelf.png" /></span>
 					<div className="logo">Notello</div>
 					<Login />
 				</header>;

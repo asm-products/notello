@@ -36,7 +36,7 @@ var App = React.createClass({displayName: 'App',
 	},
 
 	componentDidMount: function() {
-
+		
 	    bookshelfStore.onChange(this._bookShelfUpdated);
   	},
 
@@ -463,6 +463,7 @@ Store.prototype.onChange = function (callback) {
 };
 
 module.exports = Store;
+
 },{}],"/var/www/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
@@ -50372,6 +50373,8 @@ var headerComponent = React.createClass({displayName: 'headerComponent',
 
 	handleClick: function (event) {
 
+		event.stopPropagation();
+
 		viewBookshelf();
 	},
 
@@ -50380,12 +50383,11 @@ var headerComponent = React.createClass({displayName: 'headerComponent',
 		var classes = cx({
 			'bookshelf-icon': true,
 			'generic-transition': true,
-			'visible': !this.props.isViewingBookshelf,
 		    'invisible': this.props.isViewingBookshelf
 		});
 
 		return 	React.createElement("header", {className: "header"}, 
-					React.createElement("span", {className: classes, title: "View bookshelf", onClick: this.handleClick}, React.createElement("img", {src: "dist/images/bookshelf.png"})), 
+					React.createElement("span", {className: classes, title: "View bookshelf", onTouchEnd: this.handleClick, onClick: this.handleClick}, React.createElement("img", {src: "dist/images/bookshelf.png"})), 
 					React.createElement("div", {className: "logo"}, "Notello"), 
 					React.createElement(Login, null)
 				);
@@ -50479,7 +50481,7 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 		return 	React.createElement("div", {ref: "modalContainer", className: "modal-form-component"}, 
 					React.createElement("div", {className: "modal-background"}), 
 					React.createElement("div", {className: "modal-form-wrapper"}, 
-						React.createElement("span", {className: "span-close ion-ios-close-outline", onClick: this.handleClose}), 
+						React.createElement("span", {className: "span-close ion-ios-close-outline", onTouchEnd: this.handleClose, onClick: this.handleClose}), 
 						React.createElement("label", {className: "lbl-form", htmlFor: "txtEmailAddress"}, "LOGIN"), 
 						React.createElement("hr", {className: "hr-form"}), 
 						React.createElement("form", {action: "", onSubmit: this.handleSubmit, autoCorrect: "off"}, 
@@ -50601,4 +50603,5 @@ notelloDispatcher.registerDiscrete('hideBookshelf', function () {
 });
 
 module.exports = bookShelfStore;
+
 },{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/store":"/var/www/common/store.js","object-assign":"/var/www/node_modules/object-assign/index.js"}]},{},["./react-components/source/app/app.jsx"]);

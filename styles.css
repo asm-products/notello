@@ -163,32 +163,19 @@ input {
   height: 100%;
   transition: all 0.5s;
 }
-.desk .logo {
-  text-shadow: white 0px 2px 0px;
-  font-family: 'Nunito', sans-serif;
-  color: #804313;
-  opacity: 0.4;
-  height: 48px;
-  width: 100%;
-  font-size: 2em;
-  text-align: center;
-  padding-top: 5px;
-}
-@media all and (min-width: 400px) {
-  .desk .logo {
-    /*font-size: 4em;*/
-  }
-}
 
 .header {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
   position: relative;
+  height: 60px;
 }
 .header .bookshelf-icon {
   float: left;
   cursor: pointer;
+  padding-top: 10px;
+  padding-left: 10px;
 }
 .header .bookshelf-icon.visible:hover {
   opacity: 0.9;
@@ -197,15 +184,24 @@ input {
   width: 30px;
   height: 30px;
 }
-@media screen and (min-width: 500px) {
-  .bookshelf-icon {
-    top: 20px;
-    left: 40px;
-  }
+.header .logo {
+  text-shadow: white 0px 2px 0px;
+  font-family: 'Nunito', sans-serif;
+  color: #804313;
+  opacity: 0.4;
+  height: 48px;
+  width: 100%;
+  font-size: 2em;
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  width: 200px;
+  margin-left: -100px;
 }
 
 .login-container {
   float: right;
+  padding-top: 20px;
 }
 /************************************************************
 	The login button which opens the login form
@@ -226,28 +222,22 @@ input {
   opacity: 0;
   transition: transform 0.3s, opacity 0.2s;
 }
-@media screen and (min-width: 500px) {
-  .login-submit-btn {
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
-  }
-  .login-btn::before {
-    margin-right: 10px;
-    content: '[';
-    transform: translateX(20px);
-  }
-  .login-btn::after {
-    margin-left: 10px;
-    content: ']';
-    transform: translateX(-20px);
-  }
-  .login-btn:hover::before,
-  .login-btn:hover::after,
-  .login-btn:focus::before,
-  .login-btn:focus::after {
-    opacity: 1;
-    transform: translateX(0px);
-  }
+.login-btn::before {
+  margin-right: 10px;
+  content: '[';
+  transform: translateX(20px);
+}
+.login-btn::after {
+  margin-left: 10px;
+  content: ']';
+  transform: translateX(-20px);
+}
+.login-btn:hover::before,
+.login-btn:hover::after,
+.login-btn:focus::before,
+.login-btn:focus::after {
+  opacity: 1;
+  transform: translateX(0px);
 }
 
 /************************************************************
