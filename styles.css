@@ -146,6 +146,57 @@ input {
   display: none;
 }
 
+.bracket-animation::before,
+.bracket-animation:after {
+  display: inline-block;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.2s;
+  color: white;
+}
+.bracket-animation::before {
+  margin-right: 10px;
+  content: '[';
+  transform: translateX(20px);
+}
+.bracket-animation::after {
+  margin-left: 10px;
+  content: ']';
+  transform: translateX(-20px);
+}
+.bracket-animation:hover::before,
+.bracket-animation:hover::after,
+.bracket-animation:focus::before,
+.bracket-animation:focus::after {
+  opacity: 1;
+  transform: translateX(0px);
+}
+
+@keyframes modalShakeAnimation {
+  0% {
+    transform: translate(-46%, -50%);
+  }
+  20% {
+    transform: translate(-54%, -50%);
+  }
+  40% {
+    transform: translate(-48%, -50%);
+  }
+  60% {
+    transform: translate(-52%, -50%);
+  }
+  80% {
+    transform: translate(-49%, -50%);
+  }
+  100% {
+    transform: translate(-50%, -50%);
+  }
+}
+.modal-shake {
+  animation-name: modalShakeAnimation;
+  animation-duration: 0.4s;
+  animation-timing-function: linear;
+}
+
 .desk-container {
   perspective: 1000px;
   height: 100%;
@@ -168,14 +219,18 @@ input {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  position: relative;
   height: 60px;
 }
 .header .bookshelf-icon {
   float: left;
   cursor: pointer;
-  padding-top: 10px;
+  padding-top: 13px;
   padding-left: 10px;
+}
+.header .bookshelf-icon::before,
+.header .bookshelf-icon::after {
+  vertical-align: top;
+  padding-top: 8px;
 }
 .header .bookshelf-icon.visible:hover {
   opacity: 0.9;
@@ -189,7 +244,8 @@ input {
   font-family: 'Nunito', sans-serif;
   color: #804313;
   opacity: 0.4;
-  height: 48px;
+  height: 40px;
+  padding-top: 8px;
   width: 100%;
   font-size: 2em;
   text-align: center;
@@ -201,7 +257,15 @@ input {
 
 .login-container {
   float: right;
-  padding-top: 20px;
+  padding-top: 26px;
+  padding-right: 12px;
+}
+.email-icon {
+  color: #293854;
+  position: absolute;
+  left: 9%;
+  font-size: 30px;
+  padding-top: 25px;
 }
 /************************************************************
 	The login button which opens the login form
@@ -215,29 +279,6 @@ input {
   font-family: 'Raleway', sans-serif;
   font-size: 1em;
   text-shadow: 1px 1px rgba(128, 67, 19, 0.5);
-}
-.login-btn::before,
-.login-btn:after {
-  display: inline-block;
-  opacity: 0;
-  transition: transform 0.3s, opacity 0.2s;
-}
-.login-btn::before {
-  margin-right: 10px;
-  content: '[';
-  transform: translateX(20px);
-}
-.login-btn::after {
-  margin-left: 10px;
-  content: ']';
-  transform: translateX(-20px);
-}
-.login-btn:hover::before,
-.login-btn:hover::after,
-.login-btn:focus::before,
-.login-btn:focus::after {
-  opacity: 1;
-  transform: translateX(0px);
 }
 
 /************************************************************
@@ -290,13 +331,13 @@ input {
 .hr-form {
   height: 2px;
   border: 0;
-  background-color: #488BAE;
+  background-color: #488bae;
 }
 /************************************************************
 	The modal form and sub components
 *************************************************************/
 .modal-form-wrapper {
-  background-color: #303e58;
+  background-color: #293854;
   width: 90%;
   height: 90%;
   max-width: 600px;
@@ -329,30 +370,30 @@ input {
   box-sizing: border-box;
   width: 85%;
   background-color: #dde0e5;
-  color: #303e58;
+  color: #293854;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.75);
 }
 .modal-form-wrapper input[type="text"]:focus,
 .modal-form-wrapper input[type="email"]:focus {
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #66afe9;
 }
 /************************************************************
 	The submit button on the form
 *************************************************************/
 .submit-btn {
-  background-color: #488BAE;
+  background-color: #488bae;
   color: white;
   padding: 10px;
   outline: none;
   font-weight: bold;
   font-size: 0.9em;
-  border: 2px solid #488BAE;
   cursor: pointer;
   width: 85%;
   margin: 0 auto;
   display: block;
   border-radius: 3px;
   box-sizing: border-box;
+  border: 0;
 }
 .submit-btn:hover,
 .submit-btn:focus {

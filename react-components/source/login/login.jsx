@@ -7,17 +7,26 @@ var loginComponent = React.createClass({
 
 	getInitialState: function () {
 
-		return { shouldShowModal: false };
+		return { 
+			shouldShowModal: false,
+			email: null
+		};
 	},
 
 	handleClick: function (event) {
 
-		this.setState({ shouldShowModal: true });
+		this.setState({ 
+			shouldShowModal: true,
+			email: null
+		});
 	},
 
 	handleClose: function (event) {
 
-		this.setState({ shouldShowModal: false });
+		this.setState({ 
+			shouldShowModal: false,
+			email: ''
+		});
 	},
 
 	handleSubmit: function (event) {
@@ -28,9 +37,11 @@ var loginComponent = React.createClass({
 	render: function () {
 
 		return 	<div className="login-container">
-					<span className="login-btn" onTouchEnd={this.handleClick} onClick={this.handleClick}>LOGIN</span>
+					<span className="login-btn bracket-animation" onTouchEnd={this.handleClick} onClick={this.handleClick}>LOGIN</span>
 					<ModalForm onClose={this.handleClose} onSubmit={this.handleSubmit} show={this.state.shouldShowModal} buttonText="SEND LOGIN EMAIL">
-						<input id="txtEmailAddress" type="email" placeholder="Enter email address" required />
+						<span className="email-icon ion-android-mail" />
+						<input id="txtEmailAddress" style={{ paddingLeft: '40px' }} type="email"
+						 placeholder="Enter email address" className="padded-input" value={this.state.email}  />
 					</ModalForm>
 				</div>;
 	}

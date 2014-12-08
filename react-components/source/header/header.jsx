@@ -15,14 +15,16 @@ var headerComponent = React.createClass({
 
 	render: function () {
 
-		var classes = cx({
+		var bookShelfIconClasses = cx({
+			'bracket-animation': true,
 			'bookshelf-icon': true,
-			'generic-transition': true,
 		    'invisible': this.props.isViewingBookshelf
 		});
 
 		return 	<header className="header">
-					<span className={classes} title="View bookshelf" onTouchEnd={this.handleClick} onClick={this.handleClick}><img src="dist/images/bookshelf.png" /></span>
+					<span className={bookShelfIconClasses} title="View bookshelf" onTouchEnd={this.handleClick} onClick={this.handleClick}>
+						<img src="dist/images/bookshelf.png" />
+					</span>
 					<div className="logo">Notello</div>
 					<Login />
 				</header>;

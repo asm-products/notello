@@ -4,14 +4,19 @@
 	width: 100%;
 	max-width: 900px;
 	margin: 0 auto;
-	position: relative;
 	height: 60px;
 
 	& .bookshelf-icon {
 		float: left;
 		cursor: pointer;
-		padding-top: 10px;
+		padding-top: 13px;
 		padding-left: 10px;
+
+		&::before, &::after {
+
+			vertical-align: top;
+			padding-top: 8px;
+		}
 	}
 
 	& .bookshelf-icon.visible:hover
@@ -31,7 +36,8 @@
 		font-family: 'Nunito', sans-serif;
 		color: #804313;
 		opacity: 0.4;
-		height: 48px;
+		height: 40px;
+		padding-top: 8px;
 		width: 100%;
 		font-size: 2em;
 		text-align: center;

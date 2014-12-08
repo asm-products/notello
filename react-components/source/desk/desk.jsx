@@ -32,7 +32,7 @@ var deskComponent = React.createClass({
 
 		return 	<div className="desk-container">
 					<div id="divDesk" ref="divDesk" className={classes} onTouchEnd={this.handleClick} onClick={this.handleClick}>
-						<Header />
+						<Header isViewingBookshelf={this.props.isViewingBookshelf} />
 						<Notepad isViewingBookshelf={this.props.isViewingBookshelf} />
 					</div>
 				</div>

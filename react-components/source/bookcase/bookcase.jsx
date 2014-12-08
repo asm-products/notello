@@ -7,8 +7,8 @@ var bookcaseComponent = React.createClass({
 	render: function () {
 
 		var classes = cx({
-			'bookcase-shown': this.props.isViewingBookshelf,
-			bookcase: true
+			bookcase: true,
+			'bookcase-shown': this.props.isViewingBookshelf
 		});
 
 		return 	<div ref="divBookcase" className={classes}>
