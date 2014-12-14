@@ -3,6 +3,8 @@
 var es5Shim = require('../../../node_modules/es5-shim/es5-shim');
 var es5Sham = require('../../../node_modules/es5-shim/es5-sham');
 var React = require('react');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;
@@ -16,6 +18,11 @@ var Bookcase = require('../bookcase/bookcase');
 var bookshelfStore = require('../../../stores/bookshelfStore');
 
 React.initializeTouchEvents(true);
+
+var isMobile = false;
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+	isMobile = true;
+}
 
 var App = React.createClass({
 
@@ -41,7 +48,13 @@ var App = React.createClass({
 
 	render: function () {
 
-		return  <div id="divContainer" className="container">
+		var classes = cx({
+			'container': true,
+			'is-mobile': isMobile,
+			'is-desktop': !isMobile
+		});
+
+		return  <div id="divContainer" className={classes}>
 					<Bookcase isViewingBookshelf={this.state.isViewingBookshelf} />
 					<Desk isViewingBookshelf={this.state.isViewingBookshelf} />
 			    </div>;

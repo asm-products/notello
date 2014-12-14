@@ -8,40 +8,41 @@ var loginComponent = React.createClass({
 	getInitialState: function () {
 
 		return { 
-			shouldShowModal: false,
-			email: null
+			email: ''
 		};
 	},
 
 	handleClick: function (event) {
 
-		this.setState({ 
-			shouldShowModal: true,
-			email: null
-		});
+		this.refs.ModalForm.open();
 	},
 
 	handleClose: function (event) {
 
 		this.setState({ 
-			shouldShowModal: false,
 			email: ''
 		});
 	},
 
+	handleChange: function(event) {
+
+		this.setState( {email: event.target.value} );
+	},
+
 	handleSubmit: function (event) {
 
-
+		// TODO: Attempt login here
+		alert('success');
 	},
 
 	render: function () {
 
 		return 	<div className="login-container">
 					<span className="login-btn bracket-animation" onTouchEnd={this.handleClick} onClick={this.handleClick}>LOGIN</span>
-					<ModalForm onClose={this.handleClose} onSubmit={this.handleSubmit} show={this.state.shouldShowModal} buttonText="SEND LOGIN EMAIL">
+					<ModalForm ref="ModalForm" onClose={this.handleClose} onSubmit={this.handleSubmit} buttonText="SEND LOGIN EMAIL">
 						<span className="email-icon ion-android-mail" />
-						<input id="txtEmailAddress" style={{ paddingLeft: '40px' }} type="email"
-						 placeholder="Enter email address" className="padded-input" value={this.state.email}  />
+						<input id="txtEmailAddress" isRequired={true} requiredMessage="Email is required" regex="^\S+@\S+$" regexMessage="Invalid email" style={{ paddingLeft: '40px' }} type="text"
+						 placeholder="Enter email address" onChange={this.handleChange} className="padded-input" value={this.state.email}  />
 					</ModalForm>
 				</div>;
 	}

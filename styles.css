@@ -163,10 +163,10 @@ input {
   content: ']';
   transform: translateX(-20px);
 }
-.bracket-animation:hover::before,
-.bracket-animation:hover::after,
-.bracket-animation:focus::before,
-.bracket-animation:focus::after {
+.is-desktop .bracket-animation:hover::before,
+.is-desktop .bracket-animation:hover::after,
+.is-desktop .bracket-animation:focus::before,
+.is-desktop .bracket-animation:focus::after {
   opacity: 1;
   transform: translateX(0px);
 }
@@ -376,6 +376,22 @@ input {
 .modal-form-wrapper input[type="text"]:focus,
 .modal-form-wrapper input[type="email"]:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #66afe9;
+}
+/************************************************************
+	The validation DIV
+*************************************************************/
+.modal-validation-container {
+  background-color: white;
+  border: 2px solid #cd2626;
+  color: #cd2626;
+  width: 85%;
+  border-radius: 3px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  font-weight: 700;
+  font-size: .9em;
+  padding: 10px;
+  font-family: Arial;
 }
 /************************************************************
 	The submit button on the form

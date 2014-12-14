@@ -4,6 +4,8 @@
 var es5Shim = require('../../../node_modules/es5-shim/es5-shim');
 var es5Sham = require('../../../node_modules/es5-shim/es5-sham');
 var React = require('react');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;
@@ -17,6 +19,11 @@ var Bookcase = require('../bookcase/bookcase');
 var bookshelfStore = require('../../../stores/bookshelfStore');
 
 React.initializeTouchEvents(true);
+
+var isMobile = false;
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+	isMobile = true;
+}
 
 var App = React.createClass({displayName: 'App',
 
@@ -42,7 +49,13 @@ var App = React.createClass({displayName: 'App',
 
 	render: function () {
 
-		return  React.createElement("div", {id: "divContainer", className: "container"}, 
+		var classes = cx({
+			'container': true,
+			'is-mobile': isMobile,
+			'is-desktop': !isMobile
+		});
+
+		return  React.createElement("div", {id: "divContainer", className: classes}, 
 					React.createElement(Bookcase, {isViewingBookshelf: this.state.isViewingBookshelf}), 
 					React.createElement(Desk, {isViewingBookshelf: this.state.isViewingBookshelf})
 			    );
@@ -59,7 +72,7 @@ var appComponent = React.render(
     document.body
 );
 
-},{"../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","react":"/var/www/node_modules/react/react.js","react-router":"/var/www/node_modules/react-router/modules/index.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
+},{"../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -415,7 +428,70 @@ var viewBookshelfAction = function () {
 
 module.exports = viewBookshelfAction;
 
-},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/common/dom-utils.js":[function(require,module,exports){
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/common/buffer-loader.js":[function(require,module,exports){
+
+var BufferLoader = function (context, urlList, callback) {
+    'use strict';
+
+    this.context = context;
+    this.urlList = urlList;
+    this.onload = callback;
+    this.bufferList = [];
+    this.loadCount = 0;
+};
+
+BufferLoader.prototype.loadBuffer = function (url, index) {
+    'use strict';
+
+    // Load buffer asynchronously
+    var request = new XMLHttpRequest(),
+        loader = this;
+
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
+
+    request.onload = function () {
+        // Asynchronously decode the audio file data in request.response
+        loader.context.decodeAudioData(
+            request.response,
+            function (buffer) {
+                if (buffer) {
+
+                    loader.bufferList[index] = buffer;
+                    loader.loadCount += 1;
+                    if (loader.loadCount === loader.urlList.length) {
+
+                        loader.onload(loader.bufferList);
+                    }
+                }
+            },
+            function (error) {
+                // TODO: handle error
+            }
+        );
+    };
+
+    request.onerror = function () {
+        // TODO: handle request error
+    };
+
+    request.send();
+};
+
+BufferLoader.prototype.load = function () {
+    'use strict';
+
+    var i,
+        max;
+
+    for (i = 0, max = this.urlList.length; i < max; i += 1) {
+        this.loadBuffer(this.urlList[i], i);
+    }
+};
+
+module.exports = BufferLoader;
+
+},{}],"/var/www/common/dom-utils.js":[function(require,module,exports){
 
 var publicMembers = {
 
@@ -446,7 +522,66 @@ var publicMembers = {
 
 module.exports = publicMembers;
 
-},{}],"/var/www/common/store.js":[function(require,module,exports){
+},{}],"/var/www/common/sounds.js":[function(require,module,exports){
+var BufferLoader = require('./buffer-loader');
+
+var play = (function () {
+
+    var context,
+        bufferLoader,
+        sounds = {},
+        go = function (i) {
+
+            return function () {
+
+                var source = context.createBufferSource();
+                source.connect(context.destination);
+                source.buffer = i;
+                source.start(0);
+            };
+        },
+        finishedLoading = function (bufferList) {
+
+            sounds.bongos = go(bufferList[0]);
+        },
+        retVal = function (sound) {
+
+            if (sounds[sound]) {
+                sounds[sound]();
+            }
+        };
+
+    // Fix up prefixing
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+    context = new AudioContext();
+
+    bufferLoader = new BufferLoader(
+        context,
+        [
+            'https://s3-us-west-2.amazonaws.com/static-omaj/bongos.mp3'
+            // 'https://s3-us-west-2.amazonaws.com/static-omaj/scifi.mp3',
+            // 'https://s3-us-west-2.amazonaws.com/static-omaj/scifi2.mp3',
+            // 'https://s3-us-west-2.amazonaws.com/static-omaj/birds.mp3',
+            // 'https://s3-us-west-2.amazonaws.com/static-omaj/mysterious.mp3'
+        ],
+        finishedLoading
+    );
+
+    bufferLoader.load();
+
+    return retVal;
+
+}());
+
+var sounds = {
+
+    'play': play
+};
+
+module.exports = sounds;
+
+},{"./buffer-loader":"/var/www/common/buffer-loader.js"}],"/var/www/common/store.js":[function(require,module,exports){
 
 var Store = function () {
 	this.callbacks = [];
@@ -50410,40 +50545,41 @@ var loginComponent = React.createClass({displayName: 'loginComponent',
 	getInitialState: function () {
 
 		return { 
-			shouldShowModal: false,
-			email: null
+			email: ''
 		};
 	},
 
 	handleClick: function (event) {
 
-		this.setState({ 
-			shouldShowModal: true,
-			email: null
-		});
+		this.refs.ModalForm.open();
 	},
 
 	handleClose: function (event) {
 
 		this.setState({ 
-			shouldShowModal: false,
 			email: ''
 		});
 	},
 
+	handleChange: function(event) {
+
+		this.setState( {email: event.target.value} );
+	},
+
 	handleSubmit: function (event) {
 
-
+		// TODO: Attempt login here
+		alert('success');
 	},
 
 	render: function () {
 
 		return 	React.createElement("div", {className: "login-container"}, 
 					React.createElement("span", {className: "login-btn bracket-animation", onTouchEnd: this.handleClick, onClick: this.handleClick}, "LOGIN"), 
-					React.createElement(ModalForm, {onClose: this.handleClose, onSubmit: this.handleSubmit, show: this.state.shouldShowModal, buttonText: "SEND LOGIN EMAIL"}, 
+					React.createElement(ModalForm, {ref: "ModalForm", onClose: this.handleClose, onSubmit: this.handleSubmit, buttonText: "SEND LOGIN EMAIL"}, 
 						React.createElement("span", {className: "email-icon ion-android-mail"}), 
-						React.createElement("input", {id: "txtEmailAddress", style: { paddingLeft: '40px'}, type: "email", 
-						 placeholder: "Enter email address", className: "padded-input", value: this.state.email})
+						React.createElement("input", {id: "txtEmailAddress", isRequired: true, requiredMessage: "Email is required", regex: "^\\S+@\\S+$", regexMessage: "Invalid email", style: { paddingLeft: '40px'}, type: "text", 
+						 placeholder: "Enter email address", onChange: this.handleChange, className: "padded-input", value: this.state.email})
 					)
 				);
 	}
@@ -50457,11 +50593,54 @@ var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var $ = require('jquery');
+var sounds = require('../../../common/sounds');
 
 var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
 	_modalContainer: null,
 	_modalWrapper: null,
+
+	_shake: function () {
+
+  		// Got frustrated here with react and did straight up jQuery
+  		// I'm sure there's a "proper" way to do this type of recurring animation in react.
+  		var modalWrapper = this._modalWrapper.get(0);
+  		sounds.play('bongos');
+  		modalWrapper.className = 'modal-form-wrapper';
+  		setTimeout(function () { 
+  			modalWrapper.className = 'modal-form-wrapper modal-shake';
+  		}, 1);
+	},
+
+	_checkValidation: function () {
+
+		var validationMessage = '';
+
+		{React.Children.map(this.props.children, function (child) {
+
+			if (child.props.isRequired && child.props.value === '') {
+				validationMessage += child.props.requiredMessage + '<br>';
+			} else if (child.props.regex && new RegExp(child.props.regex).test(child.props.value) === false) {
+				validationMessage += child.props.regexMessage + '<br>';
+			}
+		})}
+
+		return validationMessage;
+	},
+
+	getInitialState: function () {
+
+		return {
+			isValid: true,
+			validationMessage: ''
+		};
+	},
+
+	open: function () {
+
+		this._modalContainer.fadeIn(200);
+		this._modalContainer.find('input').first().focus();
+	},
 
 	componentDidMount: function () {
 
@@ -50469,28 +50648,20 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 		this._modalWrapper = $(this.refs.modalWrapper.getDOMNode());
 	},
 
-	getInitialState: function () {
-
-		return {
-			isValid: null
-		};
-	},
-
-	toggleFade: function () {
-
-		if (this.props.show) {
-
-			this._modalContainer.fadeIn(200).find('input').first().focus();
-
-		} else {
-
-			this._modalContainer.fadeOut(200);
-		}
-	},
-
 	handleClose: function (event) {
 
+		this._modalContainer.fadeOut(200);
+  		this._modalWrapper.get(0).className = 'modal-form-wrapper';
 		this.props.onClose(event);
+
+		if ("activeElement" in document) {
+    		document.activeElement.blur();
+		}
+
+		this.setState({
+  			isValid: true,
+			validationMessage: ''
+  		});
 	},
 
 	handleSubmit: function (event) {
@@ -50498,21 +50669,21 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
   		event.preventDefault();
   		event.stopPropagation();
 
-  		// Got frustrated here with react and did straight up jQuery
-  		// I'm sure there's a "proper" way to do this type of recurring 
-  		// animation in react.
-  		var modalWrapper = this._modalWrapper.get(0);
+  		var validationMessage = this._checkValidation();
 
-  		modalWrapper.className = 'modal-form-wrapper';
-  		setTimeout(function () { 
-  			modalWrapper.className = 'modal-form-wrapper modal-shake';
-  		}, 1);
+  		if (validationMessage !== '') {
+  		
+  			this._shake();
+
+  		} else {
+
+  			this.props.onSubmit(event);
+  		}
 
   		this.setState({
-  			isValid: false
+  			isValid: validationMessage === '',
+  			validationMessage: validationMessage
   		});
-
-  		this.props.onSubmit(event);
 	},
 
 	handleClick: function (event) {
@@ -50524,19 +50695,20 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
 		var props = this.props;
 
-		setTimeout(this.toggleFade, 1);
-
 		return 	React.createElement("div", {ref: "modalContainer", className: "modal-form-component", onClick: this.handleClick}, 
 					React.createElement("div", {className: "modal-background"}), 
 					React.createElement("div", {ref: "modalWrapper", className: "modal-form-wrapper"}, 
 						React.createElement("span", {className: "span-close ion-ios-close-outline", onTouchEnd: this.handleClose, onClick: this.handleClose}), 
 						React.createElement("label", {className: "lbl-form", htmlFor: "txtEmailAddress"}, "LOGIN"), 
 						React.createElement("hr", {className: "hr-form"}), 
+						React.createElement("div", {className:  cx({'modal-validation-container': true, 'hide': this.state.isValid }), 
+							dangerouslySetInnerHTML: {__html: this.state.validationMessage}}
+						), 
 						React.createElement("form", {action: "", onSubmit: this.handleSubmit, autoCorrect: "off"}, 
 							React.Children.map(props.children, function (child) {
 								return React.createElement("div", {className: "input-wrapper"}, child);
 							}), 
-							React.createElement("input", {ref: "btnSubmitEmail", type: "submit", className: "submit-btn", value: "SEND LOGIN EMAIL"})
+							React.createElement("input", {ref: "btnSubmitEmail", type: "submit", onTouchEnd: this.handleSubmit, className: "submit-btn", value: "SEND LOGIN EMAIL"})
 						)
 					)
 				);
@@ -50546,7 +50718,7 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
 module.exports = modalFormComponent;
 
-},{"jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/notepad/notepad.jsx":[function(require,module,exports){
+},{"../../../common/sounds":"/var/www/common/sounds.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/notepad/notepad.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
