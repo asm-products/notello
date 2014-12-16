@@ -10,6 +10,8 @@ module.exports = assign(new Dispatcher(), {
 		if (this.actionList.indexOf(actionName) !== -1) {
 
 			actions[actionName] = callback;
+		} else {
+			throw new Error(actionName + ' is not in the actionList array for the notelloDispatcher.');
 		}
 	},
 
@@ -21,5 +23,5 @@ module.exports = assign(new Dispatcher(), {
 		}
 	},
 
-	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail']
+	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail', 'attemptedLogin']
 });

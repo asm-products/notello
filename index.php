@@ -12,9 +12,10 @@ $app->get('/', function () use ($app) {
     $app->render('index.html');
 });
 
-$app->post('/login-attempt', function () {
+$app->post('/api/login', function () use ($app) {
 
-	return 'test';
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo json_encode($app->request->post('email'));
 });
 
 // Run app

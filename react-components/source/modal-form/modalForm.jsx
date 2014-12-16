@@ -14,7 +14,7 @@ var modalFormComponent = React.createClass({
   		// Got frustrated here with react and did straight up jQuery
   		// I'm sure there's a "proper" way to do this type of recurring animation in react.
   		var modalWrapper = this._modalWrapper.get(0);
-  		sounds.play('bongos');
+  		//sounds.play('bongos');
   		modalWrapper.className = 'modal-form-wrapper';
   		setTimeout(function () { 
   			modalWrapper.className = 'modal-form-wrapper modal-shake';
@@ -51,6 +51,11 @@ var modalFormComponent = React.createClass({
 		this._modalContainer.find('input').first().focus();
 	},
 
+	close: function () {
+
+		this._modalContainer.fadeOut(200);
+	},
+
 	componentDidMount: function () {
 
 		this._modalContainer = $(this.refs.modalContainer.getDOMNode());
@@ -59,7 +64,7 @@ var modalFormComponent = React.createClass({
 
 	handleClose: function (event) {
 
-		this._modalContainer.fadeOut(200);
+		this.close();
   		this._modalWrapper.get(0).className = 'modal-form-wrapper';
 		this.props.onClose(event);
 
