@@ -5,21 +5,19 @@ var lscache = require('ls-cache');
 
 // The loginStore is a special store which uses lscache to store values as opposed to
 // an in memory object. This is because authentication details should persist on page refreshes, etc.
-var loginStore = assign(new Store(), {
-
-	pendingLogin: false
-});
+var loginStore = new Store();
 
 if (!lscache.get('isAuthenticated')) {
 
 	lscache.set('isAuthenticated', false);
+	lscache.set('pendingLogin', false);
 	lscache.set('email', null);
 	lscache.set('authToken', null);
 }
 
 notelloDispatcher.registerDiscrete('attemptedLogin', function () {
 
-	loginStore.pendingLogin = true;
+	lscache.set('pendingLogin', true);
 
 	loginStore.save();
 });

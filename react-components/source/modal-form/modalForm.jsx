@@ -14,7 +14,7 @@ var modalFormComponent = React.createClass({
   		// Got frustrated here with react and did straight up jQuery
   		// I'm sure there's a "proper" way to do this type of recurring animation in react.
   		var modalWrapper = this._modalWrapper.get(0);
-  		//sounds.play('bongos');
+  		sounds.play('bongos');
   		modalWrapper.className = 'modal-form-wrapper';
   		setTimeout(function () { 
   			modalWrapper.className = 'modal-form-wrapper modal-shake';
@@ -68,7 +68,7 @@ var modalFormComponent = React.createClass({
   		this._modalWrapper.get(0).className = 'modal-form-wrapper';
 		this.props.onClose(event);
 
-		if ("activeElement" in document) {
+		if ('activeElement' in document) {
     		document.activeElement.blur();
 		}
 
@@ -109,6 +109,8 @@ var modalFormComponent = React.createClass({
 
 		var props = this.props;
 
+		var btnSubmitText = this.props.loading ? <span className="ion-load-d"></span> : 'SEND LOGIN EMAIL';
+
 		return 	<div ref="modalContainer" className="modal-form-component" onClick={this.handleClick}>
 					<div className="modal-background"></div>
 					<div ref="modalWrapper" className="modal-form-wrapper">
@@ -118,11 +120,13 @@ var modalFormComponent = React.createClass({
 						<div className={ cx({'modal-validation-container': true, 'hide': this.state.isValid }) }
 							dangerouslySetInnerHTML={{__html: this.state.validationMessage}}>
 						</div>
-						<form action="" onSubmit={this.handleSubmit} autoCorrect="off">
+						<form action="" onSubmit={this.handleSubmit} autoComplete="on" autoCorrect="off">
 							{React.Children.map(props.children, function (child) {
 								return <div className="input-wrapper">{child}</div>;
 							})}
-							<input ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn" value="SEND LOGIN EMAIL" />
+							<button ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn ion ion-load">
+								{btnSubmitText}
+							</button>
 						</form>
 					</div>
 				</div>;

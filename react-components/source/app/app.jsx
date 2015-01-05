@@ -11,6 +11,8 @@ var Routes = Router.Routes;
 var NotFoundRoute = Router.NotFoundRoute;
 var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
+var api = require('../../../common/api');
+var _ = require('underscore');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -37,11 +39,25 @@ var App = React.createClass({
 	getInitialState: function () {
 
 		return {
-			isViewingBookshelf: bookshelfStore.isViewingBookshelf
+			isViewingBookshelf: bookshelfStore.isViewingBookshelf,
+			showFormBlocker: false
 		};
 	},
 
 	componentDidMount: function() {
+
+		var app = this;
+
+		api = _.wrap(api, function (apiFunction, options) {
+			console.log('here');
+
+			app.setState({
+				showFormBlocker: true
+			})
+
+
+			apiFunction(options);
+		});
 		
 	    bookshelfStore.onChange(this._bookShelfUpdated);
   	},
@@ -57,6 +73,7 @@ var App = React.createClass({
 		return  <div id="divContainer" className={classes}>
 					<Bookcase isViewingBookshelf={this.state.isViewingBookshelf} />
 					<Desk isViewingBookshelf={this.state.isViewingBookshelf} />
+					{this.state.showFormBlocker && <div className="div-form-blocker"></div>}
 			    </div>;
 	}
 });

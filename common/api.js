@@ -1,13 +1,30 @@
 
 var $ = require('jquery');
+var _ = require('underscore');
 
 var api = function (options) {
 
-	options.failure = function (resp) {
+	options.error = function (resp) {
 
 		// Error should already have been logged on server side
-		window.location = 'error';
+		// TODO: Make sure this doesn't happen in production
+		document.body.style.background = 'white';
+		document.body.innerHTML = resp.responseText;
 	};
+
+	options.success = _.wrap(options.success, function (successFunction, data, textStatus, jqXHR) {
+
+		// This should always be JSON so if HTML came back we can assume there was an unhandled error
+		if(jqXHR.getResponseHeader('content-type') === 'text/html') {
+
+			document.body.style.background = 'white';
+			document.body.innerHTML = data;
+
+		} else {
+
+			successFunction(data);
+		}
+	});
 
 	options.type = 'json';
 
