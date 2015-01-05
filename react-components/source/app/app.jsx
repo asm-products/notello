@@ -31,6 +31,7 @@ var App = React.createClass({
 	_bookShelfUpdated: function () {
 
 	    this.setState({
+	    	showFormBlocker: false,
 			isViewingBookshelf: bookshelfStore.isViewingBookshelf
 		});
 		
@@ -48,15 +49,12 @@ var App = React.createClass({
 
 		var app = this;
 
-		api = _.wrap(api, function (apiFunction, options) {
-			console.log('here');
+		api.register(function () {
 
 			app.setState({
 				showFormBlocker: true
-			})
+			});
 
-
-			apiFunction(options);
 		});
 		
 	    bookshelfStore.onChange(this._bookShelfUpdated);

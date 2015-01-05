@@ -2,7 +2,13 @@
 var $ = require('jquery');
 var _ = require('underscore');
 
+var callbacks = [];
+
 var api = function (options) {
+
+	callbacks.map(function (callback) {
+		callback();
+	});
 
 	options.error = function (resp) {
 
@@ -29,6 +35,11 @@ var api = function (options) {
 	options.type = 'json';
 
 	$.ajax(options);
+};
+
+api.register = function (callback) {
+
+	callbacks.push(callback);
 };
 
 module.exports = api;

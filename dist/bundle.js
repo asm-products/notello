@@ -32,6 +32,7 @@ var App = React.createClass({displayName: 'App',
 	_bookShelfUpdated: function () {
 
 	    this.setState({
+	    	showFormBlocker: false,
 			isViewingBookshelf: bookshelfStore.isViewingBookshelf
 		});
 		
@@ -49,15 +50,12 @@ var App = React.createClass({displayName: 'App',
 
 		var app = this;
 
-		api = _.wrap(api, function (apiFunction, options) {
-			console.log('here');
+		api.register(function () {
 
 			app.setState({
 				showFormBlocker: true
-			})
+			});
 
-
-			apiFunction(options);
 		});
 		
 	    bookshelfStore.onChange(this._bookShelfUpdated);
@@ -480,7 +478,13 @@ module.exports = viewBookshelfAction;
 var $ = require('jquery');
 var _ = require('underscore');
 
+var callbacks = [];
+
 var api = function (options) {
+
+	callbacks.map(function (callback) {
+		callback();
+	});
 
 	options.error = function (resp) {
 
@@ -507,6 +511,11 @@ var api = function (options) {
 	options.type = 'json';
 
 	$.ajax(options);
+};
+
+api.register = function (callback) {
+
+	callbacks.push(callback);
 };
 
 module.exports = api;

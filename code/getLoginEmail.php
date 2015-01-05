@@ -4,8 +4,6 @@ use Aws\DynamoDb\DynamoDbClient;
 
 function getNewEmailToken($email, $tokenId) {
 
-	date_default_timezone_set("UTC"); 
-
 	$dbClient = DynamoDBClient::factory(array(
         'region'  => 'us-west-2'
 	));
