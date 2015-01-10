@@ -3,7 +3,7 @@
 return array (
     'apiVersion' => '2013-01-01',
     'endpointPrefix' => 'cloudsearchdomain',
-    'serviceFullName' => 'Amazon CloudSearchDomain',
+    'serviceFullName' => 'Amazon CloudSearch Domain',
     'serviceType' => 'rest-json',
     'signatureVersion' => 'v4',
     'signingName' => 'cloudsearch',

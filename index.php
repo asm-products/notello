@@ -7,22 +7,22 @@ use Aws\Common\Aws;
 use Aws\Ses\SesClient;
 use Aws\DynamoDb\DynamoDbClient;
 
-// Prepare app
+// Prepare Slim PHP app
 $app = new \Slim\Slim(array(
-    'templates.path' => 'templates',
+    'templates.path' => 'templates'
 ));
 
+// Set timezone
 date_default_timezone_set("UTC"); 
 
 $app->get('/', function () use ($app) {
 
     // Render index view
-    $app->render('index.html');
+    $app->render('index.html', array('message' => ''));
 });
 
 $app->post('/api/login', function () use ($app) {
 
-	// TODO: Make all requests add this header automatically
     $app->response->headers->set('Content-Type', 'application/json');
 	$email = $app->request->post('email');
 
@@ -63,10 +63,7 @@ $app->post('/api/login', function () use ($app) {
 
 $app->get('/authenticate', function () use ($app) {
 
-	// TODO: Make all requests add this header automatically
-    $app->response->headers->set('Content-Type', 'application/json');
-
-    // Get tokenId from query string
+    // Get tokenId from query string which is most likely given from login email
 	$tokenId = $app->request->get('token');
 
 	if (isset($tokenId)) {
@@ -88,32 +85,42 @@ $app->get('/authenticate', function () use ($app) {
 		// Get email from query result
 		$email = $result['Item']['email']['S'];
 
-		// Get inserted date from query result for comparison purposes
-		$insertedDateTimeStamp = $result['Item']['insertedDate']['N'];
-		$insertedDate = DateTime::createFromFormat( 'U', $insertedDateTimeStamp);
-		$currentTime = new DateTime();
+		// If the email is not there, the token has been deleted or is just invalid
+		if (isset($email)) {
 
-		// Delete token from database regardless of whether it's expired or not
-		$dbClient->deleteItem(array(
-		    'TableName' => 'tokens',
-		    'Key' => array(
-			    'tokenId'	=> array('S' => $tokenId)
-			)
-		));
+			// Get inserted date from query result for comparison purposes
+			$insertedDateTimeStamp = $result['Item']['insertedDate']['N'];
+			$insertedDate = DateTime::createFromFormat( 'U', $insertedDateTimeStamp);
+			$currentTime = new DateTime();
 
-		// If the token is over 1 hour old then it is considered invalid and we don't authenticate the user
-		if (date_diff($insertedDate, $currentTime)->h > 1) {
+			// Delete token from database regardless of whether it's expired or not.
+			// Then check the result to see if there was anything done or not. If not we know the token was invalid and should redirect.
+			$deleteResult = $dbClient->deleteItem(array(
+			    'TableName' => 'tokens',
+			    'Key' => array(
+				    'tokenId'	=> array('S' => $tokenId)
+				)
+			));
 
-			// TODO: Explain expired token in a nicer way
-			echo json_encode();
+			// If the token is over 1 hour old then it is considered invalid and we don't authenticate the user
+			if (date_diff($insertedDate, $currentTime)->h > 1) {
+
+	    		$app->render('index.html', array('message' => 'expired'));
+
+			} else {
+
+				$rawToken = '';
+				$signature = hash_hmac('ripemd160', $email, 'secret');
+				$authToken = $rawToken . ':' . $signature;
+				echo json_encode($authToken);
+			}
 
 		} else {
 
-			$rawToken = '';
-			$signature = hash_hmac('ripemd160', $email, 'secret');
-			$authToken = $rawToken . ':' . $signature;
-			echo json_encode($authToken);
+			// Invalid or deleted token
+			$app->render('index.html', array('message' => 'invalid'));
 		}
+
 	}
 
 });

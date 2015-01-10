@@ -47,6 +47,12 @@ return array(
             )
         ),
 
+        'cloudhsm' => array(
+            'alias'   => 'CloudHsm',
+            'extends' => 'default_settings',
+            'class'   => 'Aws\CloudHsm\CloudHsmClient'
+        ),
+
         'cloudsearch' => array(
             'alias'   => 'CloudSearch',
             'extends' => 'default_settings',
@@ -141,6 +147,12 @@ return array(
             'alias'   => 'Ec2',
             'extends' => 'default_settings',
             'class'   => 'Aws\Ec2\Ec2Client'
+        ),
+
+        'ecs' => array(
+            'alias'   => 'Ecs',
+            'extends' => 'default_settings',
+            'class'   => 'Aws\Ecs\EcsClient'
         ),
 
         'elasticache' => array(
