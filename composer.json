@@ -1,0 +1,7 @@
+{
+    "require": {
+        "slim/slim": "2.*",
+        "aws/aws-sdk-php": "2.*",
+        "twig/twig": "1.16.3"
+    }
+}

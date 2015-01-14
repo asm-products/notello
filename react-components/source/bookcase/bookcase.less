@@ -1,0 +1,52 @@
+.bookcase
+{
+	width: 100%;
+	height: 150px;
+	position: fixed;
+	z-index: 0;
+	top: 0;
+	left: 0;
+
+	& .wall
+	{
+		width: 100%;
+		background: #c2d1cb; /* Old browsers */
+		background: linear-gradient(to bottom,  #c2d1cb 0%,#88a5ad 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c2d1cb', endColorstr='#88a5ad',GradientType=0 ); /* IE6-9 */
+		overflow-x: scroll;
+		text-align: center;
+		white-space: nowrap;
+		position: fixed;
+		z-index: 10;
+		font-size: 0px;
+		letter-spacing: 0px;
+		word-spacing: 0px;
+	}
+
+	& .shelf
+	{
+		margin: 0 auto;
+		height: 150px;
+		width: 100%;
+		display: inline-block;
+	}
+
+	& .img-shelf
+	{
+		height: 100%;
+		width: 100%;
+	}
+}
+
+.bookcase-shown
+{
+    animation-name: bookcaseShownAnimation;
+    animation-duration: .5s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+@keyframes bookcaseShownAnimation {  
+    0% { z-index: 0; }
+    100% { z-index: 1; }
+}

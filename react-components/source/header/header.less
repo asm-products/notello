@@ -1,0 +1,49 @@
+
+.header {
+
+	width: 100%;
+	max-width: 900px;
+	margin: 0 auto;
+	height: 60px;
+
+	& .bookshelf-icon {
+		float: left;
+		cursor: pointer;
+		padding-top: 13px;
+		padding-left: 10px;
+
+		&::before, &::after {
+
+			vertical-align: top;
+			padding-top: 8px;
+		}
+	}
+
+	& .bookshelf-icon.visible:hover
+	{
+		opacity: 0.9;
+	}
+
+	& .bookshelf-icon img
+	{
+		width: 30px;
+		height: 30px;
+	}
+
+	& .logo
+	{
+		text-shadow: white 0px 2px 0px;
+		font-family: 'Nunito', sans-serif;
+		color: #804313;
+		opacity: 0.4;
+		height: 40px;
+		padding-top: 8px;
+		width: 100%;
+		font-size: 2em;
+		text-align: center;
+		position: absolute;
+		left: 50%;
+		width: 200px;
+		margin-left: -100px;
+	}
+}

@@ -1,0 +1,30 @@
+
+.bracket-animation {
+
+	&::before, &:after {
+		display: inline-block;
+		opacity: 0;
+		transition: transform 0.3s, opacity 0.2s;
+		color: white;
+	}
+
+	&::before {
+		margin-right: 10px;
+		content: '[';
+		transform: translateX(20px);
+	}
+
+	&::after {
+		margin-left: 10px;
+		content: ']';
+		transform: translateX(-20px);
+	}
+
+	.is-desktop &:hover::before,
+	.is-desktop &:hover::after,
+	.is-desktop &:focus::before,
+	.is-desktop &:focus::after {
+		opacity: 1;
+		transform: translateX(0px);
+	}
+}
