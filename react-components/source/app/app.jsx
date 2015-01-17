@@ -3,6 +3,7 @@
 // External libraries
 var es5Shim = require('../../../node_modules/es5-shim/es5-shim');
 var es5Sham = require('../../../node_modules/es5-shim/es5-sham');
+var dateJS = require('datejs');
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
@@ -82,12 +83,7 @@ var App = React.createClass({
 
 	    	app.refs.mainModalForm.open();
 
-	    } else if (tempAuthToken) {
-	    	
-			authenticateAction(email, tempAuthToken);
-	    }
-
-		$.removeCookie('tempAuthToken');
+	    } 
   	},
 
   	handleModalSubmit: function () {

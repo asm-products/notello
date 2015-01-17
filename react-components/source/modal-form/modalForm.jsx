@@ -10,6 +10,8 @@ var modalFormComponent = React.createClass({
 	
 	_modalWrapper: null,
 
+	_isOpened: null,
+
 	_shake: function () {
 
   		// Got frustrated here with react and did straight up jQuery
@@ -46,14 +48,20 @@ var modalFormComponent = React.createClass({
 		};
 	},
 
+	isOpened: function () {
+
+	},
+
 	open: function () {
 
+		this._isOpened = true;
 		this._modalContainer.fadeIn(200);
 		this._modalContainer.find('input').first().focus();
 	},
 
 	close: function () {
 
+		this._isOpened = false;
 		this._modalContainer.fadeOut(200);
 	},
 

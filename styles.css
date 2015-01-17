@@ -297,6 +297,9 @@ input {
   font-size: 1em;
   text-shadow: 1px 1px rgba(128, 67, 19, 0.5);
 }
+.second-ticker {
+  color: red;
+}
 
 /************************************************************
 	The white modalness thingy
@@ -459,6 +462,7 @@ input {
 }
 .span-modal-text {
   padding-left: 10px;
+  display: block;
 }
 
 .notepad {
