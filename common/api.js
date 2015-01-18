@@ -1,12 +1,14 @@
 
 var $ = require('jquery');
 var _ = require('underscore');
+var lscache = require('ls-cache');
 
-var callbacks = [];
+var preProcessingCallbacks = [];
+var postProcessingCallbacks = [];
 
 var api = function (options) {
 
-	callbacks.map(function (callback) {
+	preProcessingCallbacks.map(function (callback) {
 		callback();
 	});
 
@@ -29,17 +31,29 @@ var api = function (options) {
 		} else {
 
 			successFunction(data);
+
+			postProcessingCallbacks.map(function (callback) {
+				callback();
+			});
 		}
 	});
 
 	options.type = 'json';
 
+	if (lscache.get('authToken')) {
+
+		options.headers = {
+        	'X-Authorization': lscache.get('authToken')
+		};
+	}
+
 	$.ajax(options);
 };
 
-api.register = function (callback) {
+api.register = function (preProcessingCallback, postProcessingCallback) {
 
-	callbacks.push(callback);
+	preProcessingCallbacks.push(preProcessingCallback);
+	postProcessingCallbacks.push(postProcessingCallback);
 };
 
 module.exports = api;

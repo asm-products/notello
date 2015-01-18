@@ -20,6 +20,7 @@ var cookie = require('jquery.cookie');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
+var resetTokenAction = require('../../../actions/resetToken');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -75,6 +76,12 @@ var App = React.createClass({displayName: 'App',
 				showFormBlocker: true
 			});
 
+		}, function () {
+
+			app.setState({
+				showFormBlocker: false
+			});
+
 		});
 		
 	    bookshelfStore.onChange(app._bookShelfUpdated);
@@ -126,7 +133,12 @@ var appComponent = React.render(
     document.body
 );
 
-},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../common/api":"/var/www/common/api.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
+$(function () {
+
+	resetTokenAction();
+});
+
+},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../common/api":"/var/www/common/api.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -496,10 +508,39 @@ module.exports = assign(new Dispatcher(), {
 		}
 	},
 
-	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail', 'attemptedLogin', 'loggedIn', 'loggedOut']
+	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail', 'attemptedLogin', 'loggedIn', 'loggedOut', 'resetToken']
 });
 
-},{"./Dispatcher":"/var/www/actions/Dispatcher.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
+},{"./Dispatcher":"/var/www/actions/Dispatcher.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/actions/resetToken.js":[function(require,module,exports){
+
+var api = require('../common/api');
+var lscache = require('ls-cache');
+var dispatcher = require('./notelloDispatcher');
+
+var resetTokenAction = function () {
+
+	api({
+		url: 'api/token',
+		method: 'get',
+		cache: false,
+		success: function (resp) {
+			
+			if (resp.token !== 'InvalidToken') {
+
+				lscache.set('authToken', resp.token);
+				dispatcher.dispatchDiscrete('resetToken');
+
+			} else {
+
+				dispatcher.dispatchDiscrete('loggedOut');
+			}
+	    }
+	});
+};
+
+module.exports = resetTokenAction;
+
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -534,12 +575,14 @@ module.exports = viewBookshelfAction;
 
 var $ = require('jquery');
 var _ = require('underscore');
+var lscache = require('ls-cache');
 
-var callbacks = [];
+var preProcessingCallbacks = [];
+var postProcessingCallbacks = [];
 
 var api = function (options) {
 
-	callbacks.map(function (callback) {
+	preProcessingCallbacks.map(function (callback) {
 		callback();
 	});
 
@@ -562,22 +605,34 @@ var api = function (options) {
 		} else {
 
 			successFunction(data);
+
+			postProcessingCallbacks.map(function (callback) {
+				callback();
+			});
 		}
 	});
 
 	options.type = 'json';
 
+	if (lscache.get('authToken')) {
+
+		options.headers = {
+        	'X-Authorization': lscache.get('authToken')
+		};
+	}
+
 	$.ajax(options);
 };
 
-api.register = function (callback) {
+api.register = function (preProcessingCallback, postProcessingCallback) {
 
-	callbacks.push(callback);
+	preProcessingCallbacks.push(preProcessingCallback);
+	postProcessingCallbacks.push(postProcessingCallback);
 };
 
 module.exports = api;
 
-},{"jquery":"/var/www/node_modules/jquery/dist/jquery.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/common/buffer-loader.js":[function(require,module,exports){
+},{"jquery":"/var/www/node_modules/jquery/dist/jquery.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/common/buffer-loader.js":[function(require,module,exports){
 
 var BufferLoader = function (context, urlList, callback) {
     'use strict';
@@ -596,8 +651,8 @@ BufferLoader.prototype.loadBuffer = function (url, index) {
     var request = new XMLHttpRequest(),
         loader = this;
 
-    request.open("GET", url, true);
-    request.responseType = "arraybuffer";
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
 
     request.onload = function () {
         // Asynchronously decode the audio file data in request.response
@@ -56922,7 +56977,7 @@ var currentDate = new Date();
 
 var getSessionMinutes = function () {
 	currentDate = new Date();
-	currentDate.setMinutes(currentDate.getMinutes() + 1);
+	currentDate.setMinutes(currentDate.getMinutes() + 60);
 
 	return currentDate;
 };
@@ -56980,12 +57035,9 @@ var loginComponent = React.createClass({displayName: 'loginComponent',
 					self.refs.sessionTimerModalForm.close();
 					logoutAction();
 
-				} else {
+				} else if (timeLeft < 60 && !self.refs.sessionTimerModalForm.isOpened()) {
 
-					if (!self.refs.sessionTimerModalForm.isOpened()) {
-
-						self.refs.sessionTimerModalForm.open();
-					}
+					self.refs.sessionTimerModalForm.open();
 				}
 
 				self.setState({
@@ -57368,6 +57420,11 @@ notelloDispatcher.registerDiscrete('loggedOut', function () {
 	lscache.set('isAuthenticated', false);
 	lscache.set('email', null);
 	lscache.set('authToken', null);
+
+	loginStore.save();
+});
+
+notelloDispatcher.registerDiscrete('resetToken', function () {
 
 	loginStore.save();
 });

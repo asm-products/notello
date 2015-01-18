@@ -21,6 +21,61 @@ $app->get('/', function () use ($app) {
     $app->render('index.html');
 });
 
+$app->get('/api/token', function () use ($app) {
+
+	// The old token should be sent in request header
+	$token = $app->request->headers->get('X-Authorization');
+
+	$app->response->headers->set('Content-Type', 'application/json');
+
+	// If the user had a token in their local storage, refresh it and send the new one back.
+	if (isset($token)) {
+
+		// Get email, expiration timestamp, and signature from old token
+		$oldToken = explode(':', $token);
+		$email = $oldToken[0];
+		$expirationTimestamp = $oldToken[1];
+		$givenSignature = $oldToken[2];
+
+		// Setup dates to check if token is expired
+		$currentDate = new DateTime();
+        $expirationDate = new DateTime();
+		$expirationDate->setTimestamp(intval($expirationTimestamp));
+
+		// Setup expected signature for purposes of comparison.
+		$rawToken = $email . ':' . $expirationTimestamp;
+		$expectedSignature = hash_hmac('ripemd160', $rawToken, 'secret');
+
+		if ($currentDate >= $expirationDate) {
+
+			// The token is expired
+            $app->response->setBody(json_encode(array('token' => 'InvalidToken')));
+
+		} else if (md5($givenSignature) === md5($expectedSignature)) {
+
+			// All is well and we can finally refresh the auth token
+			$newRawToken = $email . ':' . strtotime('+7 days');
+			$newSignature = hash_hmac('ripemd160', $newRawToken, 'secret');
+			$newAuthToken = $newRawToken . ':' . $newSignature;
+                        
+            $app->response->setBody(json_encode(array('token' => $newAuthToken)));
+		
+		} else {
+
+			// The token is invalid and has probably been tampered with
+            $app->response->setBody(json_encode(array('token' => 'InvalidToken')));
+
+		}
+		
+	} else {
+
+		// User didn't supply a token to be refreshed so this is either an invalid request or
+		// they just opened the appication.
+        $app->response->setBody(json_encode(array('token' => 'InvalidToken')));
+    }
+
+});
+
 $app->post('/api/login', function () use ($app) {
 
     $app->response->headers->set('Content-Type', 'application/json');
@@ -46,18 +101,19 @@ $app->post('/api/login', function () use ($app) {
 	$msg['Message']['Body']['Html']['Data'] = getLoginHTMLEmail($email, $tokenId);
 	$msg['Message']['Body']['Html']['Charset'] = "UTF-8";
 
-	try{
+	try {
 
-	     $result = $sesClient->sendEmail($msg);
+	    $result = $sesClient->sendEmail($msg);
 
-	     //save the MessageId which can be used to track the request
-	     $msg_id = $result->get('MessageId');
+	    //save the MessageId which can be used to track the request
+	    $msg_id = $result->get('MessageId');
 
-	     //view sample output
-    	echo json_encode(true);
+	    //view sample output
+            echo json_encode(true);
+
 	} catch (Exception $e) {
-	     //An error happened and the email did not get sent
-	     echo($e->getMessage());
+	    //An error happened and the email did not get sent
+	    echo($e->getMessage());
 	}
 });
 
@@ -132,7 +188,7 @@ $app->get('/authenticate', function () use ($app) {
 			} else {
 
 				$rawToken = $email . ':' . strtotime('+7 days');
-				$signature = hash_hmac('ripemd160', $email, 'secret');
+				$signature = hash_hmac('ripemd160', $rawToken, 'secret');
 				$authToken = $rawToken . ':' . $signature;
 
 				$app->setCookie('tempAuthToken', $authToken, '5 minutes', '/', null, true);

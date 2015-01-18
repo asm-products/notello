@@ -19,6 +19,7 @@ var cookie = require('jquery.cookie');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
+var resetTokenAction = require('../../../actions/resetToken');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -74,6 +75,12 @@ var App = React.createClass({
 				showFormBlocker: true
 			});
 
+		}, function () {
+
+			app.setState({
+				showFormBlocker: false
+			});
+
 		});
 		
 	    bookshelfStore.onChange(app._bookShelfUpdated);
@@ -124,3 +131,8 @@ var appComponent = React.render(
 
     document.body
 );
+
+$(function () {
+
+	resetTokenAction();
+});

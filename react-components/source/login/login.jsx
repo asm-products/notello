@@ -15,7 +15,7 @@ var currentDate = new Date();
 
 var getSessionMinutes = function () {
 	currentDate = new Date();
-	currentDate.setMinutes(currentDate.getMinutes() + 1);
+	currentDate.setMinutes(currentDate.getMinutes() + 60);
 
 	return currentDate;
 };
@@ -73,12 +73,9 @@ var loginComponent = React.createClass({
 					self.refs.sessionTimerModalForm.close();
 					logoutAction();
 
-				} else {
+				} else if (timeLeft < 60 && !self.refs.sessionTimerModalForm.isOpened()) {
 
-					if (!self.refs.sessionTimerModalForm.isOpened()) {
-
-						self.refs.sessionTimerModalForm.open();
-					}
+					self.refs.sessionTimerModalForm.open();
 				}
 
 				self.setState({

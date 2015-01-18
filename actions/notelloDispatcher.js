@@ -23,5 +23,5 @@ module.exports = assign(new Dispatcher(), {
 		}
 	},
 
-	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail', 'attemptedLogin', 'loggedIn', 'loggedOut']
+	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail', 'attemptedLogin', 'loggedIn', 'loggedOut', 'resetToken']
 });

@@ -43,4 +43,9 @@ notelloDispatcher.registerDiscrete('loggedOut', function () {
 	loginStore.save();
 });
 
+notelloDispatcher.registerDiscrete('resetToken', function () {
+
+	loginStore.save();
+});
+
 module.exports = loginStore;
