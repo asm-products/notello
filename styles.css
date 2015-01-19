@@ -536,14 +536,18 @@ input {
   word-wrap: break-word;
   resize: none;
   white-space: pre;
-  height: calc(100% - 90px);
   width: calc(100% - 40px);
   padding: 10px 0 0 0;
   margin: 0 0 0 30px;
 }
+.notepad .txt-area-div {
+  height: calc(100% - 90px);
+}
 .notepad .txt-area.txt-area-hidden {
   color: transparent;
   z-index: 2;
+  overflow: hidden;
+  height: calc(100% - 70px);
 }
 .notepad .txt-area.txt-area-hidden::selection {
   color: white;

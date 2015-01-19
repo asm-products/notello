@@ -4,6 +4,7 @@ var cx = ReactAddons.classSet;
 var _s = require('underscore.string');
 var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
+var $ = require('jquery');
 
 var moveCursor = function (domNode) {
 
@@ -26,25 +27,36 @@ var notepadComponent = React.createClass({
 	handleChange: function (event) {
 
 		var text = moveCursor(event.target);
-		var words = text.split(' ');
-		var styledText = [];
-		var outputText = '';
+		var lines = text.split(/\r\n|\r|\n/g);
+		var finalTextArray = [];
+		var finalText = '';
 
-		words.map(function (word) {
+		lines.map(function (line) {
 
-			if (_s.startsWith(word, '#')) {
+			var words = line.split(' ');
+			var styledText = [];
+			var outputText = '';
 
-				word = '<span class="hashtag">' + word + '</span>';
-			}
+			words.map(function (word) {
 
-			styledText.push(word);
+				if (_s.startsWith(word, '#')) {
+
+					word = '<span class="hashtag">' + word + '</span>';
+				}
+
+				styledText.push(word);
+			});
+
+			outputText = styledText.join('&nbsp;');
+
+			outputText = outputText.replace(/D258DC19ED0D4065AAB60FEAAC8029A6/, domUtils.iOS ? '' : '<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>');
+
+			finalTextArray.push(outputText);
 		});
 
-		outputText = styledText.join('&nbsp;');
-
-		outputText = outputText.replace(/D258DC19ED0D4065AAB60FEAAC8029A6/, domUtils.iOS ? '' : '<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>');
-
-	    this.setState({ value: outputText });
+		finalText = finalTextArray.join('\r\n');
+		
+	    this.setState({ value: finalText });
 	},
 
 	handleBlur: function (event) {
@@ -53,6 +65,10 @@ var notepadComponent = React.createClass({
 	},
 
 	render: function () {
+
+		var lineCount = Math.floor($('textarea').prop('scrollHeight') / 40) || this.state.value.split(/\r\n|\r|\n/g).length;
+
+		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
 
 		var value = this.state.value.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
@@ -63,13 +79,13 @@ var notepadComponent = React.createClass({
 			'hide': this.props.isViewingBookshelf
 		});
 
-		return 	<div className="notepad">
+		return 	<div className="notepad" style={{ height: calculatedNotepadHeight + 'px' }}>
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
 						<input className="notepad-title" type="text" maxLength="14" placeholder="Enter a title" />
 						<span className="notepad-date">{moment(new Date()).format("MM/DD/YYYY")}</span>
 					</div>
-					<div className="txt-area" dangerouslySetInnerHTML={{__html: value}}></div>
+					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" className={txtAreaCSSClasses} onKeyDown={this.handleChange} onBlur={this.handleBlur}
 					onKeyUp={this.handleChange} onFocus={this.handleChange} onClick={this.handleChange} onChange={this.handleChange}></textarea>
 				</div>;

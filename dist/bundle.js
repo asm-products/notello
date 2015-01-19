@@ -57279,6 +57279,7 @@ var cx = ReactAddons.classSet;
 var _s = require('underscore.string');
 var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
+var $ = require('jquery');
 
 var moveCursor = function (domNode) {
 
@@ -57301,25 +57302,36 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 	handleChange: function (event) {
 
 		var text = moveCursor(event.target);
-		var words = text.split(' ');
-		var styledText = [];
-		var outputText = '';
+		var lines = text.split(/\r\n|\r|\n/g);
+		var finalTextArray = [];
+		var finalText = '';
 
-		words.map(function (word) {
+		lines.map(function (line) {
 
-			if (_s.startsWith(word, '#')) {
+			var words = line.split(' ');
+			var styledText = [];
+			var outputText = '';
 
-				word = '<span class="hashtag">' + word + '</span>';
-			}
+			words.map(function (word) {
 
-			styledText.push(word);
+				if (_s.startsWith(word, '#')) {
+
+					word = '<span class="hashtag">' + word + '</span>';
+				}
+
+				styledText.push(word);
+			});
+
+			outputText = styledText.join('&nbsp;');
+
+			outputText = outputText.replace(/D258DC19ED0D4065AAB60FEAAC8029A6/, domUtils.iOS ? '' : '<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>');
+
+			finalTextArray.push(outputText);
 		});
 
-		outputText = styledText.join('&nbsp;');
-
-		outputText = outputText.replace(/D258DC19ED0D4065AAB60FEAAC8029A6/, domUtils.iOS ? '' : '<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>');
-
-	    this.setState({ value: outputText });
+		finalText = finalTextArray.join('\r\n');
+		
+	    this.setState({ value: finalText });
 	},
 
 	handleBlur: function (event) {
@@ -57328,6 +57340,10 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 	},
 
 	render: function () {
+
+		var lineCount = Math.floor($('textarea').prop('scrollHeight') / 40) || this.state.value.split(/\r\n|\r|\n/g).length;
+
+		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
 
 		var value = this.state.value.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
@@ -57338,13 +57354,13 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 			'hide': this.props.isViewingBookshelf
 		});
 
-		return 	React.createElement("div", {className: "notepad"}, 
+		return 	React.createElement("div", {className: "notepad", style: { height: calculatedNotepadHeight + 'px'}}, 
 					React.createElement("div", {className: "pink-divider"}), 
 					React.createElement("div", {className: "notepad-header"}, 
 						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "14", placeholder: "Enter a title"}), 
 						React.createElement("span", {className: "notepad-date"}, moment(new Date()).format("MM/DD/YYYY"))
 					), 
-					React.createElement("div", {className: "txt-area", dangerouslySetInnerHTML: {__html: value}}), 
+					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
 					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onKeyDown: this.handleChange, onBlur: this.handleBlur, 
 					onKeyUp: this.handleChange, onFocus: this.handleChange, onClick: this.handleChange, onChange: this.handleChange})
 				);
@@ -57354,7 +57370,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 module.exports = notepadComponent;
 
-},{"../../../common/dom-utils":"/var/www/common/dom-utils.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
+},{"../../../common/dom-utils":"/var/www/common/dom-utils.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
 var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');
