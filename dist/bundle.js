@@ -57289,6 +57289,31 @@ var moveCursor = function (domNode) {
 	return text;
 };
 
+var replaceCursor = function (text) {
+
+	return text.replace(/D258DC19ED0D4065AAB60FEAAC8029A6/, domUtils.iOS ? '' : '<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>');
+};
+
+var showCaret = function () {
+
+	var caret = document.getElementById('spanCaret');
+
+	if (caret) {
+		
+		caret.style.display = 'inline';
+	}
+};
+
+var hideCaret = function () {
+
+	var caret = document.getElementById('spanCaret');
+
+	if (caret) {
+
+		caret.style.display = 'none';
+	}
+};
+
 var cursor = null;
 
 var notepadComponent = React.createClass({displayName: 'notepadComponent',
@@ -57314,7 +57339,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 			words.map(function (word) {
 
-				if (_s.startsWith(word, '#')) {
+				if (_s.startsWith(word, '#') || _s.startsWith(word, 'D258DC19ED0D4065AAB60FEAAC8029A6#')) {
 
 					word = '<span class="hashtag">' + word + '</span>';
 				}
@@ -57324,7 +57349,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 			outputText = styledText.join('&nbsp;');
 
-			outputText = outputText.replace(/D258DC19ED0D4065AAB60FEAAC8029A6/, domUtils.iOS ? '' : '<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>');
+			outputText = replaceCursor(outputText);
 
 			finalTextArray.push(outputText);
 		});
@@ -57332,16 +57357,18 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 		finalText = finalTextArray.join('\r\n');
 		
 	    this.setState({ value: finalText });
+		
+		showCaret();
 	},
 
 	handleBlur: function (event) {
 
-		document.getElementById('spanCaret').style.display = 'none';
+		hideCaret();
 	},
 
 	render: function () {
 
-		var lineCount = Math.floor($('textarea').prop('scrollHeight') / 40) || this.state.value.split(/\r\n|\r|\n/g).length;
+		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.value.split(/\r\n|\r|\n/g).length;
 
 		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
 
@@ -57357,12 +57384,13 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 		return 	React.createElement("div", {className: "notepad", style: { height: calculatedNotepadHeight + 'px'}}, 
 					React.createElement("div", {className: "pink-divider"}), 
 					React.createElement("div", {className: "notepad-header"}, 
-						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "14", placeholder: "Enter a title"}), 
+						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title"}), 
 						React.createElement("span", {className: "notepad-date"}, moment(new Date()).format("MM/DD/YYYY"))
 					), 
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
-					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onKeyDown: this.handleChange, onBlur: this.handleBlur, 
-					onKeyUp: this.handleChange, onFocus: this.handleChange, onClick: this.handleChange, onChange: this.handleChange})
+					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onKeyDown: this.handleChange, 
+					onKeyUp: this.handleChange, onFocus: this.handleChange, onClick: this.handleChange, onChange: this.handleChange}), 
+					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}}, this.state.value)
 				);
 	}
 
