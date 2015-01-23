@@ -56885,8 +56885,19 @@ var hideBookshelf = require('../../../actions/hideBookshelf');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var Header = require('../header/header');
+var _ = require('underscore');
+var $ = require('jquery');
 
 var deskComponent = React.createClass({displayName: 'deskComponent',
+
+	_adjustMinHeight: _.throttle(function () {
+
+		var deskDOMNode = this.refs.divDesk.getDOMNode();
+		var calculatedHeight = window.innerHeight - deskDOMNode.offsetTop;
+
+		deskDOMNode.style.minHeight = calculatedHeight + 'px';
+
+	}, 50),
 
 	handleClick: function (event) {
 
@@ -56897,10 +56908,8 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 
 	componentDidMount: function () {
 
-		var deskDOMNode = this.refs.divDesk.getDOMNode();
-		var calculatedHeight = window.innerHeight - deskDOMNode.offsetTop;
-
-		deskDOMNode.style.minHeight = calculatedHeight + 'px';
+		this._adjustMinHeight();
+		$(window).resize(this._adjustMinHeight);
 	},
 
 	render: function () {
@@ -56922,7 +56931,7 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 
 module.exports = deskComponent;
 
-},{"../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../header/header":"/var/www/react-components/source/header/header.jsx","../notepad/notepad":"/var/www/react-components/source/notepad/notepad.jsx","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/header/header.jsx":[function(require,module,exports){
+},{"../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../header/header":"/var/www/react-components/source/header/header.jsx","../notepad/notepad":"/var/www/react-components/source/notepad/notepad.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/react-components/source/header/header.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;

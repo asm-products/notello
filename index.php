@@ -7,18 +7,192 @@ use Aws\Common\Aws;
 use Aws\Ses\SesClient;
 use Aws\DynamoDb\DynamoDbClient;
 
+// Set timezone
+date_default_timezone_set("UTC"); 
+
 // Prepare Slim PHP app
 $app = new \Slim\Slim(array(
     'templates.path' => 'templates'
 ));
 
-// Set timezone
-date_default_timezone_set("UTC"); 
+function isValid ($app) {
+
+	// The old token should be sent in request header
+	$token = $app->request->headers->get('X-Authorization');
+	
+	$app->response->headers->set('Content-Type', 'application/json');
+
+	// If the user had a token in their local storage, refresh it and send the new one back.
+	if (isset($token)) {
+
+		// Get email, expiration timestamp, and signature from old token
+		$oldToken = explode(':', $token);
+		$email = $oldToken[0];
+		$expirationTimestamp = $oldToken[1];
+		$givenSignature = $oldToken[2];
+
+		// Setup dates to check if token is expired
+		$currentDate = new DateTime();
+        $expirationDate = new DateTime();
+		$expirationDate->setTimestamp(intval($expirationTimestamp));
+
+		// Setup expected signature for purposes of comparison.
+		$rawToken = $email . ':' . $expirationTimestamp;
+		$expectedSignature = hash_hmac('ripemd160', $rawToken, 'secret');
+
+		if ($currentDate >= $expirationDate) {
+
+			// The token is expired
+			$app->response->setStatus(403);
+        	$app->response->setBody(json_encode(array('message' => 'Forbidden'));
+
+		} else if (md5($givenSignature) === md5($expectedSignature)) {
+
+			// All is well and we can finally refresh the auth token
+			$newRawToken = $email . ':' . strtotime('+7 days');
+			$newSignature = hash_hmac('ripemd160', $newRawToken, 'secret');
+			$newAuthToken = $newRawToken . ':' . $newSignature;
+                        
+			$app->response->headers->set('X-Authorization', $newAuthToken);
+			return true;
+		
+		} else {
+
+			// The token is invalid and has probably been tampered with
+            $app->response->setBody(json_encode(array('token' => 'InvalidToken')));
+
+		}
+		
+	} else {
+
+		$app->response->setStatus(403);
+        $app->response->setBody(json_encode(array('message' => 'Forbidden'));
+    }
+
+}
 
 $app->get('/', function () use ($app) {
 
     // Render index view
     $app->render('index.html');
+});
+
+$app->get('/api/usernotes/:email', function ($email) use ($app) {
+
+	if ($isValid($app)) {
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		// Query user notes from database
+		$result = $dbClient->getItem(array(
+		    'ConsistentRead' => true,
+		    'TableName' => 'usernotes',
+		    'Key'       => array(
+		        'email' => array('S' => $email)
+		    )
+		));
+
+		$userNotes = $result['Item']['usernotes']['S'];
+
+        $app->response->setBody(json_encode('userNotes' => $userNotes));
+	}
+
+});
+
+$app->put('/api/usernotes/:email', function ($email) use ($app) {
+
+	if ($isValid($app)) {
+
+		$userNotes = json_encode($app->request->post('usernotes'));
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		// Make update to user notes in database
+		$dbClient->putItem(array(
+		    'TableName' => 'usernotes',
+	        'Item' => array(
+	        	'email' 	=> array('S' => $email), // Primary Key
+	        	'usernotes' => array('S' => $userNotes)
+	        )
+		));
+
+        $app->response->setBody(json_encode(array('message' => 'Successful'));
+	}
+
+});
+
+$app->get('/api/note:noteId', function ($noteId) use ($app) {
+
+	if ($isValid($app)) {
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		// Query user notes from database
+		$result = $dbClient->getItem(array(
+		    'ConsistentRead' => true,
+		    'TableName' => 'notes',
+		    'Key'       => array(
+		        'noteId' => array('S' => $noteId)
+		    )
+		));
+
+		$note = $result['Item']['noteText']['S'];
+
+        $app->response->setBody(json_encode(array('noteText' => $note));
+	}
+
+});
+
+$app->post('/api/note', function () use ($app) {
+
+	if ($isValid($app)) {
+
+		
+	}
+
+});
+
+$app->put('/api/note:noteId', function () use ($app) {
+
+	if ($isValid($app)) {
+
+		$userNotes = json_encode($app->request->post('usernotes'));
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		// Make update to user notes in database
+		$dbClient->putItem(array(
+		    'TableName' => 'usernotes',
+	        'Item' => array(
+	        	'email' 	=> array('S' => $email), // Primary Key
+	        	'usernotes' => array('S' => $userNotes)
+	        )
+		));
+
+        $app->response->setBody(json_encode(array('message' => 'Success'));
+	}
+
+});
+
+$app->delete('/api/note:noteId', function () use ($app) {
+
+	if ($isValid($app)) {
+
+		
+	}
+
 });
 
 $app->get('/api/token', function () use ($app) {

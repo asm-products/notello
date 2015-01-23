@@ -5,8 +5,19 @@ var hideBookshelf = require('../../../actions/hideBookshelf');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var Header = require('../header/header');
+var _ = require('underscore');
+var $ = require('jquery');
 
 var deskComponent = React.createClass({
+
+	_adjustMinHeight: _.throttle(function () {
+
+		var deskDOMNode = this.refs.divDesk.getDOMNode();
+		var calculatedHeight = window.innerHeight - deskDOMNode.offsetTop;
+
+		deskDOMNode.style.minHeight = calculatedHeight + 'px';
+
+	}, 50),
 
 	handleClick: function (event) {
 
@@ -17,10 +28,8 @@ var deskComponent = React.createClass({
 
 	componentDidMount: function () {
 
-		var deskDOMNode = this.refs.divDesk.getDOMNode();
-		var calculatedHeight = window.innerHeight - deskDOMNode.offsetTop;
-
-		deskDOMNode.style.minHeight = calculatedHeight + 'px';
+		this._adjustMinHeight();
+		$(window).resize(this._adjustMinHeight);
 	},
 
 	render: function () {
