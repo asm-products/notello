@@ -44,7 +44,7 @@ function isValid ($app) {
 
 			// The token is expired
 			$app->response->setStatus(403);
-        	$app->response->setBody(json_encode(array('message' => 'Forbidden'));
+        	$app->response->setBody(json_encode(array('message' => 'Forbidden')));
 
 		} else if (md5($givenSignature) === md5($expectedSignature)) {
 
@@ -66,7 +66,7 @@ function isValid ($app) {
 	} else {
 
 		$app->response->setStatus(403);
-        $app->response->setBody(json_encode(array('message' => 'Forbidden'));
+        $app->response->setBody(json_encode(array('message' => 'Forbidden')));
     }
 
 }
@@ -77,9 +77,13 @@ $app->get('/', function () use ($app) {
     $app->render('index.html');
 });
 
-$app->get('/api/usernotes/:email', function ($email) use ($app) {
+$app->get('/api/usernotes', function () use ($app) {
 
 	if ($isValid($app)) {
+	
+		$token = $app->request->headers->get('X-Authorization');
+		$oldToken = explode(':', $token);
+		$email = $oldToken[0];
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
@@ -97,14 +101,18 @@ $app->get('/api/usernotes/:email', function ($email) use ($app) {
 
 		$userNotes = $result['Item']['usernotes']['S'];
 
-        $app->response->setBody(json_encode('userNotes' => $userNotes));
+        $app->response->setBody(json_encode(array('userNotes' => $userNotes)));
 	}
 
 });
 
-$app->put('/api/usernotes/:email', function ($email) use ($app) {
+$app->put('/api/usernotes', function () use ($app) {
 
 	if ($isValid($app)) {
+
+		$token = $app->request->headers->get('X-Authorization');
+		$oldToken = explode(':', $token);
+		$email = $oldToken[0];
 
 		$userNotes = json_encode($app->request->post('usernotes'));
 
@@ -113,7 +121,7 @@ $app->put('/api/usernotes/:email', function ($email) use ($app) {
         	'region'  => 'us-west-2'
 		));
 
-		// Make update to user notes in database
+		// Make update or insert to user notes in database
 		$dbClient->putItem(array(
 		    'TableName' => 'usernotes',
 	        'Item' => array(
@@ -122,7 +130,7 @@ $app->put('/api/usernotes/:email', function ($email) use ($app) {
 	        )
 		));
 
-        $app->response->setBody(json_encode(array('message' => 'Successful'));
+        $app->response->setBody(json_encode(array('message' => 'Successful')));
 	}
 
 });
@@ -136,7 +144,7 @@ $app->get('/api/note:noteId', function ($noteId) use ($app) {
         	'region'  => 'us-west-2'
 		));
 
-		// Query user notes from database
+		// Query notes from database
 		$result = $dbClient->getItem(array(
 		    'ConsistentRead' => true,
 		    'TableName' => 'notes',
@@ -147,7 +155,7 @@ $app->get('/api/note:noteId', function ($noteId) use ($app) {
 
 		$note = $result['Item']['noteText']['S'];
 
-        $app->response->setBody(json_encode(array('noteText' => $note));
+        $app->response->setBody(json_encode(array('noteText' => $note)));
 	}
 
 });
@@ -156,40 +164,70 @@ $app->post('/api/note', function () use ($app) {
 
 	if ($isValid($app)) {
 
-		
-	}
-
-});
-
-$app->put('/api/note:noteId', function () use ($app) {
-
-	if ($isValid($app)) {
-
-		$userNotes = json_encode($app->request->post('usernotes'));
+		$noteText = json_encode($app->request->post('noteText'));
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
         	'region'  => 'us-west-2'
 		));
 
-		// Make update to user notes in database
-		$dbClient->putItem(array(
-		    'TableName' => 'usernotes',
-	        'Item' => array(
-	        	'email' 	=> array('S' => $email), // Primary Key
-	        	'usernotes' => array('S' => $userNotes)
-	        )
+		// Make insert into user notes in database
+		$dbClient->postItem(array(
+		    'TableName' => 'notes',
+		    'Item'       => array(
+		        'noteId'   => array('S' => uniqid()), // Primary Key
+		        'noteText' => array('S' => $noteText)
+		    )
 		));
 
-        $app->response->setBody(json_encode(array('message' => 'Success'));
+        $app->response->setBody(json_encode(array('message' => 'Successful')));
 	}
 
 });
 
-$app->delete('/api/note:noteId', function () use ($app) {
+$app->put('/api/note:noteId', function ($noteId) use ($app) {
 
 	if ($isValid($app)) {
 
+		$noteText = json_encode($app->request->post('noteText'));
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		// Make insert into user notes in database
+		$dbClient->putItem(array(
+		    'TableName' => 'notes',
+		    'Item'       => array(
+		        'noteId'   => array('S' => $noteId), // Primary Key
+		        'noteText' => array('S' => $noteText)
+		    )
+		));
+
+        $app->response->setBody(json_encode(array('message' => 'Successful')));
+	}
+
+});
+
+$app->delete('/api/note:noteId', function ($noteId) use ($app) {
+
+	if ($isValid($app)) {
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		// Make insert into user notes in database
+		$dbClient->deleteItem(array(
+		    'TableName' => 'notes',
+		    'Key'       => array(
+		        'noteId'   => array('S' => $noteId) // Primary Key
+		    )
+		));
+
+        $app->response->setBody(json_encode(array('message' => 'Successful')));
 		
 	}
 

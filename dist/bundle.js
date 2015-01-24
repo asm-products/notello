@@ -508,7 +508,21 @@ module.exports = assign(new Dispatcher(), {
 		}
 	},
 
-	actionList: ['viewBookshelf', 'hideBookshelf', 'sendLoginEmail', 'attemptedLogin', 'loggedIn', 'loggedOut', 'resetToken']
+	actionList: [
+
+		'viewBookshelf',
+		'hideBookshelf',
+		'sendLoginEmail',
+		'attemptedLogin',
+		'loggedIn',
+		'loggedOut',
+		'resetToken',
+		'getNoteCompleted',
+		'getUserNotesCompleted',
+		'updateUserNotesCompleted',
+		'updateNoteCompleted',
+		'insertNoteCompleted'
+	]
 });
 
 },{"./Dispatcher":"/var/www/actions/Dispatcher.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/actions/resetToken.js":[function(require,module,exports){
