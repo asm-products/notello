@@ -5,6 +5,9 @@ var _s = require('underscore.string');
 var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
 var $ = require('jquery');
+var updateNoteAction = require('../../../actions/updateNote');
+
+var cursor = null;
 
 var moveCursor = function (domNode) {
 
@@ -38,8 +41,6 @@ var hideCaret = function () {
 		caret.style.display = 'none';
 	}
 };
-
-var cursor = null;
 
 var notepadComponent = React.createClass({
 
@@ -80,6 +81,9 @@ var notepadComponent = React.createClass({
 		});
 
 		finalText = finalTextArray.join('\r\n');
+
+		// TODO: get rid of this
+		updateNoteAction('test', finalText);
 		
 	    this.setState({ value: finalText });
 		
@@ -115,7 +119,7 @@ var notepadComponent = React.createClass({
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onKeyDown={this.handleChange} 
 					onKeyUp={this.handleChange} onFocus={this.handleChange} onClick={this.handleChange} onChange={this.handleChange}></textarea>
-					<textarea id="txtHiddenTextArea" style={{ display: 'none' }}>{this.state.value}</textarea>
+					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} value={this.state.value} />
 				</div>;
 	}
 

@@ -9,7 +9,7 @@ var updateUserNotesAction = function (userNotes) {
 		method: 'post',
 		data: {
 			'_METHOD': 'PUT',
-			'usernotes': userNotes
+			usernotes: userNotes
 		},
 		success: function (resp) {
 			

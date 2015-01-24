@@ -79,7 +79,7 @@ $app->get('/', function () use ($app) {
 
 $app->get('/api/usernotes', function () use ($app) {
 
-	if ($isValid($app)) {
+	if (isValid($app)) {
 	
 		$token = $app->request->headers->get('X-Authorization');
 		$oldToken = explode(':', $token);
@@ -108,7 +108,7 @@ $app->get('/api/usernotes', function () use ($app) {
 
 $app->put('/api/usernotes', function () use ($app) {
 
-	if ($isValid($app)) {
+	if (isValid($app)) {
 
 		$token = $app->request->headers->get('X-Authorization');
 		$oldToken = explode(':', $token);
@@ -135,9 +135,9 @@ $app->put('/api/usernotes', function () use ($app) {
 
 });
 
-$app->get('/api/note:noteId', function ($noteId) use ($app) {
+$app->get('/api/note/:noteId', function ($noteId) use ($app) {
 
-	if ($isValid($app)) {
+	if (isValid($app)) {
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
@@ -162,7 +162,7 @@ $app->get('/api/note:noteId', function ($noteId) use ($app) {
 
 $app->post('/api/note', function () use ($app) {
 
-	if ($isValid($app)) {
+	if (isValid($app)) {
 
 		$noteText = json_encode($app->request->post('noteText'));
 
@@ -185,9 +185,9 @@ $app->post('/api/note', function () use ($app) {
 
 });
 
-$app->put('/api/note:noteId', function ($noteId) use ($app) {
+$app->put('/api/note/:noteId', function ($noteId) use ($app) {
 
-	if ($isValid($app)) {
+	if (isValid($app)) {
 
 		$noteText = json_encode($app->request->post('noteText'));
 
@@ -210,9 +210,9 @@ $app->put('/api/note:noteId', function ($noteId) use ($app) {
 
 });
 
-$app->delete('/api/note:noteId', function ($noteId) use ($app) {
+$app->delete('/api/note/:noteId', function ($noteId) use ($app) {
 
-	if ($isValid($app)) {
+	if (isValid($app)) {
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(

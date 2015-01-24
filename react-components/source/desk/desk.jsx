@@ -36,7 +36,8 @@ var deskComponent = React.createClass({
 
 		var classes = cx({
 			desk: true,
-			'animate-desk': this.props.isViewingBookshelf
+			'animate-desk': this.props.isViewingBookshelf,
+			'animating-desk': !this.props.isDoneAnimating
 		});
 
 		return 	<div className="desk-container">

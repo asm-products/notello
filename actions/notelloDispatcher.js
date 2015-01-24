@@ -32,6 +32,7 @@ module.exports = assign(new Dispatcher(), {
 		'loggedIn',
 		'loggedOut',
 		'resetToken',
+		'shelfHidden',
 		'getNoteCompleted',
 		'getUserNotesCompleted',
 		'updateUserNotesCompleted',

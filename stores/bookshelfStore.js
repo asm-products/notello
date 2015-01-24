@@ -4,18 +4,28 @@ var assign = require('object-assign');
 
 var bookShelfStore = assign(new Store(), {
 
-	isViewingBookshelf: false
+	isViewingBookshelf: false,
+	isDoneAnimating: true
 });
 
 notelloDispatcher.registerDiscrete('viewBookshelf', function () {
 
 	bookShelfStore.isViewingBookshelf = true;
+	bookShelfStore.isDoneAnimating = false;
 	bookShelfStore.save();
 });
 
 notelloDispatcher.registerDiscrete('hideBookshelf', function () {
 
 	bookShelfStore.isViewingBookshelf = false;
+	bookShelfStore.isDoneAnimating = false;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('shelfHidden', function () {
+
+	bookShelfStore.isViewingBookshelf = false;
+	bookShelfStore.isDoneAnimating = true;
 	bookShelfStore.save();
 });
 

@@ -412,6 +412,12 @@ var dispatcher = require('./notelloDispatcher');
 var hideBookshelfAction = function () {
 	
 	dispatcher.dispatchDiscrete('hideBookshelf');
+
+	_.delay(function () {
+
+		dispatcher.dispatchDiscrete('shelfHidden');
+
+	}, 500);
 };
 
 module.exports = hideBookshelfAction;
@@ -517,6 +523,7 @@ module.exports = assign(new Dispatcher(), {
 		'loggedIn',
 		'loggedOut',
 		'resetToken',
+		'shelfHidden',
 		'getNoteCompleted',
 		'getUserNotesCompleted',
 		'updateUserNotesCompleted',
@@ -573,6 +580,29 @@ var sendLoginEmailAction = function (email) {
 };
 
 module.exports = sendLoginEmailAction;
+
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/updateNote.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+var api = require('../common/api');
+
+var updateNoteAction = function (noteId, noteText) {
+
+	api({
+		url: 'api/note/' + noteId,
+		method: 'post',
+		data: {
+			'_METHOD': 'PUT',
+			noteText: noteText
+		},
+		success: function () {
+			
+			dispatcher.dispatchDiscrete('updateNoteCompleted');
+	    }
+	});
+};
+
+module.exports = updateNoteAction;
 
 },{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){
 
@@ -56930,7 +56960,8 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 
 		var classes = cx({
 			desk: true,
-			'animate-desk': this.props.isViewingBookshelf
+			'animate-desk': this.props.isViewingBookshelf,
+			'animating-desk': !this.props.isDoneAnimating
 		});
 
 		return 	React.createElement("div", {className: "desk-container"}, 
@@ -57303,6 +57334,9 @@ var _s = require('underscore.string');
 var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
 var $ = require('jquery');
+var updateNoteAction = require('../../../actions/updateNote');
+
+var cursor = null;
 
 var moveCursor = function (domNode) {
 
@@ -57336,8 +57370,6 @@ var hideCaret = function () {
 		caret.style.display = 'none';
 	}
 };
-
-var cursor = null;
 
 var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
@@ -57378,6 +57410,9 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 		});
 
 		finalText = finalTextArray.join('\r\n');
+
+		// TODO: get rid of this
+		updateNoteAction('test', finalText);
 		
 	    this.setState({ value: finalText });
 		
@@ -57413,7 +57448,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
 					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onKeyDown: this.handleChange, 
 					onKeyUp: this.handleChange, onFocus: this.handleChange, onClick: this.handleChange, onChange: this.handleChange}), 
-					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}}, this.state.value)
+					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, value: this.state.value})
 				);
 	}
 
@@ -57421,25 +57456,35 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 module.exports = notepadComponent;
 
-},{"../../../common/dom-utils":"/var/www/common/dom-utils.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
+},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
 var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');
 
 var bookShelfStore = assign(new Store(), {
 
-	isViewingBookshelf: false
+	isViewingBookshelf: false,
+	isDoneAnimating: true
 });
 
 notelloDispatcher.registerDiscrete('viewBookshelf', function () {
 
 	bookShelfStore.isViewingBookshelf = true;
+	bookShelfStore.isDoneAnimating = false;
 	bookShelfStore.save();
 });
 
 notelloDispatcher.registerDiscrete('hideBookshelf', function () {
 
 	bookShelfStore.isViewingBookshelf = false;
+	bookShelfStore.isDoneAnimating = false;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('shelfHidden', function () {
+
+	bookShelfStore.isViewingBookshelf = false;
+	bookShelfStore.isDoneAnimating = true;
 	bookShelfStore.save();
 });
 
