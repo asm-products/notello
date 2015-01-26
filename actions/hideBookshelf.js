@@ -1,5 +1,6 @@
 
 var dispatcher = require('./notelloDispatcher');
+var _ = require('underscore');
 
 var hideBookshelfAction = function () {
 	

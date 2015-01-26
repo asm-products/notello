@@ -1,5 +1,5 @@
-.bookcase
-{
+
+.bookcase {
 	width: 100%;
 	height: 150px;
 	position: fixed;
@@ -7,14 +7,10 @@
 	top: 0;
 	left: 0;
 
-	& .wall
-	{
+	& .wall {
 		width: 100%;
-		background: #c2d1cb; /* Old browsers */
-		background: linear-gradient(to bottom,  #c2d1cb 0%,#88a5ad 100%); /* W3C */
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c2d1cb', endColorstr='#88a5ad',GradientType=0 ); /* IE6-9 */
+		background: #777;
 		overflow-x: scroll;
-		text-align: center;
 		white-space: nowrap;
 		position: fixed;
 		z-index: 10;
@@ -23,23 +19,61 @@
 		word-spacing: 0px;
 	}
 
-	& .shelf
-	{
+	& .shelf {
 		margin: 0 auto;
-		height: 150px;
 		width: 100%;
 		display: inline-block;
+		position: relative;
+		background: #130f10; /* Old browsers */
+		background: linear-gradient(to bottom,  #130f10 0%,#79472e 84%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#130f10', endColorstr='#79472e',GradientType=0 ); /* IE6-9 */
 	}
 
-	& .img-shelf
-	{
+	& .img-shelf {
 		height: 100%;
 		width: 100%;
 	}
+
+	& .shelf-border {
+		width: 100%;
+		height: 20px;
+		background-image: url('images/shelf-border.png');
+	}
+
+	& .archive-box, & .notebook, & .paper, & .add-item {
+
+		display: inline-block;
+		cursor: pointer;
+    	transition: all .2s;
+    	width: 70px;
+    	margin: 0 10px;
+    	padding-top: 24px;
+	}
+
+	& .paper, & .notebook {
+		width: 60px;
+	}
+
+	& .archive-box:hover, & .notebook:hover, & .paper:hover {
+		transform: scale(1.2, 1.2);
+	}
+
+	& .add-item {
+		font-size: 40px;
+		opacity: 0.5;
+		left: 400px;
+		color: white;
+		padding-top: 0;
+		vertical-align: middle;
+		padding-bottom: 90px;
+	}
+
+	& .add-item:hover {
+		opacity: 0.7;
+	}
 }
 
-.bookcase-shown
-{
+.bookcase-shown {
     animation-name: bookcaseShownAnimation;
     animation-duration: .5s;
     animation-timing-function: linear;

@@ -14,10 +14,14 @@ var bookcaseComponent = React.createClass({
 		return 	<div ref="divBookcase" className={classes}>
 					<div className="wall">
 						<div className="shelf">
-							<img src="dist/images/bookshelf-small.jpg" className="img-shelf" />
-						</div>
-						<div className="shelf">
-							<img src="dist/images/bookshelf-small.jpg" className="img-shelf" />
+							<div className="shelf-border"></div>
+							<div style={{ height: '100px' }}>
+								<img src="dist/images/archivebox.png" className="archive-box" />
+								<img src="dist/images/notebook.png" className="notebook" />
+								<img src="dist/images/paper.png" className="paper" />
+								<span className="add-item ion-plus-circled" title="Add a new item"></span>
+							</div>
+							<div className="shelf-border"></div>
 						</div>
 					</div>
 				</div>;

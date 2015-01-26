@@ -408,6 +408,7 @@ module.exports = authenticate;
 },{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/hideBookshelf.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
+var _ = require('underscore');
 
 var hideBookshelfAction = function () {
 	
@@ -422,7 +423,7 @@ var hideBookshelfAction = function () {
 
 module.exports = hideBookshelfAction;
 
-},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/invariant.js":[function(require,module,exports){
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/invariant.js":[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -56908,10 +56909,14 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 		return 	React.createElement("div", {ref: "divBookcase", className: classes}, 
 					React.createElement("div", {className: "wall"}, 
 						React.createElement("div", {className: "shelf"}, 
-							React.createElement("img", {src: "dist/images/bookshelf-small.jpg", className: "img-shelf"})
-						), 
-						React.createElement("div", {className: "shelf"}, 
-							React.createElement("img", {src: "dist/images/bookshelf-small.jpg", className: "img-shelf"})
+							React.createElement("div", {className: "shelf-border"}), 
+							React.createElement("div", {style: { height: '100px'}}, 
+								React.createElement("img", {src: "dist/images/archivebox.png", className: "archive-box"}), 
+								React.createElement("img", {src: "dist/images/notebook.png", className: "notebook"}), 
+								React.createElement("img", {src: "dist/images/paper.png", className: "paper"}), 
+								React.createElement("span", {className: "add-item ion-plus-circled", title: "Add a new item"})
+							), 
+							React.createElement("div", {className: "shelf-border"})
 						)
 					)
 				);
