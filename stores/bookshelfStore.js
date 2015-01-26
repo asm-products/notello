@@ -18,7 +18,6 @@ notelloDispatcher.registerDiscrete('viewBookshelf', function () {
 notelloDispatcher.registerDiscrete('hideBookshelf', function () {
 
 	bookShelfStore.isViewingBookshelf = false;
-	bookShelfStore.isDoneAnimating = false;
 	bookShelfStore.save();
 });
 

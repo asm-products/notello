@@ -42,7 +42,8 @@ var App = React.createClass({displayName: 'App',
 
 	    this.setState({
 	    	showFormBlocker: false,
-			isViewingBookshelf: bookshelfStore.isViewingBookshelf
+			isViewingBookshelf: bookshelfStore.isViewingBookshelf,
+			isDoneAnimating: bookshelfStore.isDoneAnimating
 		});
 		
 	},
@@ -111,7 +112,7 @@ var App = React.createClass({displayName: 'App',
 
 		return  React.createElement("div", {id: "divContainer", className: classes}, 
 					React.createElement(Bookcase, {isViewingBookshelf: this.state.isViewingBookshelf}), 
-					React.createElement(Desk, {isViewingBookshelf: this.state.isViewingBookshelf}), 
+					React.createElement(Desk, {isViewingBookshelf: this.state.isViewingBookshelf, isDoneAnimating: this.state.isDoneAnimating}), 
 					React.createElement(ModalForm, {ref: "mainModalForm", modalTitle: "ERROR", btnSubmitText: "OK", onSubmit: this.handleModalSubmit}, 
 						React.createElement("p", {className: "p-modal-text"}, 
 							React.createElement("span", {className: "span-modal-text"}, tempAuthToken === 'expired' && 'This login token has expired.'), 
@@ -57482,7 +57483,6 @@ notelloDispatcher.registerDiscrete('viewBookshelf', function () {
 notelloDispatcher.registerDiscrete('hideBookshelf', function () {
 
 	bookShelfStore.isViewingBookshelf = false;
-	bookShelfStore.isDoneAnimating = false;
 	bookShelfStore.save();
 });
 

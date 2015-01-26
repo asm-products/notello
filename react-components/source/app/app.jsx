@@ -41,7 +41,8 @@ var App = React.createClass({
 
 	    this.setState({
 	    	showFormBlocker: false,
-			isViewingBookshelf: bookshelfStore.isViewingBookshelf
+			isViewingBookshelf: bookshelfStore.isViewingBookshelf,
+			isDoneAnimating: bookshelfStore.isDoneAnimating
 		});
 		
 	},
@@ -110,7 +111,7 @@ var App = React.createClass({
 
 		return  <div id="divContainer" className={classes}>
 					<Bookcase isViewingBookshelf={this.state.isViewingBookshelf} />
-					<Desk isViewingBookshelf={this.state.isViewingBookshelf} />
+					<Desk isViewingBookshelf={this.state.isViewingBookshelf} isDoneAnimating={this.state.isDoneAnimating} />
 					<ModalForm ref="mainModalForm" modalTitle="ERROR" btnSubmitText="OK" onSubmit={this.handleModalSubmit} >
 						<p className="p-modal-text">
 							<span className="span-modal-text">{tempAuthToken === 'expired' && 'This login token has expired.'}</span>
