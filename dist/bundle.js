@@ -56897,6 +56897,7 @@ module.exports = require('./lib/React');
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
+var Searchbar = require('../searchbar/searchbar');
 
 var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
@@ -56912,6 +56913,7 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 						React.createElement("div", {className: "shelf"}, 
 							React.createElement("div", {className: "shelf-border"}), 
 							React.createElement("div", {style: { height: '100px'}}, 
+								React.createElement(Searchbar, null), 
 								React.createElement("img", {src: "dist/images/archivebox.png", className: "archive-box"}), 
 								React.createElement("img", {src: "dist/images/notebook.png", className: "notebook"}), 
 								React.createElement("img", {src: "dist/images/paper.png", className: "paper"}), 
@@ -56927,7 +56929,7 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
 module.exports = bookcaseComponent;
 
-},{"react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
+},{"../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
 var React = require('react');
 var Notepad = require('../notepad/notepad');
 var Bookcase = require('../bookcase/bookcase');
@@ -57462,7 +57464,28 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 module.exports = notepadComponent;
 
-},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
+},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
+var React = require('react');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
+
+var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
+
+	handleClick: function (event) {
+
+		alert('test');
+	},
+
+	render: function () {
+
+		return React.createElement("span", {className: "search ion-android-search", title: "Search notes", onClick: this.handleClick});
+	}
+
+});
+
+module.exports = searchbarComponent;
+
+},{"react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
 var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');

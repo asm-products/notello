@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
+var Searchbar = require('../searchbar/searchbar');
 
 var bookcaseComponent = React.createClass({
 
@@ -16,6 +17,7 @@ var bookcaseComponent = React.createClass({
 						<div className="shelf">
 							<div className="shelf-border"></div>
 							<div style={{ height: '100px' }}>
+								<Searchbar />
 								<img src="dist/images/archivebox.png" className="archive-box" />
 								<img src="dist/images/notebook.png" className="notebook" />
 								<img src="dist/images/paper.png" className="paper" />

@@ -61,11 +61,11 @@
 .bookcase .add-item {
   font-size: 40px;
   opacity: 0.5;
-  left: 400px;
   color: white;
   padding-top: 0;
   vertical-align: middle;
-  padding-bottom: 90px;
+  height: 40px;
+  margin-top: -102px;
 }
 .bookcase .add-item:hover {
   opacity: 0.7;
@@ -645,4 +645,23 @@ input {
   100% {
     opacity: 1.0;
   }
+}
+
+.search {
+  display: inline-block;
+  cursor: pointer;
+  transition: all .2s;
+  width: 40px;
+  height: 40px;
+  margin: 0 10px;
+  padding-top: 0;
+  padding-left: 10px;
+  font-size: 40px;
+  opacity: 0.5;
+  color: white;
+  vertical-align: middle;
+  margin-top: -106px;
+}
+.search:hover {
+  opacity: 0.7;
 }
