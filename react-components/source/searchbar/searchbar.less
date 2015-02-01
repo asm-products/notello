@@ -2,21 +2,60 @@
 .search {
 	
 	display: inline-block;
-	cursor: pointer;
+	cursor: text;
 	transition: all .2s;
 	width: 40px;
-	height: 40px;
-	margin: 0 10px;
-	padding-top: 0;
-	padding-left: 10px;
-	font-size: 40px;
+	height: 30px;
+	padding-top: 3px;
+	font-size: 1.5em;
 	opacity: 0.5;
 	color: white;
-	vertical-align: middle;
-	margin-top: -106px;
+	vertical-align: top;
 }
 
 .search:hover {
 	
 	opacity: 0.7;
+}
+
+.searchbar-container {
+	
+	max-width: 300px;
+	left: 130px;
+	position: absolute;
+	top: 5px;
+
+	&:hover .searchbar-wrapper {
+		opacity: 0.8;
+	}
+}
+
+.searchbar-wrapper {
+	
+	border: 1px solid white;
+	border-radius: 15px;
+	background-color: #32231C;
+	height: 28px;
+	opacity: 0.9;
+}
+
+.search-text {
+	height: 22px;
+	width: 220px;
+	background-color: transparent;
+	border: 0;
+	outline: none;
+	color: white;
+	margin-top: 2px;
+}
+
+.search-focused {
+
+	& input {
+		width: 250px;
+	}
+
+	& .searchbar-wrapper {
+		opacity: 1 !important;
+	}
 }

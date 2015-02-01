@@ -56911,15 +56911,17 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 		return 	React.createElement("div", {ref: "divBookcase", className: classes}, 
 					React.createElement("div", {className: "wall"}, 
 						React.createElement("div", {className: "shelf"}, 
-							React.createElement("div", {className: "shelf-border"}), 
-							React.createElement("div", {style: { height: '100px'}}, 
+							React.createElement("div", {className: "top-shelf shelf-border"}, 
 								React.createElement(Searchbar, null), 
+								React.createElement("div", {className: "logo"}, "Notello")
+							), 
+							React.createElement("div", {style: { height: '100px', paddingLeft: '130px'}}, 
 								React.createElement("img", {src: "dist/images/archivebox.png", className: "archive-box"}), 
 								React.createElement("img", {src: "dist/images/notebook.png", className: "notebook"}), 
 								React.createElement("img", {src: "dist/images/paper.png", className: "paper"}), 
 								React.createElement("span", {className: "add-item ion-plus-circled", title: "Add a new item"})
 							), 
-							React.createElement("div", {className: "shelf-border"})
+							React.createElement("div", {className: "bottom-shelf shelf-border"})
 						)
 					)
 				);
@@ -57012,7 +57014,7 @@ var headerComponent = React.createClass({displayName: 'headerComponent',
 					React.createElement("span", {className: bookShelfIconClasses, title: "View bookshelf", onTouchEnd: this.handleClick, onClick: this.handleClick}, 
 						React.createElement("img", {src: "dist/images/bookshelf.png"})
 					), 
-					React.createElement("div", {className: "logo"}, "Notello"), 
+					React.createElement("div", {className: "logo generic-transition"}, "Notello"), 
 					React.createElement(Login, null)
 				);
 	}
@@ -57471,14 +57473,41 @@ var cx = ReactAddons.classSet;
 
 var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 
-	handleClick: function (event) {
+	getInitialState: function () {
+		return {
+			isFocused: false
+		};
+	},
 
-		alert('test');
+	handleFocus: function (event) {
+
+		this.setState({
+			isFocused: true
+		});
+	},
+
+	handleBlur: function (event) {
+
+		this.setState({
+			isFocused: false
+		});
 	},
 
 	render: function () {
 
-		return React.createElement("span", {className: "search ion-android-search", title: "Search notes", onClick: this.handleClick});
+		var classes = cx({
+			'searchbar-container': true,
+			'search-focused': this.state.isFocused
+		});
+
+		return 	React.createElement("div", {className: classes}, 
+					React.createElement("div", {className: "searchbar-wrapper generic-transition"}, 
+						React.createElement("label", {htmlFor: "txtSearch"}, 
+							React.createElement("span", {className: "search ion-android-search", title: "Search notes"})
+						), 
+						React.createElement("input", {id: "txtSearch", type: "text", placeholder: "Search your notes", className: "search-text generic-transition", onBlur: this.handleBlur, onFocus: this.handleFocus})
+					)
+				);
 	}
 
 });

@@ -4,14 +4,41 @@ var cx = ReactAddons.classSet;
 
 var searchbarComponent = React.createClass({
 
-	handleClick: function (event) {
+	getInitialState: function () {
+		return {
+			isFocused: false
+		};
+	},
 
-		alert('test');
+	handleFocus: function (event) {
+
+		this.setState({
+			isFocused: true
+		});
+	},
+
+	handleBlur: function (event) {
+
+		this.setState({
+			isFocused: false
+		});
 	},
 
 	render: function () {
 
-		return <span className="search ion-android-search" title="Search notes" onClick={this.handleClick}></span>;
+		var classes = cx({
+			'searchbar-container': true,
+			'search-focused': this.state.isFocused
+		});
+
+		return 	<div className={classes}>
+					<div className="searchbar-wrapper generic-transition">
+						<label htmlFor="txtSearch">
+							<span className="search ion-android-search" title="Search notes"></span>
+						</label>
+						<input id="txtSearch" type="text" placeholder="Search your notes" className="search-text generic-transition" onBlur={this.handleBlur} onFocus={this.handleFocus} />
+					</div>
+				</div>;
 	}
 
 });

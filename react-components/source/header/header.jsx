@@ -25,7 +25,7 @@ var headerComponent = React.createClass({
 					<span className={bookShelfIconClasses} title="View bookshelf" onTouchEnd={this.handleClick} onClick={this.handleClick}>
 						<img src="dist/images/bookshelf.png" />
 					</span>
-					<div className="logo">Notello</div>
+					<div className="logo generic-transition">Notello</div>
 					<Login />
 				</header>;
 	}
