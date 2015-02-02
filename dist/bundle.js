@@ -56898,14 +56898,55 @@ var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
+var ModalForm = require('../modal-form/modalForm');
 
 var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
+
+	getInitialState: function () {
+
+		return {
+			shouldSlide: false
+		};
+	},
+
+	handleAddItem: function (event) {
+
+		this.refs.addNewItemModal.open();
+	},
+
+	handleNewNote: function (event) {
+
+
+		this.setState({
+			shouldSlide: true
+		});
+	},
+
+	handleNewNoteBook: function (event) {
+
+		this.setState({
+			shouldSlide: true
+		});
+	},
+
+	handleNewBox: function (event) {
+
+
+		this.setState({
+			shouldSlide: true
+		});
+	},
 
 	render: function () {
 
 		var classes = cx({
 			bookcase: true,
 			'bookcase-shown': this.props.isViewingBookshelf
+		});
+
+		var buttonClasses = cx({
+			'submit-btn ion ion-load text-left button-transition': true,
+			'slide': this.state.shouldSlide
 		});
 
 		return 	React.createElement("div", {ref: "divBookcase", className: classes}, 
@@ -56919,10 +56960,21 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 								React.createElement("img", {src: "dist/images/archivebox.png", className: "archive-box"}), 
 								React.createElement("img", {src: "dist/images/notebook.png", className: "notebook"}), 
 								React.createElement("img", {src: "dist/images/paper.png", className: "paper"}), 
-								React.createElement("span", {className: "add-item ion-plus-circled", title: "Add a new item"})
+								React.createElement("span", {className: "add-item ion-plus-circled", title: "Add a new item", onClick: this.handleAddItem, onTouchEnd: this.handleAddItem})
 							), 
 							React.createElement("div", {className: "bottom-shelf shelf-border"})
 						)
+					), 
+					React.createElement(ModalForm, {ref: "addNewItemModal", showSubmit: false, modalTitle: "ADD NEW ITEM"}, 
+							React.createElement("button", {ref: "btnNewNote", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNote}, 
+								React.createElement("img", {src: "dist/images/paper-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTE")
+							), 
+							React.createElement("button", {ref: "btnNewNoteBook", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNoteBook}, 
+								React.createElement("img", {src: "dist/images/notebook-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTEBOOK")
+							), 
+							React.createElement("button", {ref: "btnNewBox", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewBox}, 
+								React.createElement("img", {src: "dist/images/archivebox.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW BOX")
+							)
 					)
 				);
 	}
@@ -56931,7 +56983,7 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
 module.exports = bookcaseComponent;
 
-},{"../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
+},{"../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
 var React = require('react');
 var Notepad = require('../notepad/notepad');
 var Bookcase = require('../bookcase/bookcase');
@@ -57212,7 +57264,7 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
   		modalWrapper.className = 'modal-form-wrapper';
   		setTimeout(function () { 
   			modalWrapper.className = 'modal-form-wrapper modal-shake';
-  		}, 1);
+  		}, 100);
 	},
 
 	_checkValidation: function () {
@@ -57266,7 +57318,11 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
 		this.close();
   		this._modalWrapper.get(0).className = 'modal-form-wrapper';
-		this.props.onClose(event);
+
+  		if (this.props.onClose) {
+
+			this.props.onClose(event);
+  		}
 
 		if ('activeElement' in document) {
     		document.activeElement.blur();
@@ -57291,7 +57347,9 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
   		} else {
 
-  			this.props.onSubmit(event);
+  			if (this.props.onSubmit) {
+  				this.props.onSubmit(event);
+  			}
   		}
 
   		this.setState({
@@ -57320,11 +57378,11 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 						React.createElement("div", {className:  cx({'modal-validation-container': true, 'hide': this.state.isValid }), 
 							dangerouslySetInnerHTML: {__html: this.state.validationMessage}}
 						), 
-						React.createElement("form", {action: "", onSubmit: this.handleSubmit, autoComplete: "on", autoCorrect: "off"}, 
+						React.createElement("form", {action: "", onSubmit: this.handleSubmit, autoComplete: "on", autoCorrect: "off", style: { overflow: 'hidden'}}, 
 							React.Children.map(props.children, function (child) {
 								return React.createElement("div", {className: "input-wrapper"}, child);
 							}), 
-							React.createElement("button", {ref: "btnSubmitEmail", type: "submit", onTouchEnd: this.handleSubmit, className: "submit-btn ion ion-load"}, 
+							this.props.showSubmit !== false && React.createElement("button", {ref: "btnSubmitEmail", type: "submit", onTouchEnd: this.handleSubmit, className: "submit-btn ion ion-load generic-transition"}, 
 								btnSubmitText
 							)
 						)

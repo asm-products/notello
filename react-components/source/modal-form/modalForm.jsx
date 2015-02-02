@@ -21,7 +21,7 @@ var modalFormComponent = React.createClass({
   		modalWrapper.className = 'modal-form-wrapper';
   		setTimeout(function () { 
   			modalWrapper.className = 'modal-form-wrapper modal-shake';
-  		}, 1);
+  		}, 100);
 	},
 
 	_checkValidation: function () {
@@ -75,7 +75,11 @@ var modalFormComponent = React.createClass({
 
 		this.close();
   		this._modalWrapper.get(0).className = 'modal-form-wrapper';
-		this.props.onClose(event);
+
+  		if (this.props.onClose) {
+
+			this.props.onClose(event);
+  		}
 
 		if ('activeElement' in document) {
     		document.activeElement.blur();
@@ -100,7 +104,9 @@ var modalFormComponent = React.createClass({
 
   		} else {
 
-  			this.props.onSubmit(event);
+  			if (this.props.onSubmit) {
+  				this.props.onSubmit(event);
+  			}
   		}
 
   		this.setState({
@@ -129,13 +135,13 @@ var modalFormComponent = React.createClass({
 						<div className={ cx({'modal-validation-container': true, 'hide': this.state.isValid }) }
 							dangerouslySetInnerHTML={{__html: this.state.validationMessage}}>
 						</div>
-						<form action="" onSubmit={this.handleSubmit} autoComplete="on" autoCorrect="off">
+						<form action="" onSubmit={this.handleSubmit} autoComplete="on" autoCorrect="off" style={{ overflow: 'hidden' }}>
 							{React.Children.map(props.children, function (child) {
 								return <div className="input-wrapper">{child}</div>;
 							})}
-							<button ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn ion ion-load">
+							{this.props.showSubmit !== false && <button ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn ion ion-load generic-transition">
 								{btnSubmitText}
-							</button>
+							</button>}
 						</form>
 					</div>
 				</div>;

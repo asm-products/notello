@@ -12,7 +12,7 @@
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 4;
+	z-index: 9999;
 	display: none;
 }
 
@@ -155,11 +155,13 @@
 }
 
 .submit-btn:hover, .submit-btn:focus {
+	transform: scale(1.02);
 	background-color: #357596;
 }
 
 .submit-btn:active {
-	margin-top: 24px;
+	margin: 0 auto !important;
+	transform: scale(0.9);
 }
 
 @keyframes loader {

@@ -98,6 +98,17 @@
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
+.item-icon {
+  width: 25px;
+  height: 32px;
+  vertical-align: middle;
+}
+.new-button-text {
+  padding-left: 20px;
+}
+.slide {
+  margin-left: -200px !important;
+}
 @keyframes bookcaseShownAnimation {
   0% {
     z-index: 0;
@@ -109,6 +120,9 @@
 
 .generic-transition {
   transition: transform 0.3s, all 0.2s;
+}
+.button-transition {
+  transition: transform 0.3s, margin 4s, all 0.2s;
 }
 .opacity-transition {
   transition: display 0.3s, opacity 0.2s;
@@ -208,6 +222,12 @@ input {
 }
 .hide {
   display: none;
+}
+.text-left {
+  text-align: left;
+}
+.valign-middle {
+  vertical-align: middle;
 }
 .div-form-blocker {
   position: fixed;
@@ -397,7 +417,7 @@ input {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 4;
+  z-index: 9999;
   display: none;
 }
 .modal-background {
@@ -521,10 +541,12 @@ input {
 }
 .submit-btn:hover,
 .submit-btn:focus {
+  transform: scale(1.02);
   background-color: #357596;
 }
 .submit-btn:active {
-  margin-top: 24px;
+  margin: 0 auto !important;
+  transform: scale(0.9);
 }
 @keyframes loader {
   0% {
