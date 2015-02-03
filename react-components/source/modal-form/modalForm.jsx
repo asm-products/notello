@@ -54,8 +54,14 @@ var modalFormComponent = React.createClass({
 
 	open: function () {
 
+		var self = this;
+
 		this._isOpened = true;
-		this._modalContainer.fadeIn(200);
+		this._modalContainer.fadeIn(200, function () {
+			if (self.props.onOpened) {
+				self.props.onOpened();
+			}
+		});
 		this._modalContainer.find('input').first().focus();
 	},
 
@@ -135,9 +141,9 @@ var modalFormComponent = React.createClass({
 						<div className={ cx({'modal-validation-container': true, 'hide': this.state.isValid }) }
 							dangerouslySetInnerHTML={{__html: this.state.validationMessage}}>
 						</div>
-						<form action="" onSubmit={this.handleSubmit} autoComplete="on" autoCorrect="off" style={{ overflow: 'hidden' }}>
+						<form action="" onSubmit={this.handleSubmit} autoComplete="on" autoCorrect="off" style={{ whiteSpace: 'nowrap', textAlign: 'center', overflow: 'hidden' }}>
 							{React.Children.map(props.children, function (child) {
-								return <div className="input-wrapper">{child}</div>;
+								return child.type === 'div' ? child : <div className="input-wrapper">{child}</div>;
 							})}
 							{this.props.showSubmit !== false && <button ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn ion ion-load generic-transition">
 								{btnSubmitText}

@@ -99,8 +99,7 @@
 		vertical-align: top;
 		font-size: 1em;
 		padding: 10px;
-		display: block;
-		margin: 0 auto;
+		display: inline-block;
     	box-sizing: border-box;
 		width: 85%;
 		background-color: #dde0e5;
@@ -146,8 +145,7 @@
 	font-size: 0.9em;
 	cursor: pointer;
 	width: 85%;
-	margin: 0 auto;
-	display: block;
+	display: inline-block;
 	border-radius: 3px;
     box-sizing: border-box;
     border: 0;
@@ -155,13 +153,12 @@
 }
 
 .submit-btn:hover, .submit-btn:focus {
-	transform: scale(1.02);
+	transform: scale(1.02, 1.02);
 	background-color: #357596;
 }
 
 .submit-btn:active {
-	margin: 0 auto !important;
-	transform: scale(0.9);
+	transform: scale(0.9, 0.9);
 }
 
 @keyframes loader {
