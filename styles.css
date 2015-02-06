@@ -112,6 +112,14 @@
 .slide-second-form {
   margin: auto;
 }
+.form-one,
+.form-two {
+  opacity: 0;
+  display: inline-block;
+}
+.form-two {
+  vertical-align: top;
+}
 @keyframes bookcaseShownAnimation {
   0% {
     z-index: 0;
@@ -125,7 +133,7 @@
   transition: transform 0.3s, all 0.2s;
 }
 .button-transition {
-  transition: transform 0.3s, all 0.2s, margin 1s;
+  transition: transform 0.3s, all 0.2s, margin 0.5s, opacity 0.5s;
 }
 .opacity-transition {
   transition: display 0.3s, opacity 0.2s;

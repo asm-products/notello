@@ -13,24 +13,14 @@ var bookcaseComponent = React.createClass({
 
 		// Chrome really sucks here for some reason. It's calculations for margins were way off.
 		// Not sure what other browsers are doing with this.
-
 		setTimeout(function () {
 
-			$(self.refs.formTwo.getDOMNode()).css({
-				display: 'inline-block',
-				width: '100%'
-			});
+			$(self.refs.formOne.getDOMNode()).css('width', '100%');
 
-		}, 1);
+			$(self.refs.formOne.getDOMNode()).css('opacity', '1');
+			$(self.refs.formTwo.getDOMNode()).css('opacity', '1');
 
-		setTimeout(function () {
-
-			$(self.refs.formOne.getDOMNode()).css({
-				display: 'inline-block',
-				width: '100%'
-			});
-
-		}, 10);
+		}, 50);
 		
 	},
 
@@ -43,6 +33,16 @@ var bookcaseComponent = React.createClass({
 	},
 
 	handleAddItem: function (event) {
+
+		this.setState({
+			shouldSlide: false,
+			itemType: null
+		});
+
+		$(this.refs.formOne.getDOMNode()).attr('style', '');
+		$(this.refs.formTwo.getDOMNode()).attr('style', '');
+
+		$(this.refs.formTwo.getDOMNode()).css('width', '100%');
 
 		this.refs.addNewItemModal.open();
 	},
@@ -78,7 +78,7 @@ var bookcaseComponent = React.createClass({
 			'bookcase-shown': this.props.isViewingBookshelf
 		});
 
-		var buttonClasses = 'submit-btn ion ion-load text-left';
+		var buttonClasses = 'submit-btn ion ion-load text-left generic-transition';
 
 		var firstFormClasses = cx({
 			'form-one button-transition': true,
