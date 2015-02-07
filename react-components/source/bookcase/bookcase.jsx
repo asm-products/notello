@@ -6,6 +6,8 @@ var ModalForm = require('../modal-form/modalForm');
 var $ = require('jquery');
 var createNoteAction = require('../../../actions/createNote');
 var hideBookshelfAction = require('../../../actions/hideBookshelf');
+var bookshelfStore = require('../../../stores/bookshelfStore');
+var createNotebookAction = require('../../../actions/createNotebook');
 
 var bookcaseComponent = React.createClass({
 
@@ -30,7 +32,8 @@ var bookcaseComponent = React.createClass({
 
 		return {
 			shouldSlide: false,
-			itemType: null
+			itemType: null,
+			itemName: null
 		};
 	},
 
@@ -79,6 +82,34 @@ var bookcaseComponent = React.createClass({
 		});
 	},
 
+	handleCreate: function (event) {
+		
+		this.setState({
+			shouldSlide: false,
+			itemType: null
+		});
+
+		this.refs.addNewItemModal.close();
+
+		if (this.state.itemType === 'box') {
+
+			createBoxAction(bookshelfStore.userNotes, this.state.itemName);
+
+		} else if (this.state.itemType === 'notebook') {
+
+			createNotebookAction(bookshelfStore.userNotes, this.state.itemName);
+		}
+
+		hideBookshelfAction();
+	},
+
+	handleItemNameChange: function (event) {
+
+		this.setState({
+			itemName: event.target.value
+		});
+	},
+
 	render: function () {
 
 		var classes = cx({
@@ -114,28 +145,33 @@ var bookcaseComponent = React.createClass({
 							<div className="bottom-shelf shelf-border"></div>
 						</div>
 					</div>
-					<ModalForm ref="addNewItemModal" showSubmit={false} modalTitle="ADD NEW ITEM" onOpened={this.handleOpened}>
+					<ModalForm ref="addNewItemModal" showSubmit={false} modalTitle="ADD NEW ITEM" onOpened={this.handleOpened} onSubmit={this.handleCreate}>
 						<div ref="formOne" className={firstFormClasses}>
 							<div className="input-wrapper">
-								<button ref="btnNewNote" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewNote}>
+								<button ref="btnNewNote" type="button" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewNote}>
 									<img src="dist/images/paper-icon.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW NOTE</span>
 								</button>
 							</div>
 							<div className="input-wrapper">
-								<button ref="btnNewNoteBook" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewNoteBook}>
+								<button ref="btnNewNoteBook" type="button" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewNoteBook}>
 									<img src="dist/images/notebook-icon.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW NOTEBOOK</span>
 								</button>
 							</div>
 							<div className="input-wrapper">
-								<button ref="btnNewBox" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewBox}>
+								<button ref="btnNewBox" type="button" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewBox}>
 									<img src="dist/images/archivebox.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW BOX</span>
 								</button>
 							</div>
 						</div>
 						<div ref="formTwo" className={secondFormClasses}>
 							<div className="input-wrapper">
-								{this.state.itemType !== 'note' && <input id="txtItemName" name="itemName" isRequired={true} requiredMessage="Name is required" type="text"
-								 placeholder={'Enter name of the ' + this.state.itemType} className="padded-input" value={this.state.email} />}
+								{this.state.itemType !== 'note' && <input id="txtItemName" ref="itemName" name="itemName" isRequired={true} requiredMessage="Name is required" type="text"
+								 placeholder={'Enter name of the ' + this.state.itemType} className="padded-input" value={this.state.itemName} onChange={this.handleItemNameChange} />}
+							</div>
+							<div className="input-wrapper">
+								{this.state.itemType !== 'note' && <button ref="btnCreate" type="submit" onTouchEnd={this.handleCreate} className="submit-btn ion ion-load generic-transition">
+									CREATE
+								</button>}
 							</div>
 						 </div>
 					</ModalForm>

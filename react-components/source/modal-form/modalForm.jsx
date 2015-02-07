@@ -28,14 +28,31 @@ var modalFormComponent = React.createClass({
 
 		var validationMessage = '';
 
-		{React.Children.map(this.props.children, function (child) {
+		var setValidationMessage = function (child) {
 
-			if (child.props.isRequired && child.props.value === '') {
+			if (child.props && child.props.isRequired && !child.props.value) {
+
 				validationMessage += child.props.requiredMessage + '<br>';
-			} else if (child.props.regex && new RegExp(child.props.regex).test(child.props.value) === false) {
+
+			} else if (child.props && child.props.regex && new RegExp(child.props.regex).test(child.props.value) === false) {
+
 				validationMessage += child.props.regexMessage + '<br>';
+
+			} else if (child.props) {
+
+				if (React.Children.count(child.props.children) > 1) {
+
+					React.Children.map(child.props.children, setValidationMessage);
+
+				} else if (React.Children.count(child.props.children) === 1) {
+
+					setValidationMessage(child.props.children);
+				}
 			}
-		})}
+
+		};
+
+		React.Children.map(this.props.children, setValidationMessage);
 
 		return validationMessage;
 	},

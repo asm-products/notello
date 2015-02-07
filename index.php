@@ -114,7 +114,24 @@ $app->put('/api/usernotes', function () use ($app) {
 		$oldToken = explode(':', $token);
 		$email = $oldToken[0];
 
-		$userNotes = json_encode($app->request->post('usernotes'));
+		$userNotes = $app->request->post('userNotes');
+
+		foreach ($userNotes as $userNoteKey => $userNoteValue) {
+
+			if ($userNoteValue['itemType'] === 'notebook' && !isset($userNoteValue['notebookId'])) {
+
+				$userNotes[$userNoteKey]['notebookId'] = uniqid();
+			}
+
+			if ($userNoteValue['itemType'] === 'box' && !isset($userNoteValue['boxId'])) {
+
+				$userNotes[$userNoteKey]['boxId'] = uniqid();
+			}
+
+		}
+		unset($userNoteValue);
+
+		$userNotesEncoded = json_encode($userNotes);
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
@@ -126,11 +143,11 @@ $app->put('/api/usernotes', function () use ($app) {
 		    'TableName' => 'usernotes',
 	        'Item' => array(
 	        	'email' 	=> array('S' => $email), // Primary Key
-	        	'usernotes' => array('S' => $userNotes)
+	        	'usernotes' => array('S' => $userNotesEncoded)
 	        )
 		));
 
-        $app->response->setBody(json_encode(array('message' => 'Successful')));
+        $app->response->setBody(json_encode(array('message' => $userNotes)));
 	}
 
 });

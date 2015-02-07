@@ -5,7 +5,8 @@ var assign = require('object-assign');
 var bookShelfStore = assign(new Store(), {
 
 	isViewingBookshelf: false,
-	isDoneAnimating: true
+	isDoneAnimating: true,
+	userNotes: null
 });
 
 notelloDispatcher.registerDiscrete('viewBookshelf', function () {
@@ -25,6 +26,12 @@ notelloDispatcher.registerDiscrete('shelfHidden', function () {
 
 	bookShelfStore.isViewingBookshelf = false;
 	bookShelfStore.isDoneAnimating = true;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNotes) {
+
+	bookShelfStore.userNotes = userNotes;
 	bookShelfStore.save();
 });
 
