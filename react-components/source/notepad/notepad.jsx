@@ -6,6 +6,7 @@ var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
 var $ = require('jquery');
 var updateNoteAction = require('../../../actions/updateNote');
+var selectedNoteStore = require('../../../stores/selectedNoteStore');
 
 var cursor = null;
 
@@ -44,10 +45,29 @@ var hideCaret = function () {
 
 var notepadComponent = React.createClass({
 
+	_selectedNote: function () {
+
+
+console.log('f');
+
+		this.setState({
+			noteId: selectedNoteStore.noteId,
+			noteTitle: selectedNoteStore.noteTitle,
+			noteText: selectedNoteStore.noteText
+		});
+	},
+
 	getInitialState: function() {
     	return {
-    		value: ''
+    		noteId: null,
+    		noteTitle: '',
+    		noteText: ''
     	};
+	},
+
+	componentDidMount: function () {
+
+		selectedNoteStore.onChange(this._selectedNote);
 	},
 
 	handleChange: function (event) {
@@ -82,12 +102,22 @@ var notepadComponent = React.createClass({
 
 		finalText = finalTextArray.join('\r\n');
 
-		// TODO: get rid of this
-		updateNoteAction('test', finalText);
+		updateNoteAction(this.state.noteId, this.state.noteTitle, finalText);
 		
-	    this.setState({ value: finalText });
+	    this.setState({ 
+	    	noteText: finalText
+	    });
 		
 		showCaret();
+	},
+
+	handleTitleChange: function (event) {
+
+		updateNoteAction(this.state.noteId, event.target.value, this.state.noteText);
+
+		this.setState({
+			noteTitle: event.target.value
+		});
 	},
 
 	handleBlur: function (event) {
@@ -97,11 +127,11 @@ var notepadComponent = React.createClass({
 
 	render: function () {
 
-		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.value.split(/\r\n|\r|\n/g).length;
+		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.noteText.split(/\r\n|\r|\n/g).length;
 
 		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
 
-		var value = this.state.value.replace(/(?:\r\n|\r|\n)/g, '<br />');
+		var value = this.state.noteText.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
 		var txtAreaCSSClasses = cx({
 			'ios': domUtils.iOS,
@@ -113,13 +143,13 @@ var notepadComponent = React.createClass({
 		return 	<div className="notepad" style={{ height: calculatedNotepadHeight + 'px' }}>
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
-						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" />
+						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} />
 						<span className="notepad-date">{moment(new Date()).format("MM/DD/YYYY")}</span>
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
-					<textarea id="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onKeyDown={this.handleChange} 
-					onKeyUp={this.handleChange} onFocus={this.handleChange} onClick={this.handleChange} onChange={this.handleChange}></textarea>
-					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} value={this.state.value} />
+					<textarea id="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
+					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange}></textarea>
+					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={this.state.noteText} />
 				</div>;
 	}
 

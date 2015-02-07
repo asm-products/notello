@@ -4,6 +4,8 @@ var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
 var ModalForm = require('../modal-form/modalForm');
 var $ = require('jquery');
+var createNoteAction = require('../../../actions/createNote');
+var hideBookshelfAction = require('../../../actions/hideBookshelf');
 
 var bookcaseComponent = React.createClass({
 
@@ -50,9 +52,15 @@ var bookcaseComponent = React.createClass({
 	handleNewNote: function (event) {
 
 		this.setState({
-			shouldSlide: true,
-			itemType: 'note'
+			shouldSlide: false,
+			itemType: null
 		});
+
+		this.refs.addNewItemModal.close();
+
+		createNoteAction('', '');
+
+		hideBookshelfAction();
 	},
 
 	handleNewNoteBook: function (event) {

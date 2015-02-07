@@ -406,7 +406,35 @@ var authenticate = function (email, authToken) {
 
 module.exports = authenticate;
 
-},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/hideBookshelf.js":[function(require,module,exports){
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/createNote.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+var api = require('../common/api');
+
+var createNoteAction = function (noteTitle, noteText) {
+
+	api({
+		url: 'api/note',
+		method: 'post',
+		data: {
+			noteTitle: noteTitle,
+			noteText: noteText
+		},
+		success: function (result) {
+			
+			dispatcher.dispatchDiscrete('createNoteCompleted', {
+
+				noteId: result.noteId,
+				noteTitle: noteTitle,
+				noteText: noteText
+			});
+	    }
+	});
+};
+
+module.exports = createNoteAction;
+
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/hideBookshelf.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var _ = require('underscore');
@@ -530,7 +558,8 @@ module.exports = assign(new Dispatcher(), {
 		'getUserNotesCompleted',
 		'updateUserNotesCompleted',
 		'updateNoteCompleted',
-		'insertNoteCompleted'
+		'createNoteCompleted',
+		'selectedNote'
 	]
 });
 
@@ -587,14 +616,16 @@ module.exports = sendLoginEmailAction;
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
+var _ = require('underscore');
 
-var updateNoteAction = function (noteId, noteText) {
+var updateNoteAction = _.debounce(function (noteId, noteTitle, noteText) {
 
 	api({
 		url: 'api/note/' + noteId,
 		method: 'post',
 		data: {
 			'_METHOD': 'PUT',
+			noteTitle: noteTitle,
 			noteText: noteText
 		},
 		success: function () {
@@ -602,11 +633,12 @@ var updateNoteAction = function (noteId, noteText) {
 			dispatcher.dispatchDiscrete('updateNoteCompleted');
 	    }
 	});
-};
+
+}, 5000);
 
 module.exports = updateNoteAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 
@@ -56900,6 +56932,8 @@ var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
 var ModalForm = require('../modal-form/modalForm');
 var $ = require('jquery');
+var createNoteAction = require('../../../actions/createNote');
+var hideBookshelfAction = require('../../../actions/hideBookshelf');
 
 var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
@@ -56946,9 +56980,15 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 	handleNewNote: function (event) {
 
 		this.setState({
-			shouldSlide: true,
-			itemType: 'note'
+			shouldSlide: false,
+			itemType: null
 		});
+
+		this.refs.addNewItemModal.close();
+
+		createNoteAction('', '');
+
+		hideBookshelfAction();
 	},
 
 	handleNewNoteBook: function (event) {
@@ -57034,7 +57074,7 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
 module.exports = bookcaseComponent;
 
-},{"../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
+},{"../../../actions/createNote":"/var/www/actions/createNote.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
 var React = require('react');
 var Notepad = require('../notepad/notepad');
 var Bookcase = require('../bookcase/bookcase');
@@ -57460,6 +57500,7 @@ var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
 var $ = require('jquery');
 var updateNoteAction = require('../../../actions/updateNote');
+var selectedNoteStore = require('../../../stores/selectedNoteStore');
 
 var cursor = null;
 
@@ -57498,10 +57539,29 @@ var hideCaret = function () {
 
 var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
+	_selectedNote: function () {
+
+
+console.log('f');
+
+		this.setState({
+			noteId: selectedNoteStore.noteId,
+			noteTitle: selectedNoteStore.noteTitle,
+			noteText: selectedNoteStore.noteText
+		});
+	},
+
 	getInitialState: function() {
     	return {
-    		value: ''
+    		noteId: null,
+    		noteTitle: '',
+    		noteText: ''
     	};
+	},
+
+	componentDidMount: function () {
+
+		selectedNoteStore.onChange(this._selectedNote);
 	},
 
 	handleChange: function (event) {
@@ -57536,12 +57596,22 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		finalText = finalTextArray.join('\r\n');
 
-		// TODO: get rid of this
-		updateNoteAction('test', finalText);
+		updateNoteAction(this.state.noteId, this.state.noteTitle, finalText);
 		
-	    this.setState({ value: finalText });
+	    this.setState({ 
+	    	noteText: finalText
+	    });
 		
 		showCaret();
+	},
+
+	handleTitleChange: function (event) {
+
+		updateNoteAction(this.state.noteId, event.target.value, this.state.noteText);
+
+		this.setState({
+			noteTitle: event.target.value
+		});
 	},
 
 	handleBlur: function (event) {
@@ -57551,11 +57621,11 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 	render: function () {
 
-		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.value.split(/\r\n|\r|\n/g).length;
+		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.noteText.split(/\r\n|\r|\n/g).length;
 
 		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
 
-		var value = this.state.value.replace(/(?:\r\n|\r|\n)/g, '<br />');
+		var value = this.state.noteText.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
 		var txtAreaCSSClasses = cx({
 			'ios': domUtils.iOS,
@@ -57567,13 +57637,13 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 		return 	React.createElement("div", {className: "notepad", style: { height: calculatedNotepadHeight + 'px'}}, 
 					React.createElement("div", {className: "pink-divider"}), 
 					React.createElement("div", {className: "notepad-header"}, 
-						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title"}), 
+						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange}), 
 						React.createElement("span", {className: "notepad-date"}, moment(new Date()).format("MM/DD/YYYY"))
 					), 
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
-					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onKeyDown: this.handleChange, 
-					onKeyUp: this.handleChange, onFocus: this.handleChange, onClick: this.handleChange, onChange: this.handleChange}), 
-					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, value: this.state.value})
+					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
+					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange}), 
+					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: this.state.noteText})
 				);
 	}
 
@@ -57581,7 +57651,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 module.exports = notepadComponent;
 
-},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
+},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
@@ -57715,4 +57785,28 @@ notelloDispatcher.registerDiscrete('resetToken', function () {
 
 module.exports = loginStore;
 
-},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/dom-utils":"/var/www/common/dom-utils.js","../common/store":"/var/www/common/store.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js"}]},{},["./react-components/source/app/app.jsx"]);
+},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/dom-utils":"/var/www/common/dom-utils.js","../common/store":"/var/www/common/store.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/stores/selectedNoteStore.js":[function(require,module,exports){
+var notelloDispatcher = require('../actions/notelloDispatcher');
+var Store = require('../common/store');
+var assign = require('object-assign');
+
+var selectedNoteStore = assign(new Store(), {
+
+	noteId: null,
+	noteTitle: '',
+	noteText: ''
+});
+
+notelloDispatcher.registerDiscrete('createNoteCompleted', function (note) {
+
+	selectedNoteStore.noteId = note.noteId;
+	selectedNoteStore.noteTitle = note.noteTitle;
+	selectedNoteStore.noteText = note.noteText;
+
+	selectedNoteStore.save();
+
+});
+
+module.exports = selectedNoteStore;
+
+},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/store":"/var/www/common/store.js","object-assign":"/var/www/node_modules/object-assign/index.js"}]},{},["./react-components/source/app/app.jsx"]);

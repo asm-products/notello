@@ -37,6 +37,7 @@ module.exports = assign(new Dispatcher(), {
 		'getUserNotesCompleted',
 		'updateUserNotesCompleted',
 		'updateNoteCompleted',
-		'insertNoteCompleted'
+		'createNoteCompleted',
+		'selectedNote'
 	]
 });

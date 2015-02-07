@@ -164,7 +164,9 @@ $app->post('/api/note', function () use ($app) {
 
 	if (isValid($app)) {
 
+		$noteTitle = json_encode($app->request->post('noteTitle'));
 		$noteText = json_encode($app->request->post('noteText'));
+		$noteId = uniqid();
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
@@ -172,15 +174,16 @@ $app->post('/api/note', function () use ($app) {
 		));
 
 		// Make insert into user notes in database
-		$dbClient->postItem(array(
+		$dbClient->putItem(array(
 		    'TableName' => 'notes',
 		    'Item'       => array(
-		        'noteId'   => array('S' => uniqid()), // Primary Key
+		        'noteId'   => array('S' => $noteId), // Primary Key
+		        'noteTitle' => array('S' => $noteTitle),
 		        'noteText' => array('S' => $noteText)
 		    )
 		));
 
-        $app->response->setBody(json_encode(array('message' => 'Successful')));
+        $app->response->setBody(json_encode(array('noteId' => $noteId)));
 	}
 
 });
@@ -189,6 +192,7 @@ $app->put('/api/note/:noteId', function ($noteId) use ($app) {
 
 	if (isValid($app)) {
 
+		$noteTitle = json_encode($app->request->post('noteTitle'));
 		$noteText = json_encode($app->request->post('noteText'));
 
 		// Get AWS DynamoDB Client
@@ -201,6 +205,7 @@ $app->put('/api/note/:noteId', function ($noteId) use ($app) {
 		    'TableName' => 'notes',
 		    'Item'       => array(
 		        'noteId'   => array('S' => $noteId), // Primary Key
+		        'noteTitle' => array('S' => $noteTitle),
 		        'noteText' => array('S' => $noteText)
 		    )
 		));
