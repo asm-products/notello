@@ -159,7 +159,7 @@ $app->put('/api/usernotes', function () use ($app) {
 	        )
 		));
 
-        $app->response->setBody(json_encode(array('message' => $userNotes)));
+        $app->response->setBody(json_encode(array('userNotes' => $userNotes)));
 	}
 
 });

@@ -2,6 +2,7 @@
 var api = require('../common/api');
 var lscache = require('ls-cache');
 var dispatcher = require('./notelloDispatcher');
+var getUserNotesAction = require('./getUserNotes');
 
 var resetTokenAction = function () {
 
@@ -15,6 +16,8 @@ var resetTokenAction = function () {
 
 				lscache.set('authToken', resp.token);
 				dispatcher.dispatchDiscrete('resetToken');
+
+				getUserNotesAction();
 
 			} else {
 

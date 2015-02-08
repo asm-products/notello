@@ -509,6 +509,26 @@ var createNotebookAction = function (userNotes, notebookName) {
 
 module.exports = createNotebookAction;
 
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/getUserNotes.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+var api = require('../common/api');
+
+var getUserNotesAction = function () {
+
+	api({
+		url: 'api/usernotes',
+		method: 'get',
+		cache: false,
+		success: function (resp) {
+			
+			dispatcher.dispatchDiscrete('getUserNotesCompleted', JSON.parse(resp.userNotes));
+	    }
+	});
+};
+
+module.exports = getUserNotesAction;
+
 },{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/hideBookshelf.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
@@ -645,6 +665,7 @@ module.exports = assign(new Dispatcher(), {
 var api = require('../common/api');
 var lscache = require('ls-cache');
 var dispatcher = require('./notelloDispatcher');
+var getUserNotesAction = require('./getUserNotes');
 
 var resetTokenAction = function () {
 
@@ -659,6 +680,8 @@ var resetTokenAction = function () {
 				lscache.set('authToken', resp.token);
 				dispatcher.dispatchDiscrete('resetToken');
 
+				getUserNotesAction();
+
 			} else {
 
 				dispatcher.dispatchDiscrete('loggedOut');
@@ -669,7 +692,7 @@ var resetTokenAction = function () {
 
 module.exports = resetTokenAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./getUserNotes":"/var/www/actions/getUserNotes.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -57008,7 +57031,8 @@ var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
 var $ = require('jquery');
-var NewItem = require('../newitem/newitem')
+var NewItem = require('../newitem/newitem');
+var UserNotes = require('../usernotes/usernotes');
 
 var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
@@ -57033,9 +57057,7 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 							), 
 							React.createElement("div", {className: "item-container"}, 
 								React.createElement("span", {className: "add-item ion-plus-circled", title: "Add a new note, notebook, or box", onClick: this.handleAddItem, onTouchEnd: this.handleAddItem, style: { width: '40px'}}), 
-								React.createElement("img", {src: "dist/images/archivebox.png", className: "archive-box"}), 
-								React.createElement("img", {src: "dist/images/notebook.png", className: "notebook"}), 
-								React.createElement("img", {src: "dist/images/paper.png", className: "paper"})
+								React.createElement(UserNotes, null)
 							), 
 							React.createElement("div", {className: "bottom-shelf shelf-border"})
 						)
@@ -57048,7 +57070,7 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
 module.exports = bookcaseComponent;
 
-},{"../newitem/newitem":"/var/www/react-components/source/newitem/newitem.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
+},{"../newitem/newitem":"/var/www/react-components/source/newitem/newitem.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","../usernotes/usernotes":"/var/www/react-components/source/usernotes/usernotes.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
 var React = require('react');
 var Notepad = require('../notepad/notepad');
 var Bookcase = require('../bookcase/bookcase');
@@ -57864,7 +57886,61 @@ var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 
 module.exports = searchbarComponent;
 
-},{"react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
+},{"react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/usernotes/usernotes.jsx":[function(require,module,exports){
+
+var React = require('react');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
+var bookshelfStore = require('../../../stores/bookshelfStore');
+
+var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
+
+	_haveUsernotes: function () {
+
+		this.setState({
+			userNotes: bookshelfStore.userNotes
+		});
+	},
+
+	getInitialState: function () {
+
+		return {
+			userNotes: bookshelfStore.userNotes || []
+		};
+	},
+
+	componentDidMount: function () {
+
+		bookshelfStore.onChange(this._haveUsernotes);
+	},
+
+	render: function () {
+
+		console.log(this.state.userNotes);
+
+		return 	React.createElement("div", {style: { display: 'inline-block'}}, 
+					this.state.userNotes && this.state.userNotes.map(function (item) {
+
+						if (item.itemType === 'note') {
+							return React.createElement("img", {key: item.noteId, src: "dist/images/paper.png", className: "paper"});
+						}
+
+						if (item.itemType === 'notebook') {
+							return React.createElement("img", {key: item.notebookId, src: "dist/images/notebook.png", className: "notebook"})
+						}
+
+						if (item.itemType === 'box') {
+							return React.createElement("img", {key: item.boxId, src: "dist/images/archivebox.png", className: "archive-box"});
+						}
+					})
+				);
+	}
+
+});
+
+module.exports = usernotesComponent;
+
+},{"../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
 var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');
@@ -57897,6 +57973,12 @@ notelloDispatcher.registerDiscrete('shelfHidden', function () {
 });
 
 notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNotes) {
+
+	bookShelfStore.userNotes = userNotes;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes) {
 
 	bookShelfStore.userNotes = userNotes;
 	bookShelfStore.save();

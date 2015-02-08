@@ -3,7 +3,8 @@ var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
 var $ = require('jquery');
-var NewItem = require('../newitem/newitem')
+var NewItem = require('../newitem/newitem');
+var UserNotes = require('../usernotes/usernotes');
 
 var bookcaseComponent = React.createClass({
 
@@ -28,9 +29,7 @@ var bookcaseComponent = React.createClass({
 							</div>
 							<div className="item-container">
 								<span className="add-item ion-plus-circled" title="Add a new note, notebook, or box" onClick={this.handleAddItem} onTouchEnd={this.handleAddItem} style={{ width: '40px' }}></span>
-								<img src="dist/images/archivebox.png" className="archive-box" />
-								<img src="dist/images/notebook.png" className="notebook" />
-								<img src="dist/images/paper.png" className="paper" />
+								<UserNotes />
 							</div>
 							<div className="bottom-shelf shelf-border"></div>
 						</div>

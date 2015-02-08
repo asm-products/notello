@@ -10,10 +10,7 @@ var getUserNotesAction = function () {
 		cache: false,
 		success: function (resp) {
 			
-			dispatcher.dispatchDiscrete('getUserNotesCompleted', {
-
-				userNotes: resp.userNotes
-			});
+			dispatcher.dispatchDiscrete('getUserNotesCompleted', JSON.parse(resp.userNotes));
 	    }
 	});
 };

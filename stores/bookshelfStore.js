@@ -35,4 +35,10 @@ notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNote
 	bookShelfStore.save();
 });
 
+notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes) {
+
+	bookShelfStore.userNotes = userNotes;
+	bookShelfStore.save();
+});
+
 module.exports = bookShelfStore;
