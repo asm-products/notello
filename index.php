@@ -120,10 +120,6 @@ function hydrateId ($userNotes) {
 		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'box' && !isset($userNoteValue['boxId'])) {
 
 			$userNotes[$userNoteKey]['boxId'] = uniqid();
-
-			$userNotes[$userNoteKey]['notes'] = hydrateId($userNoteValue['notes']);
-
-			$userNotes[$userNoteKey]['notebooks'] = hydrateId($userNoteValue['notebooks']);
 		}
 
 		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'note' && !isset($userNoteValue['noteId'])) {

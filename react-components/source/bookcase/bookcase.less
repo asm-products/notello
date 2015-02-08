@@ -136,7 +136,30 @@
 	vertical-align: top;
 }
 
+.item-container {
+	height: 100px;
+	padding-left: 130px;
+}
+
 @keyframes bookcaseShownAnimation {  
     0% { z-index: 0; }
     100% { z-index: 1; }
+}
+
+@media all and (max-width: 875px) {
+	.bookcase .logo {
+		display: none;
+	}
+}
+
+@media all and (max-width: 1050px) {
+	.item-container {
+		padding-left: 50px;
+	}
+}
+
+@media all and (max-width: 400px) {
+	.item-container {
+		padding-left: 10px;
+	}
 }

@@ -406,7 +406,42 @@ var authenticate = function (email, authToken) {
 
 module.exports = authenticate;
 
-},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/createNote.js":[function(require,module,exports){
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/createBox.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+var api = require('../common/api');
+
+var createBoxAction = function (userNotes, boxName) {
+
+	if (!userNotes) {
+		userNotes = [];
+	}
+
+	userNotes.push({
+
+		itemType: 'box',
+		boxName: boxName
+	});
+
+	dispatcher.dispatchDiscrete('createBoxCompleted', userNotes);
+
+	api({
+		url: 'api/usernotes',
+		method: 'post',
+		data: {
+			'_METHOD': 'PUT',
+			userNotes: userNotes
+		},
+		success: function (result) {
+			
+			dispatcher.dispatchDiscrete('createBoxCompleted', result.userNotes);
+	    }
+	});
+};
+
+module.exports = createBoxAction;
+
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/createNote.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -600,7 +635,8 @@ module.exports = assign(new Dispatcher(), {
 		'updateNoteCompleted',
 		'createNoteCompleted',
 		'selectedNote',
-		'createNotebookCompleted'
+		'createNotebookCompleted',
+		'createBoxCompleted'
 	]
 });
 
@@ -56971,112 +57007,14 @@ var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
-var ModalForm = require('../modal-form/modalForm');
 var $ = require('jquery');
-var createNoteAction = require('../../../actions/createNote');
-var hideBookshelfAction = require('../../../actions/hideBookshelf');
-var bookshelfStore = require('../../../stores/bookshelfStore');
-var createNotebookAction = require('../../../actions/createNotebook');
+var NewItem = require('../newitem/newitem')
 
 var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
-	handleOpened: function () {
-
-		var self = this;
-
-		// Chrome really sucks here for some reason. It's calculations for margins were way off.
-		// Not sure what other browsers are doing with this.
-		setTimeout(function () {
-
-			$(self.refs.formOne.getDOMNode()).css('width', '100%');
-
-			$(self.refs.formOne.getDOMNode()).css('opacity', '1');
-			$(self.refs.formTwo.getDOMNode()).css('opacity', '1');
-
-		}, 50);
-		
-	},
-
-	getInitialState: function () {
-
-		return {
-			shouldSlide: false,
-			itemType: null,
-			itemName: null
-		};
-	},
-
 	handleAddItem: function (event) {
 
-		this.setState({
-			shouldSlide: false,
-			itemType: null
-		});
-
-		$(this.refs.formOne.getDOMNode()).attr('style', '');
-		$(this.refs.formTwo.getDOMNode()).attr('style', '');
-
-		$(this.refs.formTwo.getDOMNode()).css('width', '100%');
-
-		this.refs.addNewItemModal.open();
-	},
-
-	handleNewNote: function (event) {
-
-		this.setState({
-			shouldSlide: false,
-			itemType: null
-		});
-
-		this.refs.addNewItemModal.close();
-
-		createNoteAction('', '');
-
-		hideBookshelfAction();
-	},
-
-	handleNewNoteBook: function (event) {
-
-		this.setState({
-			shouldSlide: true,
-			itemType: 'notebook'
-		});
-	},
-
-	handleNewBox: function (event) {
-
-		this.setState({
-			shouldSlide: true,
-			itemType: 'box'
-		});
-	},
-
-	handleCreate: function (event) {
-		
-		this.setState({
-			shouldSlide: false,
-			itemType: null
-		});
-
-		this.refs.addNewItemModal.close();
-
-		if (this.state.itemType === 'box') {
-
-			createBoxAction(bookshelfStore.userNotes, this.state.itemName);
-
-		} else if (this.state.itemType === 'notebook') {
-
-			createNotebookAction(bookshelfStore.userNotes, this.state.itemName);
-		}
-
-		hideBookshelfAction();
-	},
-
-	handleItemNameChange: function (event) {
-
-		this.setState({
-			itemName: event.target.value
-		});
+		this.refs.newItem.open();
 	},
 
 	render: function () {
@@ -57086,18 +57024,6 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 			'bookcase-shown': this.props.isViewingBookshelf
 		});
 
-		var buttonClasses = 'submit-btn ion ion-load text-left generic-transition';
-
-		var firstFormClasses = cx({
-			'form-one button-transition': true,
-			'slide': this.state.shouldSlide
-		});
-
-		var secondFormClasses = cx({
-			'form-two button-transition': true,
-			'slide-second-form': this.state.shouldSlide
-		});
-
 		return 	React.createElement("div", {ref: "divBookcase", className: classes}, 
 					React.createElement("div", {className: "wall"}, 
 						React.createElement("div", {className: "shelf"}, 
@@ -57105,45 +57031,16 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 								React.createElement(Searchbar, null), 
 								React.createElement("div", {className: "logo"}, "Notello")
 							), 
-							React.createElement("div", {style: { height: '100px', paddingLeft: '130px'}}, 
+							React.createElement("div", {className: "item-container"}, 
+								React.createElement("span", {className: "add-item ion-plus-circled", title: "Add a new note, notebook, or box", onClick: this.handleAddItem, onTouchEnd: this.handleAddItem, style: { width: '40px'}}), 
 								React.createElement("img", {src: "dist/images/archivebox.png", className: "archive-box"}), 
 								React.createElement("img", {src: "dist/images/notebook.png", className: "notebook"}), 
-								React.createElement("img", {src: "dist/images/paper.png", className: "paper"}), 
-								React.createElement("span", {className: "add-item ion-plus-circled", title: "Add a new item", onClick: this.handleAddItem, onTouchEnd: this.handleAddItem})
+								React.createElement("img", {src: "dist/images/paper.png", className: "paper"})
 							), 
 							React.createElement("div", {className: "bottom-shelf shelf-border"})
 						)
 					), 
-					React.createElement(ModalForm, {ref: "addNewItemModal", showSubmit: false, modalTitle: "ADD NEW ITEM", onOpened: this.handleOpened, onSubmit: this.handleCreate}, 
-						React.createElement("div", {ref: "formOne", className: firstFormClasses}, 
-							React.createElement("div", {className: "input-wrapper"}, 
-								React.createElement("button", {ref: "btnNewNote", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNote}, 
-									React.createElement("img", {src: "dist/images/paper-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTE")
-								)
-							), 
-							React.createElement("div", {className: "input-wrapper"}, 
-								React.createElement("button", {ref: "btnNewNoteBook", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNoteBook}, 
-									React.createElement("img", {src: "dist/images/notebook-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTEBOOK")
-								)
-							), 
-							React.createElement("div", {className: "input-wrapper"}, 
-								React.createElement("button", {ref: "btnNewBox", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewBox}, 
-									React.createElement("img", {src: "dist/images/archivebox.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW BOX")
-								)
-							)
-						), 
-						React.createElement("div", {ref: "formTwo", className: secondFormClasses}, 
-							React.createElement("div", {className: "input-wrapper"}, 
-								this.state.itemType !== 'note' && React.createElement("input", {id: "txtItemName", ref: "itemName", name: "itemName", isRequired: true, requiredMessage: "Name is required", type: "text", 
-								 placeholder: 'Enter name of the ' + this.state.itemType, className: "padded-input", value: this.state.itemName, onChange: this.handleItemNameChange})
-							), 
-							React.createElement("div", {className: "input-wrapper"}, 
-								this.state.itemType !== 'note' && React.createElement("button", {ref: "btnCreate", type: "submit", onTouchEnd: this.handleCreate, className: "submit-btn ion ion-load generic-transition"}, 
-									"CREATE"
-								)
-							)
-						 )
-					)
+					React.createElement(NewItem, {ref: "newItem"})
 				);
 	}
 
@@ -57151,7 +57048,7 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
 module.exports = bookcaseComponent;
 
-},{"../../../actions/createNote":"/var/www/actions/createNote.js","../../../actions/createNotebook":"/var/www/actions/createNotebook.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
+},{"../newitem/newitem":"/var/www/react-components/source/newitem/newitem.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/desk/desk.jsx":[function(require,module,exports){
 var React = require('react');
 var Notepad = require('../notepad/notepad');
 var Bookcase = require('../bookcase/bookcase');
@@ -57585,7 +57482,181 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
 module.exports = modalFormComponent;
 
-},{"../../../common/sounds":"/var/www/common/sounds.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/notepad/notepad.jsx":[function(require,module,exports){
+},{"../../../common/sounds":"/var/www/common/sounds.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/newitem/newitem.jsx":[function(require,module,exports){
+var React = require('react');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
+var Searchbar = require('../searchbar/searchbar');
+var ModalForm = require('../modal-form/modalForm');
+var $ = require('jquery');
+var createNoteAction = require('../../../actions/createNote');
+var hideBookshelfAction = require('../../../actions/hideBookshelf');
+var bookshelfStore = require('../../../stores/bookshelfStore');
+var createNotebookAction = require('../../../actions/createNotebook');
+var createBoxAction = require('../../../actions/createBox');
+
+var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
+
+	getInitialState: function () {
+
+		return {
+			shouldSlide: false,
+			itemType: null,
+			itemName: null
+		};
+	},
+
+	open: function () {
+
+		this.setState({
+			shouldSlide: false,
+			itemType: null
+		});
+
+		$(this.refs.formOne.getDOMNode()).attr('style', '');
+		$(this.refs.formTwo.getDOMNode()).attr('style', '');
+
+		$(this.refs.formTwo.getDOMNode()).css('width', '100%');
+		
+		this.refs.addNewItemModal.open();
+	},
+
+	handleOpened: function () {
+
+		var self = this;
+
+		// Chrome really sucks here for some reason. It's calculations for margins were way off.
+		// Not sure what other browsers are doing with this.
+		setTimeout(function () {
+
+			$(self.refs.formOne.getDOMNode()).css('width', '100%');
+
+			$(self.refs.formOne.getDOMNode()).css('opacity', '1');
+			$(self.refs.formTwo.getDOMNode()).css('opacity', '1');
+
+		}, 50);
+		
+	},
+
+	handleNewNote: function (event) {
+
+		this.setState({
+			shouldSlide: false,
+			itemType: null
+		});
+
+		this.refs.addNewItemModal.close();
+
+		createNoteAction('', '');
+
+		hideBookshelfAction();
+	},
+
+	handleNewNoteBook: function (event) {
+
+		// TODO: handle new box and hand new notebook can be abstracted away
+
+		var self = this;
+
+		self.setState({
+			shouldSlide: true,
+			itemType: 'notebook'
+		});
+		
+		$(self.refs.itemName.getDOMNode()).focus();
+	},
+
+	handleNewBox: function (event) {
+
+		var self = this;
+
+		self.setState({
+			shouldSlide: true,
+			itemType: 'box'
+		});
+
+		$(self.refs.itemName.getDOMNode()).focus();
+	},
+
+	handleCreate: function (event) {
+		
+		this.setState({
+			shouldSlide: false,
+			itemType: null
+		});
+
+		this.refs.addNewItemModal.close();
+
+		if (this.state.itemType === 'box') {
+
+			createBoxAction(bookshelfStore.userNotes, this.state.itemName);
+
+		} else if (this.state.itemType === 'notebook') {
+
+			createNotebookAction(bookshelfStore.userNotes, this.state.itemName);
+		}
+
+		hideBookshelfAction();
+	},
+
+	handleItemNameChange: function (event) {
+
+		this.setState({
+			itemName: event.target.value
+		});
+	},
+
+	render: function () {
+
+		var buttonClasses = 'submit-btn ion ion-load text-left generic-transition';
+
+		var firstFormClasses = cx({
+			'form-one button-transition': true,
+			'slide': this.state.shouldSlide
+		});
+
+		var secondFormClasses = cx({
+			'form-two button-transition': true,
+			'slide-second-form': this.state.shouldSlide
+		});
+
+		return 	React.createElement(ModalForm, {ref: "addNewItemModal", showSubmit: false, modalTitle: "ADD NEW ITEM", onOpened: this.handleOpened, onSubmit: this.handleCreate}, 
+					React.createElement("div", {ref: "formOne", className: firstFormClasses}, 
+						React.createElement("div", {className: "input-wrapper"}, 
+							React.createElement("button", {ref: "btnNewNote", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNote}, 
+								React.createElement("img", {src: "dist/images/paper-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTE")
+							)
+						), 
+						React.createElement("div", {className: "input-wrapper"}, 
+							React.createElement("button", {ref: "btnNewNoteBook", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNoteBook}, 
+								React.createElement("img", {src: "dist/images/notebook-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTEBOOK")
+							)
+						), 
+						React.createElement("div", {className: "input-wrapper"}, 
+							React.createElement("button", {ref: "btnNewBox", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewBox}, 
+								React.createElement("img", {src: "dist/images/archivebox.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW BOX")
+							)
+						)
+					), 
+					React.createElement("div", {ref: "formTwo", className: secondFormClasses}, 
+						React.createElement("div", {className: "input-wrapper"}, 
+							this.state.itemType !== 'note' && React.createElement("input", {id: "txtItemName", ref: "itemName", name: "itemName", isRequired: true, requiredMessage: "Name is required", type: "text", 
+							 placeholder: 'Enter name of the ' + this.state.itemType, className: "padded-input", value: this.state.itemName, onChange: this.handleItemNameChange})
+						), 
+						React.createElement("div", {className: "input-wrapper"}, 
+							this.state.itemType !== 'note' && React.createElement("button", {ref: "btnCreate", type: "submit", onTouchEnd: this.handleCreate, className: "submit-btn ion ion-load generic-transition"}, 
+								"CREATE"
+							)
+						)
+					 )
+				);
+	}
+
+});
+
+module.exports = bookcaseComponent;
+
+},{"../../../actions/createBox":"/var/www/actions/createBox.js","../../../actions/createNote":"/var/www/actions/createNote.js","../../../actions/createNotebook":"/var/www/actions/createNotebook.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","../searchbar/searchbar":"/var/www/react-components/source/searchbar/searchbar.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/notepad/notepad.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
