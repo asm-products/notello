@@ -106,6 +106,37 @@ $app->get('/api/usernotes', function () use ($app) {
 
 });
 
+function hydrateId ($userNotes) {
+
+	foreach ($userNotes as $userNoteKey => $userNoteValue) {
+
+		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'notebook' && !isset($userNoteValue['notebookId'])) {
+
+			$userNotes[$userNoteKey]['notebookId'] = uniqid();
+
+			$userNotes[$userNoteKey]['notes'] = hydrateId($userNoteValue['notes']);
+		}
+
+		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'box' && !isset($userNoteValue['boxId'])) {
+
+			$userNotes[$userNoteKey]['boxId'] = uniqid();
+
+			$userNotes[$userNoteKey]['notes'] = hydrateId($userNoteValue['notes']);
+
+			$userNotes[$userNoteKey]['notebooks'] = hydrateId($userNoteValue['notebooks']);
+		}
+
+		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'note' && !isset($userNoteValue['noteId'])) {
+
+			$userNotes[$userNoteKey]['noteId'] = uniqid();
+		}
+
+	}
+	unset($userNoteValue);
+        
+    return $userNotes;
+}
+
 $app->put('/api/usernotes', function () use ($app) {
 
 	if (isValid($app)) {
@@ -114,22 +145,7 @@ $app->put('/api/usernotes', function () use ($app) {
 		$oldToken = explode(':', $token);
 		$email = $oldToken[0];
 
-		$userNotes = $app->request->post('userNotes');
-
-		foreach ($userNotes as $userNoteKey => $userNoteValue) {
-
-			if ($userNoteValue['itemType'] === 'notebook' && !isset($userNoteValue['notebookId'])) {
-
-				$userNotes[$userNoteKey]['notebookId'] = uniqid();
-			}
-
-			if ($userNoteValue['itemType'] === 'box' && !isset($userNoteValue['boxId'])) {
-
-				$userNotes[$userNoteKey]['boxId'] = uniqid();
-			}
-
-		}
-		unset($userNoteValue);
+		$userNotes = hydrateId($app->request->post('userNotes'));
 
 		$userNotesEncoded = json_encode($userNotes);
 

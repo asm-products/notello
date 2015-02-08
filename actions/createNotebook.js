@@ -13,6 +13,7 @@ var createNotebookAction = function (userNotes, notebookName) {
 		itemType: 'notebook',
 		notebookName: notebookName,
 		notes: [{
+			itemType: 'note',
 			noteTitle: '',
 			noteText: ''
 		}]
