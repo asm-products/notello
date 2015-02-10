@@ -601,6 +601,7 @@ input {
   display: block;
 }
 
+
 .notepad {
   height: 360px;
   /*width: 600px; TODO: see about getting rid of this */
@@ -778,4 +779,11 @@ input {
 }
 .search-focused .searchbar-wrapper {
   opacity: 1 !important;
+}
+
+.ghost {
+  opacity: 0;
+}
+.usernote-item:active {
+  opacity: 0;
 }

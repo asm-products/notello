@@ -7,6 +7,7 @@ var cx = ReactAddons.classSet;
 var Header = require('../header/header');
 var _ = require('underscore');
 var $ = require('jquery');
+var bookshelf
 
 var deskComponent = React.createClass({
 
@@ -23,7 +24,9 @@ var deskComponent = React.createClass({
 
 		event.preventDefault();
 
-		hideBookshelf();
+		if (this.props.isViewingBookshelf) {
+			hideBookshelf();
+		}
 	},
 
 	componentDidMount: function () {
