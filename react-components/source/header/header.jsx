@@ -8,7 +8,12 @@ var headerComponent = React.createClass({
 
 	handleClick: function (event) {
 
+		event.preventDefault();
 		event.stopPropagation();
+
+		if ('activeElement' in document) {
+		    document.activeElement.blur();
+		}
 
 		viewBookshelf();
 	},

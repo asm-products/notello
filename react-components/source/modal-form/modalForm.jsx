@@ -3,6 +3,7 @@ var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var $ = require('jquery');
 var sounds = require('../../../common/sounds');
+var modalToggle = require('../../../actions/modalToggle');
 
 var modalFormComponent = React.createClass({
 
@@ -65,13 +66,11 @@ var modalFormComponent = React.createClass({
 		};
 	},
 
-	isOpened: function () {
-
-	},
-
 	open: function () {
 
 		var self = this;
+
+		modalToggle.opened();
 
 		this._isOpened = true;
 		this._modalContainer.fadeIn(200, function () {
@@ -83,6 +82,8 @@ var modalFormComponent = React.createClass({
 	},
 
 	close: function () {
+
+		modalToggle.closed();
 
 		this._isOpened = false;
 		this._modalContainer.fadeOut(200);
@@ -152,8 +153,10 @@ var modalFormComponent = React.createClass({
 		return 	<div ref="modalContainer" className="modal-form-component" onClick={this.handleClick}>
 					<div className="modal-background"></div>
 					<div ref="modalWrapper" className="modal-form-wrapper">
-						<span className="span-close ion-ios-close-outline" onTouchEnd={this.handleClose} onClick={this.handleClose}></span>
-						<label className="lbl-form" htmlFor="txtEmailAddress">{props.modalTitle}</label>
+						<div style={{ position: 'relative' }}>
+							<span className="span-close ion-ios-close-outline" onTouchEnd={this.handleClose} onClick={this.handleClose}></span>
+							<label className="lbl-form" htmlFor="txtEmailAddress">{props.modalTitle}</label>
+						</div>
 						<hr className="hr-form" />
 						<div className={ cx({'modal-validation-container': true, 'hide': this.state.isValid }) }
 							dangerouslySetInnerHTML={{__html: this.state.validationMessage}}>

@@ -25,6 +25,11 @@ var deskComponent = React.createClass({
 		event.preventDefault();
 
 		if (this.props.isViewingBookshelf) {
+
+			if ('activeElement' in document) {
+		    	document.activeElement.blur();
+			}
+			
 			hideBookshelf();
 		}
 	},

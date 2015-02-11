@@ -7,6 +7,8 @@ var moment = require('moment');
 var $ = require('jquery');
 var updateNoteAction = require('../../../actions/updateNote');
 var selectedNoteStore = require('../../../stores/selectedNoteStore');
+var bookShelfStore = require('../../../stores/bookshelfStore');
+var modalStore = require('../../../stores/modalStore');
 
 var cursor = null;
 
@@ -47,14 +49,16 @@ var notepadComponent = React.createClass({
 
 	_selectedNote: function () {
 
-
-console.log('f');
-
 		this.setState({
 			noteId: selectedNoteStore.noteId,
 			noteTitle: selectedNoteStore.noteTitle,
 			noteText: selectedNoteStore.noteText
 		});
+	},
+
+	_modalOpened: function () {
+
+		this.forceUpdate();
 	},
 
 	getInitialState: function() {
@@ -68,6 +72,7 @@ console.log('f');
 	componentDidMount: function () {
 
 		selectedNoteStore.onChange(this._selectedNote);
+		modalStore.onChange(this._modalOpened);
 	},
 
 	handleChange: function (event) {
@@ -140,15 +145,17 @@ console.log('f');
 			'hide': this.props.isViewingBookshelf
 		});
 
+		var shouldBeDisabled = (modalStore.numberOfModalsOpened > 0) || (domUtils.isMobile && bookShelfStore.isViewingBookshelf);
+
 		return 	<div className="notepad" style={{ height: calculatedNotepadHeight + 'px' }}>
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
-						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} />
+						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} disabled={shouldBeDisabled} />
 						<span className="notepad-date">{moment(new Date()).format("MM/DD/YYYY")}</span>
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
-					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange}></textarea>
+					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled}></textarea>
 					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={this.state.noteText} />
 				</div>;
 	}

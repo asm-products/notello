@@ -16,11 +16,13 @@ var Link = Router.Link;
 var _ = require('underscore');
 var $ = require('jquery');
 var cookie = require('jquery.cookie');
+var domUtils= require('../../../common/dom-utils');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
 var resetTokenAction = require('../../../actions/resetToken');
 var hideBookshelfAction = require('../../../actions/hideBookshelf');
+var logoutAction = require('../../../actions/logout');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -32,10 +34,7 @@ var lscache = require('ls-cache');
 
 React.initializeTouchEvents(true);
 
-var isMobile = false;
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-	isMobile = true;
-}
+var isMobile = domUtils.isMobile;
 
 var currentDate = new Date();
 
@@ -88,6 +87,8 @@ var App = React.createClass({
 			email =  tempAuthTokenArray && tempAuthTokenArray[0];
 
 		api.register(function () {
+			
+			self._sessionTimeoutTime = getSessionMinutes();
 
 			app.setState({
 				showFormBlocker: true
@@ -122,8 +123,6 @@ var App = React.createClass({
 			self._sessionInterval = setInterval(function () {
 
 				timeLeft = Math.floor((self._sessionTimeoutTime - Date.now()) / 1000);
-
-				console.log(timeLeft);
 				
 				if (timeLeft < 2) {
 		

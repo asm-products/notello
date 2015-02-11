@@ -40,6 +40,8 @@ module.exports = assign(new Dispatcher(), {
 		'createNoteCompleted',
 		'selectedNote',
 		'createNotebookCompleted',
-		'createBoxCompleted'
+		'createBoxCompleted',
+		'modalClosed',
+		'modalOpened'
 	]
 });

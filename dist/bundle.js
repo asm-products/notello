@@ -17,11 +17,13 @@ var Link = Router.Link;
 var _ = require('underscore');
 var $ = require('jquery');
 var cookie = require('jquery.cookie');
+var domUtils= require('../../../common/dom-utils');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
 var resetTokenAction = require('../../../actions/resetToken');
 var hideBookshelfAction = require('../../../actions/hideBookshelf');
+var logoutAction = require('../../../actions/logout');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -33,10 +35,7 @@ var lscache = require('ls-cache');
 
 React.initializeTouchEvents(true);
 
-var isMobile = false;
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-	isMobile = true;
-}
+var isMobile = domUtils.isMobile;
 
 var currentDate = new Date();
 
@@ -89,6 +88,8 @@ var App = React.createClass({displayName: 'App',
 			email =  tempAuthTokenArray && tempAuthTokenArray[0];
 
 		api.register(function () {
+			
+			self._sessionTimeoutTime = getSessionMinutes();
 
 			app.setState({
 				showFormBlocker: true
@@ -123,8 +124,6 @@ var App = React.createClass({displayName: 'App',
 			self._sessionInterval = setInterval(function () {
 
 				timeLeft = Math.floor((self._sessionTimeoutTime - Date.now()) / 1000);
-
-				console.log(timeLeft);
 				
 				if (timeLeft < 2) {
 		
@@ -209,7 +208,7 @@ $(function () {
 	resetTokenAction();
 });
 
-},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../common/api":"/var/www/common/api.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
+},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -683,6 +682,25 @@ var logout = function () {
 
 module.exports = logout;
 
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/modalToggle.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+
+var modalToggle = {
+
+	opened: function () {
+
+		dispatcher.dispatchDiscrete('modalOpened');
+	},
+
+	closed: function () {
+
+		dispatcher.dispatchDiscrete('modalClosed');
+	}
+};
+
+module.exports = modalToggle;
+
 },{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/notelloDispatcher.js":[function(require,module,exports){
 
 var assign = require('object-assign');
@@ -726,7 +744,9 @@ module.exports = assign(new Dispatcher(), {
 		'createNoteCompleted',
 		'selectedNote',
 		'createNotebookCompleted',
-		'createBoxCompleted'
+		'createBoxCompleted',
+		'modalClosed',
+		'modalOpened'
 	]
 });
 
@@ -974,7 +994,9 @@ var publicMembers = {
 		return stringObj === 'true' ? true : false;
 	},
 
-	iOS: ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false )
+	iOS: ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false ),
+
+	isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 };
 
 module.exports = publicMembers;
@@ -57171,6 +57193,11 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 		event.preventDefault();
 
 		if (this.props.isViewingBookshelf) {
+
+			if ('activeElement' in document) {
+		    	document.activeElement.blur();
+			}
+			
 			hideBookshelf();
 		}
 	},
@@ -57212,7 +57239,12 @@ var headerComponent = React.createClass({displayName: 'headerComponent',
 
 	handleClick: function (event) {
 
+		event.preventDefault();
 		event.stopPropagation();
+
+		if ('activeElement' in document) {
+		    document.activeElement.blur();
+		}
 
 		viewBookshelf();
 	},
@@ -57346,6 +57378,7 @@ var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var $ = require('jquery');
 var sounds = require('../../../common/sounds');
+var modalToggle = require('../../../actions/modalToggle');
 
 var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
@@ -57408,13 +57441,11 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 		};
 	},
 
-	isOpened: function () {
-
-	},
-
 	open: function () {
 
 		var self = this;
+
+		modalToggle.opened();
 
 		this._isOpened = true;
 		this._modalContainer.fadeIn(200, function () {
@@ -57426,6 +57457,8 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 	},
 
 	close: function () {
+
+		modalToggle.closed();
 
 		this._isOpened = false;
 		this._modalContainer.fadeOut(200);
@@ -57495,8 +57528,10 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 		return 	React.createElement("div", {ref: "modalContainer", className: "modal-form-component", onClick: this.handleClick}, 
 					React.createElement("div", {className: "modal-background"}), 
 					React.createElement("div", {ref: "modalWrapper", className: "modal-form-wrapper"}, 
-						React.createElement("span", {className: "span-close ion-ios-close-outline", onTouchEnd: this.handleClose, onClick: this.handleClose}), 
-						React.createElement("label", {className: "lbl-form", htmlFor: "txtEmailAddress"}, props.modalTitle), 
+						React.createElement("div", {style: { position: 'relative'}}, 
+							React.createElement("span", {className: "span-close ion-ios-close-outline", onTouchEnd: this.handleClose, onClick: this.handleClose}), 
+							React.createElement("label", {className: "lbl-form", htmlFor: "txtEmailAddress"}, props.modalTitle)
+						), 
 						React.createElement("hr", {className: "hr-form"}), 
 						React.createElement("div", {className:  cx({'modal-validation-container': true, 'hide': this.state.isValid }), 
 							dangerouslySetInnerHTML: {__html: this.state.validationMessage}}
@@ -57517,7 +57552,7 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 
 module.exports = modalFormComponent;
 
-},{"../../../common/sounds":"/var/www/common/sounds.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/newitem/newitem.jsx":[function(require,module,exports){
+},{"../../../actions/modalToggle":"/var/www/actions/modalToggle.js","../../../common/sounds":"/var/www/common/sounds.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/newitem/newitem.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
@@ -57701,6 +57736,8 @@ var moment = require('moment');
 var $ = require('jquery');
 var updateNoteAction = require('../../../actions/updateNote');
 var selectedNoteStore = require('../../../stores/selectedNoteStore');
+var bookShelfStore = require('../../../stores/bookshelfStore');
+var modalStore = require('../../../stores/modalStore');
 
 var cursor = null;
 
@@ -57741,14 +57778,16 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 	_selectedNote: function () {
 
-
-console.log('f');
-
 		this.setState({
 			noteId: selectedNoteStore.noteId,
 			noteTitle: selectedNoteStore.noteTitle,
 			noteText: selectedNoteStore.noteText
 		});
+	},
+
+	_modalOpened: function () {
+
+		this.forceUpdate();
 	},
 
 	getInitialState: function() {
@@ -57762,6 +57801,7 @@ console.log('f');
 	componentDidMount: function () {
 
 		selectedNoteStore.onChange(this._selectedNote);
+		modalStore.onChange(this._modalOpened);
 	},
 
 	handleChange: function (event) {
@@ -57834,15 +57874,17 @@ console.log('f');
 			'hide': this.props.isViewingBookshelf
 		});
 
+		var shouldBeDisabled = (modalStore.numberOfModalsOpened > 0) || (domUtils.isMobile && bookShelfStore.isViewingBookshelf);
+
 		return 	React.createElement("div", {className: "notepad", style: { height: calculatedNotepadHeight + 'px'}}, 
 					React.createElement("div", {className: "pink-divider"}), 
 					React.createElement("div", {className: "notepad-header"}, 
-						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange}), 
+						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange, disabled: shouldBeDisabled}), 
 						React.createElement("span", {className: "notepad-date"}, moment(new Date()).format("MM/DD/YYYY"))
 					), 
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
 					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
-					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange}), 
+					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange, disabled: shouldBeDisabled}), 
 					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: this.state.noteText})
 				);
 	}
@@ -57851,10 +57893,12 @@ console.log('f');
 
 module.exports = notepadComponent;
 
-},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
+},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
+var domUtils = require('../../../common/dom-utils');
+var bookShelfStore = require('../../../stores/bookshelfStore');
 
 var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 
@@ -57890,7 +57934,7 @@ var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 						React.createElement("label", {htmlFor: "txtSearch"}, 
 							React.createElement("span", {className: "search ion-android-search", title: "Search notes"})
 						), 
-						React.createElement("input", {id: "txtSearch", type: "text", placeholder: "Search your notes", className: "search-text generic-transition", onBlur: this.handleBlur, onFocus: this.handleFocus})
+						React.createElement("input", {id: "txtSearch", type: "text", placeholder: "Search your notes", className: "search-text generic-transition", onBlur: this.handleBlur, onFocus: this.handleFocus, disabled: domUtils.isMobile && !bookShelfStore.isViewingBookshelf})
 					)
 				);
 	}
@@ -57899,7 +57943,7 @@ var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 
 module.exports = searchbarComponent;
 
-},{"react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/usernotes/usernotes.jsx":[function(require,module,exports){
+},{"../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/usernotes/usernotes.jsx":[function(require,module,exports){
 
 var React = require('react');
 var ReactAddons = require('react-addons');
@@ -58055,7 +58099,33 @@ notelloDispatcher.registerDiscrete('resetToken', function () {
 
 module.exports = loginStore;
 
-},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/dom-utils":"/var/www/common/dom-utils.js","../common/store":"/var/www/common/store.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/stores/selectedNoteStore.js":[function(require,module,exports){
+},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/dom-utils":"/var/www/common/dom-utils.js","../common/store":"/var/www/common/store.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/stores/modalStore.js":[function(require,module,exports){
+var notelloDispatcher = require('../actions/notelloDispatcher');
+var Store = require('../common/store');
+var assign = require('object-assign');
+
+var modalStore = assign(new Store(), {
+
+	numberOfModalsOpened: 0
+});
+
+notelloDispatcher.registerDiscrete('modalOpened', function () {
+
+	modalStore.numberOfModalsOpened += 1;
+
+	modalStore.save();
+});
+
+notelloDispatcher.registerDiscrete('modalClosed', function () {
+
+	modalStore.numberOfModalsOpened = modalStore.numberOfModalsOpened === 0 ? 0 : (modalStore.numberOfModalsOpened - 1);
+
+	modalStore.save();
+});
+
+module.exports = modalStore;
+
+},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/store":"/var/www/common/store.js","object-assign":"/var/www/node_modules/object-assign/index.js"}],"/var/www/stores/selectedNoteStore.js":[function(require,module,exports){
 var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');
