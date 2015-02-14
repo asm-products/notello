@@ -17,6 +17,7 @@ var _ = require('underscore');
 var $ = require('jquery');
 var cookie = require('jquery.cookie');
 var domUtils= require('../../../common/dom-utils');
+var lscache = require('ls-cache');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
@@ -30,7 +31,7 @@ var ModalForm = require('../modal-form/modalForm');
 // Stores
 var bookshelfStore = require('../../../stores/bookshelfStore');
 var loginStore = require('../../../stores/loginStore');
-var lscache = require('ls-cache');
+var modalStore = require('../../../stores/modalStore');
 
 React.initializeTouchEvents(true);
 

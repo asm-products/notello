@@ -18,6 +18,7 @@ var _ = require('underscore');
 var $ = require('jquery');
 var cookie = require('jquery.cookie');
 var domUtils= require('../../../common/dom-utils');
+var lscache = require('ls-cache');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
@@ -31,7 +32,7 @@ var ModalForm = require('../modal-form/modalForm');
 // Stores
 var bookshelfStore = require('../../../stores/bookshelfStore');
 var loginStore = require('../../../stores/loginStore');
-var lscache = require('ls-cache');
+var modalStore = require('../../../stores/modalStore');
 
 React.initializeTouchEvents(true);
 
@@ -208,7 +209,7 @@ $(function () {
 	resetTokenAction();
 });
 
-},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
+},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -57711,7 +57712,8 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 					React.createElement("div", {ref: "formTwo", className: secondFormClasses}, 
 						React.createElement("div", {className: "input-wrapper"}, 
 							this.state.itemType !== 'note' && React.createElement("input", {id: "txtItemName", ref: "itemName", name: "itemName", isRequired: true, requiredMessage: "Name is required", type: "text", 
-							 placeholder: 'Enter name of the ' + this.state.itemType, className: "padded-input", value: this.state.itemName, onChange: this.handleItemNameChange})
+							 placeholder: 'Enter name of the ' + this.state.itemType, className: "padded-input", value: this.state.itemName, onChange: this.handleItemNameChange, 
+							 disabled: !this.state.shouldSlide})
 						), 
 						React.createElement("div", {className: "input-wrapper"}, 
 							this.state.itemType !== 'note' && React.createElement("button", {ref: "btnCreate", type: "submit", onTouchEnd: this.handleCreate, className: "submit-btn ion ion-load generic-transition"}, 

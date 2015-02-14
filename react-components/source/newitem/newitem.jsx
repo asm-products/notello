@@ -156,7 +156,8 @@ var bookcaseComponent = React.createClass({
 					<div ref="formTwo" className={secondFormClasses}>
 						<div className="input-wrapper">
 							{this.state.itemType !== 'note' && <input id="txtItemName" ref="itemName" name="itemName" isRequired={true} requiredMessage="Name is required" type="text"
-							 placeholder={'Enter name of the ' + this.state.itemType} className="padded-input" value={this.state.itemName} onChange={this.handleItemNameChange} />}
+							 placeholder={'Enter name of the ' + this.state.itemType} className="padded-input" value={this.state.itemName} onChange={this.handleItemNameChange} 
+							 disabled={!this.state.shouldSlide} />}
 						</div>
 						<div className="input-wrapper">
 							{this.state.itemType !== 'note' && <button ref="btnCreate" type="submit" onTouchEnd={this.handleCreate} className="submit-btn ion ion-load generic-transition">
