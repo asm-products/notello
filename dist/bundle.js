@@ -523,8 +523,7 @@ var _updateUserNotes = function (userNotes, noteId, noteTitle, noteText) {
 
 	var newNote = {
 		noteId: noteId,
-		noteTitle: noteTitle,
-		noteText: noteText
+		noteTitle: noteTitle
 	};
 
 	userNotes.push(newNote);
@@ -862,27 +861,37 @@ module.exports = updateNoteAction;
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
+var lscache = require('ls-cache');
 
-// TODO: Handle offline persistence
 var updateUserNotesAction = function (userNotes) {
 
-	api({
-		url: 'api/usernotes',
-		method: 'post',
-		data: {
-			'_METHOD': 'PUT',
-			usernotes: userNotes
-		},
-		success: function (resp) {
-			
-			dispatcher.dispatchDiscrete('updateUserNotesCompleted');
-	    }
-	});
+
+	if (lscache.get('isAuthenticated')) {		
+
+		api({
+			url: 'api/usernotes',
+			method: 'post',
+			data: {
+				'_METHOD': 'PUT',
+				usernotes: userNotes
+			},
+			success: function (resp) {
+				
+				dispatcher.dispatchDiscrete('updateUserNotesCompleted');
+		    }
+		});
+
+	} else {
+
+		lscache.set('unAuthUserNotes', userNotes);
+		
+		dispatcher.dispatchDiscrete('updateUserNotesCompleted');
+	}
 };
 
 module.exports = updateUserNotesAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 

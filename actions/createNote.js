@@ -9,8 +9,7 @@ var _updateUserNotes = function (userNotes, noteId, noteTitle, noteText) {
 
 	var newNote = {
 		noteId: noteId,
-		noteTitle: noteTitle,
-		noteText: noteText
+		noteTitle: noteTitle
 	};
 
 	userNotes.push(newNote);
