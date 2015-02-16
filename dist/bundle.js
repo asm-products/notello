@@ -515,31 +515,60 @@ module.exports = createBoxAction;
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
+var lscache = require('ls-cache');
+var updateUserNotesAction = require('../actions/updateUserNotes');
+var domUtility = require('../common/dom-utils');
 
-var createNoteAction = function (noteTitle, noteText) {
+var _updateUserNotes = function (userNotes, noteId, noteTitle, noteText) {
 
-	api({
-		url: 'api/note',
-		method: 'post',
-		data: {
-			noteTitle: noteTitle,
-			noteText: noteText
-		},
-		success: function (result) {
-			
-			dispatcher.dispatchDiscrete('createNoteCompleted', {
+	var newNote = {
+		noteId: noteId,
+		noteTitle: noteTitle,
+		noteText: noteText
+	};
 
-				noteId: result.noteId,
+	userNotes.push(newNote);
+
+	dispatcher.dispatchDiscrete('createNoteCompleted', newNote);
+
+	updateUserNotesAction(userNotes);
+};
+
+var createNoteAction = function (userNotes, noteTitle, noteText) {
+
+	if (lscache.get('isAuthenticated')) {		
+
+		api({
+			url: 'api/note',
+			method: 'post',
+			data: {
 				noteTitle: noteTitle,
 				noteText: noteText
-			});
-	    }
-	});
+			},
+			success: function (result) {
+
+				_updateUserNotes(userNotes, result.noteId, noteTitle, noteText);
+		    }
+		});
+
+	} else {
+
+		var newNote = {
+
+			noteId: domUtility.randomUUID(),
+			noteTitle: noteTitle,
+			noteText: noteText
+		};
+
+		lscache.set('unAuthNote_' + newNote.noteId, newNote);
+
+		_updateUserNotes(userNotes, newNote.noteId, noteTitle, noteText);
+	}
 };
 
 module.exports = createNoteAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/createNotebook.js":[function(require,module,exports){
+},{"../actions/updateUserNotes":"/var/www/actions/updateUserNotes.js","../common/api":"/var/www/common/api.js","../common/dom-utils":"/var/www/common/dom-utils.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/createNotebook.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -829,7 +858,31 @@ var updateNoteAction = _.debounce(function (noteId, noteTitle, noteText) {
 
 module.exports = updateNoteAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/updateUserNotes.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+var api = require('../common/api');
+
+// TODO: Handle offline persistence
+var updateUserNotesAction = function (userNotes) {
+
+	api({
+		url: 'api/usernotes',
+		method: 'post',
+		data: {
+			'_METHOD': 'PUT',
+			usernotes: userNotes
+		},
+		success: function (resp) {
+			
+			dispatcher.dispatchDiscrete('updateUserNotesCompleted');
+	    }
+	});
+};
+
+module.exports = updateUserNotesAction;
+
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/viewBookshelf.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 
@@ -997,7 +1050,28 @@ var publicMembers = {
 
 	iOS: ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false ),
 
-	isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+	isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+
+	randomUUID: function () {
+		
+		var s = [], itoh = '0123456789ABCDEF';
+
+		// Make array of random hex digits. The UUID only has 32 digits in it, but we
+		// allocate an extra items to make room for the '-'s we'll be inserting.
+		for (var i = 0; i < 36; i++) s[i] = Math.floor(Math.random()*0x10);
+
+		// Conform to RFC-4122, section 4.4
+		s[14] = 4;  // Set 4 high bits of time_high field to version
+		s[19] = (s[19] & 0x3) | 0x8;  // Specify 2 high bits of clock sequence
+
+		// Convert to hex chars
+		for (var i = 0; i < 36; i++) s[i] = itoh[s[i]];
+
+		// Insert '-'s
+		s[8] = s[13] = s[18] = s[23] = '-';
+
+		return s.join('');
+	}
 };
 
 module.exports = publicMembers;
@@ -57618,14 +57692,14 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 
 		this.refs.addNewItemModal.close();
 
-		createNoteAction('', '');
+		createNoteAction(bookshelfStore.userNotes || [], '', '');
 
 		hideBookshelfAction();
 	},
 
 	handleNewNoteBook: function (event) {
 
-		// TODO: handle new box and hand new notebook can be abstracted away
+		// TODO: handle new box and hand new notebook can probably be abstracted away
 
 		var self = this;
 

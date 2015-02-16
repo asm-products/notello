@@ -2,6 +2,7 @@
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
 
+// TODO: Handle offline persistence
 var updateUserNotesAction = function (userNotes) {
 
 	api({

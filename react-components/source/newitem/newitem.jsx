@@ -62,14 +62,14 @@ var bookcaseComponent = React.createClass({
 
 		this.refs.addNewItemModal.close();
 
-		createNoteAction('', '');
+		createNoteAction(bookshelfStore.userNotes || [], '', '');
 
 		hideBookshelfAction();
 	},
 
 	handleNewNoteBook: function (event) {
 
-		// TODO: handle new box and hand new notebook can be abstracted away
+		// TODO: handle new box and hand new notebook can probably be abstracted away
 
 		var self = this;
 
