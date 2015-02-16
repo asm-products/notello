@@ -1,17 +1,22 @@
 
 var dispatcher = require('./notelloDispatcher');
+<<<<<<< HEAD
 var _ = require('underscore');
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
 
 var hideBookshelfAction = function () {
 	
 	dispatcher.dispatchDiscrete('hideBookshelf');
+<<<<<<< HEAD
 
 	_.delay(function () {
 
 		dispatcher.dispatchDiscrete('shelfHidden');
 
 	}, 500);
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
 };
 
 module.exports = hideBookshelfAction;
-

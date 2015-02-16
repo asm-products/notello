@@ -1,0 +1,54 @@
+var notelloDispatcher = require('../actions/notelloDispatcher');
+var Store = require('../common/store');
+var assign = require('object-assign');
+
+var bookShelfStore = assign(new Store(), {
+
+<<<<<<< HEAD
+	isViewingBookshelf: false,
+	isDoneAnimating: true,
+	userNotes: null
+=======
+	isViewingBookshelf: false
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+});
+
+notelloDispatcher.registerDiscrete('viewBookshelf', function () {
+
+	bookShelfStore.isViewingBookshelf = true;
+<<<<<<< HEAD
+	bookShelfStore.isDoneAnimating = false;
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('hideBookshelf', function () {
+
+	bookShelfStore.isViewingBookshelf = false;
+	bookShelfStore.save();
+});
+
+<<<<<<< HEAD
+notelloDispatcher.registerDiscrete('shelfHidden', function () {
+
+	bookShelfStore.isViewingBookshelf = false;
+	bookShelfStore.isDoneAnimating = true;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNotes) {
+
+	bookShelfStore.userNotes = userNotes;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes) {
+
+	bookShelfStore.userNotes = userNotes;
+	bookShelfStore.save();
+});
+
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+module.exports = bookShelfStore;

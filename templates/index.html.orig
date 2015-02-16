@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  	<head>
+      <link href="//fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
+      <link href="//fonts.googleapis.com/css?family=Raleway:500" rel="stylesheet" type="text/css">
+      <link href="//code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css">
+  		<meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  		<meta name="keywords" content="note, notes, note taking app">
+  		<meta name="description" content="Notello is a quick and simple note taking app and it's free.">
+    	<title>Notello | A simple note taking app</title>
+    	<link rel="stylesheet" href="dist/styles.css">
+      <link rel="shortcut icon" href="favicon.ico">
+  	</head>
+  	<body>
+      <script src="dist/bundle.js"></script>
+<<<<<<< HEAD
+=======
+      <input id="hfMessage" type="hidden" value="<?php echo $message ?>" />
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+  	</body>
+</html>

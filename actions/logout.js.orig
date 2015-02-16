@@ -1,8 +1,14 @@
+
+<<<<<<< HEAD
 var dispatcher = require('./notelloDispatcher');
 
 var logout = function () {
 
 	dispatcher.dispatchDiscrete('loggedOut');
+=======
+var logout = function () {
+
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
 };
 
 module.exports = logout;

@@ -1,0 +1,82 @@
+var React = require('react');
+var Notepad = require('../notepad/notepad');
+var Bookcase = require('../bookcase/bookcase');
+var hideBookshelf = require('../../../actions/hideBookshelf');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
+var Header = require('../header/header');
+<<<<<<< HEAD
+var _ = require('underscore');
+var $ = require('jquery');
+var bookshelf
+
+var deskComponent = React.createClass({
+
+	_adjustMinHeight: _.throttle(function () {
+
+		var deskDOMNode = this.refs.divDesk.getDOMNode();
+		var calculatedHeight = window.innerHeight - deskDOMNode.offsetTop;
+
+		deskDOMNode.style.minHeight = calculatedHeight + 'px';
+
+	}, 50),
+
+=======
+
+var deskComponent = React.createClass({
+
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	handleClick: function (event) {
+
+		event.preventDefault();
+
+<<<<<<< HEAD
+		if (this.props.isViewingBookshelf) {
+
+			if ('activeElement' in document) {
+		    	document.activeElement.blur();
+			}
+			
+			hideBookshelf();
+		}
+=======
+		hideBookshelf();
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	},
+
+	componentDidMount: function () {
+
+<<<<<<< HEAD
+		this._adjustMinHeight();
+		$(window).resize(this._adjustMinHeight);
+=======
+		var deskDOMNode = this.refs.divDesk.getDOMNode();
+		var calculatedHeight = window.innerHeight - deskDOMNode.offsetTop;
+
+		deskDOMNode.style.minHeight = calculatedHeight + 'px';
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	},
+
+	render: function () {
+
+		var classes = cx({
+			desk: true,
+<<<<<<< HEAD
+			'animate-desk': this.props.isViewingBookshelf,
+			'animating-desk': !this.props.isDoneAnimating
+=======
+			'animate-desk': this.props.isViewingBookshelf
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+		});
+
+		return 	<div className="desk-container">
+					<div id="divDesk" ref="divDesk" className={classes} onTouchEnd={this.handleClick} onClick={this.handleClick}>
+						<Header isViewingBookshelf={this.props.isViewingBookshelf} />
+						<Notepad isViewingBookshelf={this.props.isViewingBookshelf} />
+					</div>
+				</div>
+	}
+
+});
+
+module.exports = deskComponent;

@@ -1,0 +1,80 @@
+
+var $ = require('jquery');
+var _ = require('underscore');
+<<<<<<< HEAD
+var lscache = require('ls-cache');
+
+var preProcessingCallbacks = [];
+var postProcessingCallbacks = [];
+
+var api = function (options) {
+
+	preProcessingCallbacks.map(function (callback) {
+=======
+
+var callbacks = [];
+
+var api = function (options) {
+
+	callbacks.map(function (callback) {
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+		callback();
+	});
+
+	options.error = function (resp) {
+
+		// Error should already have been logged on server side
+		// TODO: Make sure this doesn't happen in production
+		document.body.style.background = 'white';
+		document.body.innerHTML = resp.responseText;
+	};
+
+	options.success = _.wrap(options.success, function (successFunction, data, textStatus, jqXHR) {
+
+		// This should always be JSON so if HTML came back we can assume there was an unhandled error
+		if(jqXHR.getResponseHeader('content-type') === 'text/html') {
+
+			document.body.style.background = 'white';
+			document.body.innerHTML = data;
+
+		} else {
+
+			successFunction(data);
+<<<<<<< HEAD
+
+			postProcessingCallbacks.map(function (callback) {
+				callback();
+			});
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+		}
+	});
+
+	options.type = 'json';
+
+<<<<<<< HEAD
+	if (lscache.get('authToken')) {
+
+		options.headers = {
+        	'X-Authorization': lscache.get('authToken')
+		};
+	}
+
+	$.ajax(options);
+};
+
+api.register = function (preProcessingCallback, postProcessingCallback) {
+
+	preProcessingCallbacks.push(preProcessingCallback);
+	postProcessingCallbacks.push(postProcessingCallback);
+=======
+	$.ajax(options);
+};
+
+api.register = function (callback) {
+
+	callbacks.push(callback);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+};
+
+module.exports = api;

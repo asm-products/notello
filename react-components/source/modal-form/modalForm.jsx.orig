@@ -1,0 +1,235 @@
+var React = require('react');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
+var $ = require('jquery');
+var sounds = require('../../../common/sounds');
+<<<<<<< HEAD
+var modalToggle = require('../../../actions/modalToggle');
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+var modalFormComponent = React.createClass({
+
+	_modalContainer: null,
+<<<<<<< HEAD
+	
+	_modalWrapper: null,
+
+	_isOpened: null,
+
+=======
+	_modalWrapper: null,
+
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	_shake: function () {
+
+  		// Got frustrated here with react and did straight up jQuery
+  		// I'm sure there's a "proper" way to do this type of recurring animation in react.
+  		var modalWrapper = this._modalWrapper.get(0);
+  		sounds.play('bongos');
+  		modalWrapper.className = 'modal-form-wrapper';
+  		setTimeout(function () { 
+  			modalWrapper.className = 'modal-form-wrapper modal-shake';
+<<<<<<< HEAD
+  		}, 100);
+=======
+  		}, 1);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	},
+
+	_checkValidation: function () {
+
+		var validationMessage = '';
+
+<<<<<<< HEAD
+		var setValidationMessage = function (child) {
+
+			if (child.props && child.props.isRequired && !child.props.value) {
+
+				validationMessage += child.props.requiredMessage + '<br>';
+
+			} else if (child.props && child.props.regex && new RegExp(child.props.regex).test(child.props.value) === false) {
+
+				validationMessage += child.props.regexMessage + '<br>';
+
+			} else if (child.props) {
+
+				if (React.Children.count(child.props.children) > 1) {
+
+					React.Children.map(child.props.children, setValidationMessage);
+
+				} else if (React.Children.count(child.props.children) === 1) {
+
+					setValidationMessage(child.props.children);
+				}
+			}
+
+		};
+
+		React.Children.map(this.props.children, setValidationMessage);
+=======
+		{React.Children.map(this.props.children, function (child) {
+
+			if (child.props.isRequired && child.props.value === '') {
+				validationMessage += child.props.requiredMessage + '<br>';
+			} else if (child.props.regex && new RegExp(child.props.regex).test(child.props.value) === false) {
+				validationMessage += child.props.regexMessage + '<br>';
+			}
+		})}
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+		return validationMessage;
+	},
+
+	getInitialState: function () {
+
+		return {
+			isValid: true,
+			validationMessage: ''
+		};
+	},
+
+	open: function () {
+
+<<<<<<< HEAD
+		var self = this;
+
+		modalToggle.opened();
+
+		this._isOpened = true;
+		this._modalContainer.fadeIn(200, function () {
+			if (self.props.onOpened) {
+				self.props.onOpened();
+			}
+		});
+=======
+		this._modalContainer.fadeIn(200);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+		this._modalContainer.find('input').first().focus();
+	},
+
+	close: function () {
+
+<<<<<<< HEAD
+		modalToggle.closed();
+
+		this._isOpened = false;
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+		this._modalContainer.fadeOut(200);
+	},
+
+	componentDidMount: function () {
+
+		this._modalContainer = $(this.refs.modalContainer.getDOMNode());
+		this._modalWrapper = $(this.refs.modalWrapper.getDOMNode());
+	},
+
+	handleClose: function (event) {
+
+		this.close();
+  		this._modalWrapper.get(0).className = 'modal-form-wrapper';
+<<<<<<< HEAD
+
+  		if (this.props.onClose) {
+
+			this.props.onClose(event);
+  		}
+=======
+		this.props.onClose(event);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+		if ('activeElement' in document) {
+    		document.activeElement.blur();
+		}
+
+		this.setState({
+  			isValid: true,
+			validationMessage: ''
+  		});
+	},
+
+	handleSubmit: function (event) {
+
+  		event.preventDefault();
+  		event.stopPropagation();
+
+  		var validationMessage = this._checkValidation();
+
+  		if (validationMessage !== '') {
+  		
+  			this._shake();
+
+  		} else {
+
+<<<<<<< HEAD
+  			if (this.props.onSubmit) {
+  				this.props.onSubmit(event);
+  			}
+=======
+  			this.props.onSubmit(event);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+  		}
+
+  		this.setState({
+  			isValid: validationMessage === '',
+  			validationMessage: validationMessage
+  		});
+	},
+
+	handleClick: function (event) {
+
+  		event.stopPropagation();
+	},
+
+	render: function () {
+
+		var props = this.props;
+
+<<<<<<< HEAD
+		var btnSubmitText = this.props.loading ? <span className="ion-load-d"></span> : props.btnSubmitText;
+=======
+		var btnSubmitText = this.props.loading ? <span className="ion-load-d"></span> : 'SEND LOGIN EMAIL';
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+		return 	<div ref="modalContainer" className="modal-form-component" onClick={this.handleClick}>
+					<div className="modal-background"></div>
+					<div ref="modalWrapper" className="modal-form-wrapper">
+<<<<<<< HEAD
+						<div style={{ position: 'relative' }}>
+							<span className="span-close ion-ios-close-outline" onTouchEnd={this.handleClose} onClick={this.handleClose}></span>
+							<label className="lbl-form" htmlFor="txtEmailAddress">{props.modalTitle}</label>
+						</div>
+=======
+						<span className="span-close ion-ios-close-outline" onTouchEnd={this.handleClose} onClick={this.handleClose}></span>
+						<label className="lbl-form" htmlFor="txtEmailAddress">LOGIN</label>
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+						<hr className="hr-form" />
+						<div className={ cx({'modal-validation-container': true, 'hide': this.state.isValid }) }
+							dangerouslySetInnerHTML={{__html: this.state.validationMessage}}>
+						</div>
+<<<<<<< HEAD
+						<form action="" onSubmit={this.handleSubmit} autoComplete="on" autoCorrect="off" style={{ whiteSpace: 'nowrap', textAlign: 'center', overflow: 'hidden' }}>
+							{React.Children.map(props.children, function (child) {
+								return child.type === 'div' ? child : <div className="input-wrapper">{child}</div>;
+							})}
+							{this.props.showSubmit !== false && <button ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn ion ion-load generic-transition">
+								{btnSubmitText}
+							</button>}
+=======
+						<form action="" onSubmit={this.handleSubmit} autoComplete="on" autoCorrect="off">
+							{React.Children.map(props.children, function (child) {
+								return <div className="input-wrapper">{child}</div>;
+							})}
+							<button ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn ion ion-load">
+								{btnSubmitText}
+							</button>
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+						</form>
+					</div>
+				</div>;
+	}
+
+});
+
+module.exports = modalFormComponent;

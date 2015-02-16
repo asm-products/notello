@@ -1,0 +1,50 @@
+<<<<<<< HEAD
+
+.desk-container {
+=======
+.desk-container
+{
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	perspective: 1000px;
+	height: 100%;
+	width: 100%;
+}
+
+<<<<<<< HEAD
+.animate-desk {
+	transform: rotateX(70deg) rotateY(0deg) rotateZ(0deg) scale3d(1, 1, 1) translate3d(0px, 200px, 0px) skew(0deg, 0deg);
+	position: absolute;
+	z-index: 2;
+
+	& .header .logo {
+		opacity: 0;
+	}
+}
+
+.animating-desk {
+	position: absolute;
+	z-index: 2;
+}
+
+.desk {
+=======
+.animate-desk
+{
+	transform: rotateX(70deg) rotateY(0deg) rotateZ(0deg) scale3d(1, 1, 1) translate3d(0px, 200px, 0px) skew(0deg, 0deg);
+	position: absolute;
+	z-index: 2;
+}
+
+.desk
+{
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	background-image: url(images/wood.jpg);
+  	background-size: cover;
+	width: 100%;
+	height: 100%;
+<<<<<<< HEAD
+    transition: all .5s;
+=======
+    transition: all 0.5s;
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+}

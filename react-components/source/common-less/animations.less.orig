@@ -1,0 +1,78 @@
+
+.generic-transition {
+    transition: transform 0.3s, all 0.2s;
+<<<<<<< HEAD
+
+}
+
+.button-transition {
+    transition: transform 0.3s, all 0.2s, margin 0.5s, opacity 0.5s;
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+}
+
+.opacity-transition {
+    transition: display 0.3s, opacity 0.2s;
+}
+
+<<<<<<< HEAD
+.big-screen-login.slide-off-right, .big-screen-login.slide-in-right {
+=======
+.big-screen-login.slide-off-right, .big-screen-login.slide-in-right
+{
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+.big-screen-login.slide-in-right {
+    animation-name: slideInRight;
+}
+
+.big-screen-login.slide-off-right {
+    animation-name: slideOffRight;
+}
+
+@keyframes slideInRight {  
+
+	0% { 
+		width: 0%;
+		height: 0%;
+	}
+
+	100% { 
+		width: 90%;
+		height: 90%;
+	}
+}
+
+@keyframes slideOffRight {  
+	0% { 
+		width: 90%;
+		height: 90%;
+	}
+
+	100% { 
+		width: 0%;
+		height: 0%;
+	}
+}
+
+@media screen and (min-width: 500px)
+{
+	@keyframes slideInRight {  
+		0% { right: -500px; }
+		50% { right: 0; }
+		75% { right: 35px; }
+		100% { right: 15px;}
+	}
+
+	@keyframes slideOffRight {  
+		0% { right: 15px; }
+		50% { right: 35px; }
+		75% { right: 0; }
+		100% { right: -500px;}
+	}
+}

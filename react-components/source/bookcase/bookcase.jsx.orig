@@ -1,0 +1,58 @@
+var React = require('react');
+var ReactAddons = require('react-addons');
+var cx = ReactAddons.classSet;
+<<<<<<< HEAD
+var Searchbar = require('../searchbar/searchbar');
+var $ = require('jquery');
+var NewItem = require('../newitem/newitem');
+var UserNotes = require('../usernotes/usernotes');
+
+var bookcaseComponent = React.createClass({
+
+	handleAddItem: function (event) {
+
+		this.refs.newItem.open();
+	},
+
+=======
+
+var bookcaseComponent = React.createClass({
+
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	render: function () {
+
+		var classes = cx({
+			bookcase: true,
+			'bookcase-shown': this.props.isViewingBookshelf
+		});
+
+		return 	<div ref="divBookcase" className={classes}>
+					<div className="wall">
+						<div className="shelf">
+<<<<<<< HEAD
+							<div className="top-shelf shelf-border">
+								<Searchbar />
+								<div className="logo">Notello</div>
+							</div>
+							<div className="item-container">
+								<span className="add-item ion-plus-circled" title="Add a new note, notebook, or box" onClick={this.handleAddItem} onTouchEnd={this.handleAddItem} style={{ width: '40px' }}></span>
+								<UserNotes />
+							</div>
+							<div className="bottom-shelf shelf-border"></div>
+						</div>
+					</div>
+					<NewItem ref="newItem" />
+=======
+							<img src="dist/images/bookshelf-small.jpg" className="img-shelf" />
+						</div>
+						<div className="shelf">
+							<img src="dist/images/bookshelf-small.jpg" className="img-shelf" />
+						</div>
+					</div>
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+				</div>;
+	}
+
+});
+
+module.exports = bookcaseComponent;

@@ -1,0 +1,275 @@
+@modalDarkBlue: #293854;
+@modalLightBlue: #488BAE;
+
+
+/************************************************************
+	The white modalness thingy
+*************************************************************/
+
+.modal-form-component {
+	width: 100%;
+	height: 100%;
+<<<<<<< HEAD
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	z-index: 9999;
+=======
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 4;
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	display: none;
+}
+
+.modal-background {
+	background-color: white;
+	width: 100%;
+	height: 100%;
+	opacity: 0.9;
+<<<<<<< HEAD
+	z-index: -1;
+	position: absolute;
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+}
+
+/************************************************************
+	The close button on the form
+*************************************************************/
+
+.span-close {
+	
+<<<<<<< HEAD
+	position: absolute;
+	top: 0;
+	right: 0;
+=======
+	float: right;
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	width: 50px;
+	height: 50px;
+	margin: 10px 10px 0 0;
+	cursor: pointer;
+	color: #fff;
+	font-size: 48px;
+	display: block;
+	text-align: center;
+	opacity: 1;
+    box-sizing: border-box;
+
+	&:hover::before {
+		opacity: 0.9;
+	}
+}
+
+/************************************************************
+	The label for the form
+*************************************************************/
+
+.lbl-form {
+	color: #fff;
+	display: inline-block;
+	width: 100%;
+	text-align: center;
+	font-family: 'Raleway', sans-serif;
+<<<<<<< HEAD
+	cursor: pointer;
+	padding-top: 40px;
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+}
+
+.hr-form {
+	height: 2px;
+	border: 0;
+	background-color: @modalLightBlue;
+}
+
+/************************************************************
+	The modal form and sub components
+*************************************************************/
+
+.modal-form-wrapper {
+
+	background-color: @modalDarkBlue;
+	width: 90%;
+<<<<<<< HEAD
+	max-width: 600px;
+	position: static;
+	margin: 0 auto;
+	border-radius: 3px;
+	box-shadow: 0px 0px 19px 5px rgba(0,0,0,0.50);
+	padding-bottom: 50px;
+	transform: translateY(20%);
+=======
+	height: 90%;
+	max-width: 600px;
+	max-height: 400px;
+  	transform: translate(-50%, -50%);
+	left: 50%;
+	top: 50%;
+	position: fixed;
+	z-index: 1;
+	border-radius: 3px;
+	box-shadow: 0px 0px 19px 5px rgba(0,0,0,0.50);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+	& form {
+		padding-top: 20px;
+	}
+
+	& .input-wrapper {
+		margin-bottom: 20px;
+<<<<<<< HEAD
+		position: relative;
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	}
+	
+	& input[type="text"], & input[type="email"] {
+		border: 1px solid black;
+		height: 40px;
+		border-radius: 3px;
+		outline: 0;
+		vertical-align: top;
+		font-size: 1em;
+		padding: 10px;
+<<<<<<< HEAD
+		display: inline-block;
+=======
+		display: block;
+		margin: 0 auto;
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+    	box-sizing: border-box;
+		width: 85%;
+		background-color: #dde0e5;
+		color: @modalDarkBlue;
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.75);
+	}
+
+	& input[type="text"]:focus, & input[type="email"]:focus {
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233, 1);
+	}
+}
+
+
+/************************************************************
+	The validation DIV
+*************************************************************/
+
+.modal-validation-container {
+
+	background-color: white;
+	border: 2px solid rgb(205, 38, 38);
+	color: rgb(205, 38, 38);
+	width: 85%;
+	border-radius: 3px;
+    box-sizing: border-box;
+    margin: 0 auto;
+	font-weight: 700;
+	font-size: .9em;
+	padding: 10px;
+	font-family: Arial;
+}
+
+/************************************************************
+	The submit button on the form
+*************************************************************/
+
+.submit-btn {
+	background-color: @modalLightBlue;
+	color: white;
+	padding: 10px;
+	outline: none;
+	font-weight: bold;
+	font-size: 0.9em;
+	cursor: pointer;
+	width: 85%;
+<<<<<<< HEAD
+	display: inline-block;
+=======
+	margin: 0 auto;
+	display: block;
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	border-radius: 3px;
+    box-sizing: border-box;
+    border: 0;
+    height: 40px;
+}
+
+.submit-btn:hover, .submit-btn:focus {
+<<<<<<< HEAD
+	transform: scale(1.02, 1.02);
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	background-color: #357596;
+}
+
+.submit-btn:active {
+<<<<<<< HEAD
+	transform: scale(0.9, 0.9);
+=======
+	margin-top: 24px;
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+}
+
+@keyframes loader {
+
+  	0% {
+    	transform: rotate(0deg);
+  	}
+
+  	100% {
+    	transform: rotate(360deg);
+  	}
+
+}
+
+.ion-load-d {
+	font-size: 1.5em;
+	animation: loader 1s infinite linear;
+}
+<<<<<<< HEAD
+
+.p-modal-text {
+	
+	padding: 10px 0;
+	background-color: white;
+	width: 85%;
+	margin: 0 auto;
+	border: 1px solid #488bae;
+	padding: 10px 0;
+	font-family: arial;
+	border-radius: 3px;
+}
+
+.span-modal-text {
+	
+	padding-left: 10px;
+	display: block;
+}
+
+@media all and (max-height: 450px) {
+	
+	.modal-form-wrapper {
+		width: 98%;
+	}
+
+	.modal-form-wrapper form {
+		padding-top: 0;
+	}
+
+	.lbl-form {
+		padding-top: 10px;
+	}
+
+	.span-close {
+		margin: 0 25px 0 0;
+		font-size: 35px;
+	}
+}
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7

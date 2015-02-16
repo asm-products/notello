@@ -1,0 +1,87 @@
+var notelloDispatcher = require('../actions/notelloDispatcher');
+var Store = require('../common/store');
+var assign = require('object-assign');
+var lscache = require('ls-cache');
+<<<<<<< HEAD
+var domUtils = require('../common/dom-utils');
+=======
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+// The loginStore is a special store which uses lscache to store values as opposed to
+// an in memory object. This is because authentication details should persist on page refreshes, etc.
+var loginStore = new Store();
+
+if (!lscache.get('isAuthenticated')) {
+
+<<<<<<< HEAD
+	loginStore.pendingLogin = false;
+	lscache.set('isAuthenticated', false);
+=======
+	lscache.set('isAuthenticated', false);
+	lscache.set('pendingLogin', false);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+	lscache.set('email', null);
+	lscache.set('authToken', null);
+}
+
+notelloDispatcher.registerDiscrete('attemptedLogin', function () {
+
+<<<<<<< HEAD
+	loginStore.pendingLogin = true;
+=======
+	lscache.set('pendingLogin', true);
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+	loginStore.save();
+});
+
+<<<<<<< HEAD
+notelloDispatcher.registerDiscrete('loggedIn', function (payload) {
+
+	loginStore.pendingLogin = false;
+	lscache.set('isAuthenticated', true);
+	lscache.set('email', payload.email);
+	lscache.set('authToken', payload.authToken);
+
+	loginStore.save();
+});
+
+notelloDispatcher.registerDiscrete('loggedOut', function () {
+
+	loginStore.pendingLogin = false;
+	lscache.set('isAuthenticated', false);
+	lscache.set('email', null);
+	lscache.set('authToken', null);
+
+	loginStore.save();
+});
+
+notelloDispatcher.registerDiscrete('resetToken', function () {
+
+	loginStore.save();
+});
+=======
+// notelloDispatcher.registerDiscrete('loggedIn', function (email, authToken) {
+
+// 	loginStore.pendingLogin = false;
+
+// 	lscache.set('isAuthenticated', true);
+// 	lscache.set('email', email);
+// 	lscache.set('authToken', authToken);
+
+// 	loginStore.save();
+// });
+
+// notelloDispatcher.registerDiscrete('loggedOut', function () {
+
+// 	loginStore.pendingLogin = false;
+
+// 	lscache.set('isAuthenticated', false);
+// 	lscache.set('email', null);
+// 	lscache.set('authToken', null);
+
+// 	loginStore.save();
+// });
+>>>>>>> 3c65ce31f5b42bdd100c0e4dc07e3d40918fd8e7
+
+module.exports = loginStore;
