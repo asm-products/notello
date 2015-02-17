@@ -1,9 +1,17 @@
 
 var dispatcher = require('./notelloDispatcher');
 
-var selectNoteAction = function (noteId, noteTitle, noteText) {
+var selectNoteAction = function (noteId) {
+
+	if (lscache.get('isAuthenticated')) {
+
+		
 			
-	dispatcher.dispatchDiscrete('selectedNote');
+
+	} else {
+
+		dispatcher.dispatchDiscrete('selectedNote', lscache.get('unAuthNote_' + noteId));
+	}
 
 };
 

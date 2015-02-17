@@ -9,14 +9,22 @@ var selectedNoteStore = assign(new Store(), {
 	noteText: ''
 });
 
-notelloDispatcher.registerDiscrete('createNoteCompleted', function (note) {
+notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload) {
+
+	selectedNoteStore.noteId = notePayload.newNote.noteId;
+	selectedNoteStore.noteTitle = notePayload.newNote.noteTitle;
+	selectedNoteStore.noteText = notePayload.newNote.noteText;
+
+	selectedNoteStore.save();
+});
+
+notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 
 	selectedNoteStore.noteId = note.noteId;
 	selectedNoteStore.noteTitle = note.noteTitle;
 	selectedNoteStore.noteText = note.noteText;
 
 	selectedNoteStore.save();
-
 });
 
 module.exports = selectedNoteStore;

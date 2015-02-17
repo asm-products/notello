@@ -5,7 +5,6 @@ var lscache = require('ls-cache');
 
 var updateUserNotesAction = function (userNotes) {
 
-
 	if (lscache.get('isAuthenticated')) {		
 
 		api({

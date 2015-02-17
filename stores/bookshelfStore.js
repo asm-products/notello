@@ -29,6 +29,12 @@ notelloDispatcher.registerDiscrete('shelfHidden', function () {
 	bookShelfStore.save();
 });
 
+notelloDispatcher.registerDiscrete('createNoteCompleted', function (createNotePayload) {
+
+	bookShelfStore.userNotes = createNotePayload.userNotes;
+	bookShelfStore.save();
+});
+
 notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNotes) {
 
 	bookShelfStore.userNotes = userNotes;

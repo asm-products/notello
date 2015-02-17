@@ -7,14 +7,20 @@ var domUtility = require('../common/dom-utils');
 
 var _updateUserNotes = function (userNotes, noteId, noteTitle, noteText) {
 
-	var newNote = {
+	userNotes.push({
+		itemType: 'note',
 		noteId: noteId,
 		noteTitle: noteTitle
-	};
+	});
 
-	userNotes.push(newNote);
-
-	dispatcher.dispatchDiscrete('createNoteCompleted', newNote);
+	dispatcher.dispatchDiscrete('createNoteCompleted', {
+		userNotes: userNotes,
+		newNote: {
+			noteId: noteId,
+			noteTitle: noteTitle,
+			noteText: noteText
+		}
+	});
 
 	updateUserNotesAction(userNotes);
 };

@@ -4,8 +4,12 @@ var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var bookshelfStore = require('../../../stores/bookshelfStore');
 var Sortable = require('../../../common/sortable');
+var SortableMixin = require('../../../common/sortable-mixin');
+var selectNoteAction = require('../../../actions/selectNote');
 
 var usernotesComponent = React.createClass({
+
+    mixins: [SortableMixin],
 
 	_haveUsernotes: function () {
 
@@ -13,6 +17,11 @@ var usernotesComponent = React.createClass({
 			userNotes: bookshelfStore.userNotes
 		});
 	},
+
+	sortableOptions: {
+        ref: 'userNoteContainer',
+        model: 'userNotes'
+    },
 
 	getInitialState: function () {
 
@@ -23,24 +32,31 @@ var usernotesComponent = React.createClass({
 
 	componentDidMount: function () {
 
-		var sortable = Sortable.create(this.refs.userNoteContainer.getDOMNode(), {
-			ghostClass: "ghost"
-		});
+		// var sortable = Sortable.create(this.refs.userNoteContainer.getDOMNode(), {
+		// 	ghostClass: "ghost"
+		// });
 
 		bookshelfStore.onChange(this._haveUsernotes);
 	},
 
+	handleNoteClick: function (noteId) {
+
+		selectNoteAction(noteId);
+	},
+
 	render: function () {
+
+		var self = this;
 
 		return 	<div ref="userNoteContainer" style={{ display: 'inline-block', minHeight: '100px' }}>
 					{this.state.userNotes && this.state.userNotes.map(function (item) {
 
 						if (item.itemType === 'note') {
-							return <img key={item.noteId} src="dist/images/paper.png" className="paper usernote-item" />;
+							return <img key={item.noteId} src="dist/images/paper.png" className="paper usernote-item" onClick={self.handleNoteClick.bind(self, item.noteId)} />;
 						}
 
 						if (item.itemType === 'notebook') {
-							return <img key={item.notebookId} src="dist/images/notebook.png" className="notebook usernote-item" />
+							return <img key={item.notebookId} src="dist/images/notebook.png" className="notebook usernote-item" />;
 						}
 
 						if (item.itemType === 'box') {

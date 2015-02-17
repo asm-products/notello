@@ -24,6 +24,7 @@ var authenticateAction = require('../../../actions/authenticate');
 var resetTokenAction = require('../../../actions/resetToken');
 var hideBookshelfAction = require('../../../actions/hideBookshelf');
 var logoutAction = require('../../../actions/logout');
+var getUserNotesAction = require('../../../actions/getUserNotes');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -206,4 +207,5 @@ $(function () {
 
 	hideBookshelfAction();
 	resetTokenAction();
+	getUserNotesAction();
 });
