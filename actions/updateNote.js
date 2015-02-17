@@ -29,6 +29,10 @@ var updateNoteAction = function (noteId, noteTitle, noteText) {
 		noteTitle: noteTitle,
 		noteText: noteText
 	};
+
+	if (!noteId) {
+		return false;
+	}
 	
 	if (lscache.get('isAuthenticated')) {
 

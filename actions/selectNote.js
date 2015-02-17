@@ -1,12 +1,12 @@
 
 var dispatcher = require('./notelloDispatcher');
+var lscache = require('ls-cache');
 
 var selectNoteAction = function (noteId) {
 
 	if (lscache.get('isAuthenticated')) {
 
 		
-			
 
 	} else {
 

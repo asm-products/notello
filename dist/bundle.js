@@ -833,13 +833,13 @@ module.exports = resetTokenAction;
 },{"../common/api":"/var/www/common/api.js","./getUserNotes":"/var/www/actions/getUserNotes.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/selectNote.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
+var lscache = require('ls-cache');
 
 var selectNoteAction = function (noteId) {
 
 	if (lscache.get('isAuthenticated')) {
 
 		
-			
 
 	} else {
 
@@ -850,7 +850,7 @@ var selectNoteAction = function (noteId) {
 
 module.exports = selectNoteAction;
 
-},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -902,6 +902,10 @@ var updateNoteAction = function (noteId, noteTitle, noteText) {
 		noteTitle: noteTitle,
 		noteText: noteText
 	};
+
+	if (!noteId) {
+		return false;
+	}
 	
 	if (lscache.get('isAuthenticated')) {
 
@@ -58171,7 +58175,8 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 		return 	React.createElement("div", {className: "notepad", style: { height: calculatedNotepadHeight + 'px'}}, 
 					React.createElement("div", {className: "pink-divider"}), 
 					React.createElement("div", {className: "notepad-header"}, 
-						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange, disabled: shouldBeDisabled}), 
+						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange, 
+						disabled: shouldBeDisabled, value: this.state.noteTitle}), 
 						React.createElement("span", {className: "notepad-date"}, moment(new Date()).format("MM/DD/YYYY"))
 					), 
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 

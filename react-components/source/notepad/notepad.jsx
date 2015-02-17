@@ -150,7 +150,8 @@ var notepadComponent = React.createClass({
 		return 	<div className="notepad" style={{ height: calculatedNotepadHeight + 'px' }}>
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
-						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} disabled={shouldBeDisabled} />
+						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 
+						disabled={shouldBeDisabled} value={this.state.noteTitle} />
 						<span className="notepad-date">{moment(new Date()).format("MM/DD/YYYY")}</span>
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
