@@ -18,6 +18,15 @@ notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload)
 	selectedNoteStore.save();
 });
 
+notelloDispatcher.registerDiscrete('updateNoteCompleted', function (notePayload) {
+
+	selectedNoteStore.noteId = notePayload.noteId;
+	selectedNoteStore.noteTitle = notePayload.noteTitle;
+	selectedNoteStore.noteText = notePayload.noteText;
+
+	selectedNoteStore.save();
+});
+
 notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 
 	selectedNoteStore.noteId = note.noteId;

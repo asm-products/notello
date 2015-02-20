@@ -22,15 +22,9 @@ _updateNoteDatabase = _.debounce(function (updatedNote) {
 
 }, 5000);
 
-var updateNoteAction = function (noteId, noteTitle, noteText) {
+var updateNoteAction = function (updatedNote) {
 
-	var updatedNote = {
-		noteId: noteId,
-		noteTitle: noteTitle,
-		noteText: noteText
-	};
-
-	if (!noteId) {
+	if (!updatedNote.noteId) {
 		return false;
 	}
 	
@@ -40,7 +34,7 @@ var updateNoteAction = function (noteId, noteTitle, noteText) {
 
 	} else {
 
-		lscache.set('unAuthNote_' + noteId, updatedNote);
+		lscache.set('unAuthNote_' + updatedNote.noteId, updatedNote);
 		
 		dispatcher.dispatchDiscrete('updateNoteCompleted', updatedNote);
 	}

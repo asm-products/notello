@@ -407,6 +407,42 @@ input {
   margin-left: -100px;
 }
 
+.login-container {
+  float: right;
+  padding-top: 26px;
+  padding-right: 12px;
+}
+.email-icon {
+  color: #293854;
+  position: absolute;
+  left: 9%;
+  font-size: 30px;
+  padding-top: 25px;
+  z-index: 1;
+}
+/************************************************************
+	The login button which opens the login form
+*************************************************************/
+.login-btn {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: transparent;
+  z-index: 3;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1em;
+  text-shadow: 1px 1px rgba(128, 67, 19, 0.5);
+}
+.span-login-status {
+  color: white;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1em;
+  text-shadow: 1px 1px rgba(128, 67, 19, 0.5);
+}
+.second-ticker {
+  color: red;
+}
+
 /************************************************************
 	The white modalness thingy
 *************************************************************/
@@ -588,42 +624,6 @@ input {
     margin: 0 25px 0 0;
     font-size: 35px;
   }
-}
-
-.login-container {
-  float: right;
-  padding-top: 26px;
-  padding-right: 12px;
-}
-.email-icon {
-  color: #293854;
-  position: absolute;
-  left: 9%;
-  font-size: 30px;
-  padding-top: 25px;
-  z-index: 1;
-}
-/************************************************************
-	The login button which opens the login form
-*************************************************************/
-.login-btn {
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
-  background-color: transparent;
-  z-index: 3;
-  font-family: 'Raleway', sans-serif;
-  font-size: 1em;
-  text-shadow: 1px 1px rgba(128, 67, 19, 0.5);
-}
-.span-login-status {
-  color: white;
-  font-family: 'Raleway', sans-serif;
-  font-size: 1em;
-  text-shadow: 1px 1px rgba(128, 67, 19, 0.5);
-}
-.second-ticker {
-  color: red;
 }
 
 

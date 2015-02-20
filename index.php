@@ -77,6 +77,12 @@ $app->get('/', function () use ($app) {
     $app->render('index.html');
 });
 
+$app->get('/assuresign', function () use ($app) {
+
+    // Render index view
+    $app->render('assuresign.html');
+});
+
 $app->get('/api/usernotes', function () use ($app) {
 
 	if (isValid($app)) {

@@ -45,9 +45,20 @@ var hideCaret = function () {
 	}
 };
 
+var sanitizeHTML = function (html) {
+
+	var newHTML = html.replace('<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>', '');
+
+	return newHTML.replace(/(<[^>]*>)/g, '').replace(/&nbsp;/g, ' ');
+};
+
 var notepadComponent = React.createClass({
 
 	_selectedNote: function () {
+
+		if (this.state.noteId !== selectedNoteStore.noteId) {
+			$(this.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+		}
 
 		this.setState({
 			noteId: selectedNoteStore.noteId,
@@ -107,21 +118,21 @@ var notepadComponent = React.createClass({
 
 		finalText = finalTextArray.join('\r\n');
 
-		updateNoteAction(this.state.noteId, this.state.noteTitle, finalText);
-		
-	    this.setState({ 
-	    	noteText: finalText
-	    });
+		updateNoteAction({
+			noteId: this.state.noteId,
+			noteTitle: this.state.noteTitle,
+			noteText: finalText
+		});
 		
 		showCaret();
 	},
 
 	handleTitleChange: function (event) {
 
-		updateNoteAction(this.state.noteId, event.target.value, this.state.noteText);
-
-		this.setState({
-			noteTitle: event.target.value
+		updateNoteAction({
+			noteId: this.state.noteId,
+			noteTitle: event.target.value,
+			noteText: this.state.noteText
 		});
 	},
 
@@ -137,6 +148,8 @@ var notepadComponent = React.createClass({
 		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
 
 		var value = this.state.noteText.replace(/(?:\r\n|\r|\n)/g, '<br />');
+
+		var sanitizedText = sanitizeHTML(this.state.noteText);
 
 		var txtAreaCSSClasses = cx({
 			'ios': domUtils.iOS,
@@ -155,9 +168,9 @@ var notepadComponent = React.createClass({
 						<span className="notepad-date">{moment(new Date()).format("MM/DD/YYYY")}</span>
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
-					<textarea id="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
-					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled}></textarea>
-					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={this.state.noteText} />
+					<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
+					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled} defaultValue={sanitizedText}></textarea>
+					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={sanitizedText} />
 				</div>;
 	}
 

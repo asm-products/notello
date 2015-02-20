@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  	<head>
+  		<meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    	<title>Assuresign Components</title>
+      <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react-with-addons.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/JSXTransformer.js"></script>
+      <style>
+
+        .navbar {
+
+          box-shadow: rgba(0, 0, 0, 0.0980392) 0px 2px 5px 0px;
+          /*height: 71px;
+          position: fixed;
+          background-color: white;
+          top: 0;
+          left: 0;
+          width: 100%;*/
+        }
+
+      </style>
+  	</head>
+  	<body>
+      <div id="example"></div>
+      <script type="text/jsx">
+
+      var Header = React.createClass({
+
+        render: function () {
+
+          return <div className="navbar">
+            <img src="https://www.assuresign.com/wp-content/themes/assuresign-theme/images/logo.png" />
+          </div>;
+        }
+      });
+
+      React.render(
+        <div>
+          <Header />
+          <div className="selectable-block" buttonText="PICK THIS PLAN"></div>
+        </div>,
+        document.getElementById('example')
+      );
+    </script>
+  	</body>
+</html>

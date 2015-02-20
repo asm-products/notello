@@ -761,8 +761,17 @@ module.exports = assign(new Dispatcher(), {
 
 		if (this.actionList.indexOf(actionName) !== -1) {
 
-			actions[actionName] = callback;
+			if (!actions[actionName]) {
+
+				actions[actionName] = [callback];
+
+			} else {
+
+				actions[actionName].push(callback);
+			}
+
 		} else {
+
 			throw new Error(actionName + ' is not in the actionList array for the notelloDispatcher.');
 		}
 	},
@@ -771,7 +780,10 @@ module.exports = assign(new Dispatcher(), {
 
 		if (actions.hasOwnProperty(actionName)) {
 
-			actions[actionName](payLoad);
+			actions[actionName].map(function (callback) {
+
+				callback(payLoad);
+			});
 		}
 	},
 
@@ -895,15 +907,9 @@ _updateNoteDatabase = _.debounce(function (updatedNote) {
 
 }, 5000);
 
-var updateNoteAction = function (noteId, noteTitle, noteText) {
+var updateNoteAction = function (updatedNote) {
 
-	var updatedNote = {
-		noteId: noteId,
-		noteTitle: noteTitle,
-		noteText: noteText
-	};
-
-	if (!noteId) {
+	if (!updatedNote.noteId) {
 		return false;
 	}
 	
@@ -913,7 +919,7 @@ var updateNoteAction = function (noteId, noteTitle, noteText) {
 
 	} else {
 
-		lscache.set('unAuthNote_' + noteId, updatedNote);
+		lscache.set('unAuthNote_' + updatedNote.noteId, updatedNote);
 		
 		dispatcher.dispatchDiscrete('updateNoteCompleted', updatedNote);
 	}
@@ -58070,9 +58076,20 @@ var hideCaret = function () {
 	}
 };
 
+var sanitizeHTML = function (html) {
+
+	var newHTML = html.replace('<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>', '');
+
+	return newHTML.replace(/(<[^>]*>)/g, '').replace(/&nbsp;/g, ' ');
+};
+
 var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 	_selectedNote: function () {
+
+		if (this.state.noteId !== selectedNoteStore.noteId) {
+			$(this.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+		}
 
 		this.setState({
 			noteId: selectedNoteStore.noteId,
@@ -58132,21 +58149,21 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		finalText = finalTextArray.join('\r\n');
 
-		updateNoteAction(this.state.noteId, this.state.noteTitle, finalText);
-		
-	    this.setState({ 
-	    	noteText: finalText
-	    });
+		updateNoteAction({
+			noteId: this.state.noteId,
+			noteTitle: this.state.noteTitle,
+			noteText: finalText
+		});
 		
 		showCaret();
 	},
 
 	handleTitleChange: function (event) {
 
-		updateNoteAction(this.state.noteId, event.target.value, this.state.noteText);
-
-		this.setState({
-			noteTitle: event.target.value
+		updateNoteAction({
+			noteId: this.state.noteId,
+			noteTitle: event.target.value,
+			noteText: this.state.noteText
 		});
 	},
 
@@ -58162,6 +58179,8 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
 
 		var value = this.state.noteText.replace(/(?:\r\n|\r|\n)/g, '<br />');
+
+		var sanitizedText = sanitizeHTML(this.state.noteText);
 
 		var txtAreaCSSClasses = cx({
 			'ios': domUtils.iOS,
@@ -58180,9 +58199,9 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 						React.createElement("span", {className: "notepad-date"}, moment(new Date()).format("MM/DD/YYYY"))
 					), 
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
-					React.createElement("textarea", {id: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
-					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange, disabled: shouldBeDisabled}), 
-					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: this.state.noteText})
+					React.createElement("textarea", {id: "txtArea", ref: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
+					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange, disabled: shouldBeDisabled, defaultValue: sanitizedText}), 
+					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: sanitizedText})
 				);
 	}
 
@@ -58461,6 +58480,15 @@ notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload)
 	selectedNoteStore.noteId = notePayload.newNote.noteId;
 	selectedNoteStore.noteTitle = notePayload.newNote.noteTitle;
 	selectedNoteStore.noteText = notePayload.newNote.noteText;
+
+	selectedNoteStore.save();
+});
+
+notelloDispatcher.registerDiscrete('updateNoteCompleted', function (notePayload) {
+
+	selectedNoteStore.noteId = notePayload.noteId;
+	selectedNoteStore.noteTitle = notePayload.noteTitle;
+	selectedNoteStore.noteText = notePayload.noteText;
 
 	selectedNoteStore.save();
 });

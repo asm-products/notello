@@ -9,8 +9,17 @@ module.exports = assign(new Dispatcher(), {
 
 		if (this.actionList.indexOf(actionName) !== -1) {
 
-			actions[actionName] = callback;
+			if (!actions[actionName]) {
+
+				actions[actionName] = [callback];
+
+			} else {
+
+				actions[actionName].push(callback);
+			}
+
 		} else {
+
 			throw new Error(actionName + ' is not in the actionList array for the notelloDispatcher.');
 		}
 	},
@@ -19,7 +28,10 @@ module.exports = assign(new Dispatcher(), {
 
 		if (actions.hasOwnProperty(actionName)) {
 
-			actions[actionName](payLoad);
+			actions[actionName].map(function (callback) {
+
+				callback(payLoad);
+			});
 		}
 	},
 
