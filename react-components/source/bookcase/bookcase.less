@@ -14,6 +14,10 @@
 		position: relative;
 	}
 
+	& .bottom-shelf {
+		height: 40px !important;
+	}
+
 	& .logo {
 
 		text-shadow: rgba(255, 255, 255, 0.37) 0 2px 0;
@@ -61,7 +65,7 @@
 
 	& .bottom-shelf {
 
-		background-image: url('images/shelf-border.png');
+		background-image: url('images/shelf-border-top.png');
 	}
 
 	& .shelf-border {
@@ -69,7 +73,7 @@
 		height: 20px;
 	}
 
-	& .archive-box, & .notebook, & .paper, & .add-item {
+	& .add-item {
 
 		display: inline-block;
 		cursor: pointer;
@@ -77,14 +81,6 @@
     	width: 70px;
     	margin: 0 10px;
     	padding-top: 24px;
-	}
-
-	& .paper, & .notebook {
-		width: 60px;
-	}
-
-	& .archive-box:hover, & .notebook:hover, & .paper:hover {
-		transform: scale(1.2, 1.2);
 	}
 
 	& .add-item {

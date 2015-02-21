@@ -32,10 +32,6 @@ var usernotesComponent = React.createClass({
 
 	componentDidMount: function () {
 
-		// var sortable = Sortable.create(this.refs.userNoteContainer.getDOMNode(), {
-		// 	ghostClass: "ghost"
-		// });
-
 		bookshelfStore.onChange(this._haveUsernotes);
 	},
 
@@ -48,11 +44,14 @@ var usernotesComponent = React.createClass({
 
 		var self = this;
 
-		return 	<div ref="userNoteContainer" style={{ display: 'inline-block', minHeight: '100px' }}>
+		return 	<div ref="userNoteContainer" className="usernotes-wrapper">
 					{this.state.userNotes && this.state.userNotes.map(function (item) {
 
 						if (item.itemType === 'note') {
-							return <img key={item.noteId} src="dist/images/paper.png" className="paper usernote-item" onClick={self.handleNoteClick.bind(self, item.noteId)} />;
+							return  <span className="generic-transition usernote-item">
+										<img key={item.noteId} src="dist/images/paper.png" className="paper" onClick={self.handleNoteClick.bind(self, item.noteId)} />
+										<span className="usernote-title">{item.noteTitle || 'New Note'}</span>
+									</span>;
 						}
 
 						if (item.itemType === 'notebook') {

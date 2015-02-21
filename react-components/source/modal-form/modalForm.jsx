@@ -154,7 +154,7 @@ var modalFormComponent = React.createClass({
 					<div className="modal-background"></div>
 					<div ref="modalWrapper" className="modal-form-wrapper">
 						<div style={{ position: 'relative' }}>
-							<span className="span-close ion-ios-close-outline" onTouchEnd={this.handleClose} onClick={this.handleClose}></span>
+							<span className="generic-transition span-close ion-ios-close-outline" onTouchEnd={this.handleClose} onClick={this.handleClose}></span>
 							<label className="lbl-form" htmlFor="txtEmailAddress">{props.modalTitle}</label>
 						</div>
 						<hr className="hr-form" />

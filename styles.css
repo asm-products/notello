@@ -12,6 +12,9 @@
   height: 40px !important;
   position: relative;
 }
+.bookcase .bottom-shelf {
+  height: 40px !important;
+}
 .bookcase .logo {
   text-shadow: rgba(255, 255, 255, 0.37) 0 2px 0;
   font-family: Nunito, sans-serif;
@@ -54,15 +57,12 @@
   background-image: url('images/shelf-border-top.png');
 }
 .bookcase .bottom-shelf {
-  background-image: url('images/shelf-border.png');
+  background-image: url('images/shelf-border-top.png');
 }
 .bookcase .shelf-border {
   width: 100%;
   height: 20px;
 }
-.bookcase .archive-box,
-.bookcase .notebook,
-.bookcase .paper,
 .bookcase .add-item {
   display: inline-block;
   cursor: pointer;
@@ -70,15 +70,6 @@
   width: 70px;
   margin: 0 10px;
   padding-top: 24px;
-}
-.bookcase .paper,
-.bookcase .notebook {
-  width: 60px;
-}
-.bookcase .archive-box:hover,
-.bookcase .notebook:hover,
-.bookcase .paper:hover {
-  transform: scale(1.2, 1.2);
 }
 .bookcase .add-item {
   font-size: 40px;
@@ -482,6 +473,9 @@ input {
   opacity: 1;
   box-sizing: border-box;
 }
+.span-close:hover {
+  transform: rotate(90deg);
+}
 .span-close:hover::before {
   opacity: 0.9;
 }
@@ -639,12 +633,21 @@ input {
   border-radius: 5px;
   max-width: 900px;
 }
-.notepad .notepad-date {
+.notepad .notepad-gear {
   font-family: Arial;
   color: #a9a9a9;
   position: absolute;
   top: 10px;
   right: 10px;
+  font-size: 1.5em;
+  cursor: pointer;
+  text-align: center;
+  width: 30px;
+  height: 28px;
+  padding-top: 2px;
+}
+.notepad .notepad-gear:hover {
+  transform: rotate(90deg);
 }
 .notepad .notepad-header {
   background-color: white;
@@ -809,6 +812,63 @@ input {
 .ghost {
   opacity: 0;
 }
+.usernotes-wrapper {
+  display: inline-block;
+  min-height: 100px;
+}
+.usernotes-wrapper:hover .archive-box,
+.usernotes-wrapper:hover .paper,
+.usernotes-wrapper:hover .notebook,
+.usernotes-wrapper:hover .usernote-title {
+  opacity: 0.6;
+}
+.usernote-item {
+  font-size: initial !important;
+  display: inline-block;
+  cursor: pointer;
+  margin-left: 20px;
+}
+.usernote-item:hover {
+  transform: scale(1.2, 1.2);
+}
+.usernote-item:hover .usernote-title {
+  margin-top: 2px;
+}
+.usernote-item:hover .archive-box,
+.usernote-item:hover .notebook,
+.usernote-item:hover .paper,
+.usernote-item:hover .usernote-title {
+  opacity: 1 !important;
+}
 .usernote-item:active {
   opacity: 0;
+}
+.usernote-item .archive-box,
+.usernote-item .notebook,
+.usernote-item .paper,
+.usernote-item .add-item {
+  display: block;
+  transition: all .2s;
+  width: 70px;
+  margin: 0 10px;
+  padding-top: 24px;
+}
+.usernote-item .paper,
+.usernote-item .notebook {
+  width: 60px;
+}
+.usernote-item .usernote-title {
+  margin-top: 4px;
+  margin-left: -13px;
+  display: inline-block;
+  vertical-align: top;
+  font-size: .8em;
+  background-color: #573b15;
+  color: white;
+  font-family: Arial;
+  border-radius: 10px;
+  padding: 2px;
+  width: 108px;
+  text-align: center;
+  border: 1px solid #443115;
 }

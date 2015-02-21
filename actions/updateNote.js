@@ -3,6 +3,7 @@ var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
 var _ = require('underscore');
 var lscache = require('ls-cache');
+var updateUserNotes = require('./updateUserNotes');
 
 _updateNoteDatabase = _.debounce(function (updatedNote) {
 

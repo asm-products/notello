@@ -6,9 +6,11 @@ var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
 var $ = require('jquery');
 var updateNoteAction = require('../../../actions/updateNote');
+var updateUserNotesAction = require('../../../actions/updateUserNotes');
 var selectedNoteStore = require('../../../stores/selectedNoteStore');
 var bookShelfStore = require('../../../stores/bookshelfStore');
 var modalStore = require('../../../stores/modalStore');
+var ModalForm = require('../modal-form/modalForm');
 
 var cursor = null;
 
@@ -129,16 +131,38 @@ var notepadComponent = React.createClass({
 
 	handleTitleChange: function (event) {
 
+		var self = this;
+
+		bookShelfStore.userNotes.map(function (userNoteItem) {
+
+			if (userNoteItem.noteId === self.state.noteId) {
+
+				userNoteItem.noteTitle = event.target.value;
+			} 
+		});
+
+		updateUserNotesAction(bookShelfStore.userNotes);
+
 		updateNoteAction({
-			noteId: this.state.noteId,
+			noteId: self.state.noteId,
 			noteTitle: event.target.value,
-			noteText: this.state.noteText
+			noteText: self.state.noteText
 		});
 	},
 
 	handleBlur: function (event) {
 
 		hideCaret();
+	},
+
+	handleSettingClick: function (event) {
+
+		this.refs.settingsModal.open();
+	},
+
+	handleSettingsSaved: function (event) {
+
+
 	},
 
 	render: function () {
@@ -165,12 +189,14 @@ var notepadComponent = React.createClass({
 					<div className="notepad-header">
 						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 
 						disabled={shouldBeDisabled} value={this.state.noteTitle} />
-						<span className="notepad-date">{moment(new Date()).format("MM/DD/YYYY")}</span>
+						<span className="generic-transition notepad-gear ion-gear-b" onClick={this.handleSettingClick}></span>
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
 					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled} defaultValue={sanitizedText}></textarea>
 					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={sanitizedText} />
+					<ModalForm ref="settingsModal" btnSubmitText="DELETE NOTE" modalTitle="SETTINGS" onSubmit={this.handleSettingsSaved}>
+					</ModalForm>
 				</div>;
 	}
 

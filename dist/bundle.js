@@ -888,6 +888,7 @@ var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
 var _ = require('underscore');
 var lscache = require('ls-cache');
+var updateUserNotes = require('./updateUserNotes');
 
 _updateNoteDatabase = _.debounce(function (updatedNote) {
 
@@ -927,7 +928,7 @@ var updateNoteAction = function (updatedNote) {
 
 module.exports = updateNoteAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/updateUserNotes.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","./updateUserNotes":"/var/www/actions/updateUserNotes.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/updateUserNotes.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -57830,7 +57831,7 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 					React.createElement("div", {className: "modal-background"}), 
 					React.createElement("div", {ref: "modalWrapper", className: "modal-form-wrapper"}, 
 						React.createElement("div", {style: { position: 'relative'}}, 
-							React.createElement("span", {className: "span-close ion-ios-close-outline", onTouchEnd: this.handleClose, onClick: this.handleClose}), 
+							React.createElement("span", {className: "generic-transition span-close ion-ios-close-outline", onTouchEnd: this.handleClose, onClick: this.handleClose}), 
 							React.createElement("label", {className: "lbl-form", htmlFor: "txtEmailAddress"}, props.modalTitle)
 						), 
 						React.createElement("hr", {className: "hr-form"}), 
@@ -58037,9 +58038,11 @@ var domUtils = require('../../../common/dom-utils');
 var moment = require('moment');
 var $ = require('jquery');
 var updateNoteAction = require('../../../actions/updateNote');
+var updateUserNotesAction = require('../../../actions/updateUserNotes');
 var selectedNoteStore = require('../../../stores/selectedNoteStore');
 var bookShelfStore = require('../../../stores/bookshelfStore');
 var modalStore = require('../../../stores/modalStore');
+var ModalForm = require('../modal-form/modalForm');
 
 var cursor = null;
 
@@ -58160,16 +58163,38 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 	handleTitleChange: function (event) {
 
+		var self = this;
+
+		bookShelfStore.userNotes.map(function (userNoteItem) {
+
+			if (userNoteItem.noteId === self.state.noteId) {
+
+				userNoteItem.noteTitle = event.target.value;
+			} 
+		});
+
+		updateUserNotesAction(bookShelfStore.userNotes);
+
 		updateNoteAction({
-			noteId: this.state.noteId,
+			noteId: self.state.noteId,
 			noteTitle: event.target.value,
-			noteText: this.state.noteText
+			noteText: self.state.noteText
 		});
 	},
 
 	handleBlur: function (event) {
 
 		hideCaret();
+	},
+
+	handleSettingClick: function (event) {
+
+		this.refs.settingsModal.open();
+	},
+
+	handleSettingsSaved: function (event) {
+
+
 	},
 
 	render: function () {
@@ -58196,12 +58221,14 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 					React.createElement("div", {className: "notepad-header"}, 
 						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange, 
 						disabled: shouldBeDisabled, value: this.state.noteTitle}), 
-						React.createElement("span", {className: "notepad-date"}, moment(new Date()).format("MM/DD/YYYY"))
+						React.createElement("span", {className: "generic-transition notepad-gear ion-gear-b", onClick: this.handleSettingClick})
 					), 
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
 					React.createElement("textarea", {id: "txtArea", ref: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
 					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange, disabled: shouldBeDisabled, defaultValue: sanitizedText}), 
-					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: sanitizedText})
+					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: sanitizedText}), 
+					React.createElement(ModalForm, {ref: "settingsModal", btnSubmitText: "DELETE NOTE", modalTitle: "SETTINGS", onSubmit: this.handleSettingsSaved}
+					)
 				);
 	}
 
@@ -58209,7 +58236,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 module.exports = notepadComponent;
 
-},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
+},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../actions/updateUserNotes":"/var/www/actions/updateUserNotes.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
@@ -58294,10 +58321,6 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
 	componentDidMount: function () {
 
-		// var sortable = Sortable.create(this.refs.userNoteContainer.getDOMNode(), {
-		// 	ghostClass: "ghost"
-		// });
-
 		bookshelfStore.onChange(this._haveUsernotes);
 	},
 
@@ -58310,11 +58333,14 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
 		var self = this;
 
-		return 	React.createElement("div", {ref: "userNoteContainer", style: { display: 'inline-block', minHeight: '100px'}}, 
+		return 	React.createElement("div", {ref: "userNoteContainer", className: "usernotes-wrapper"}, 
 					this.state.userNotes && this.state.userNotes.map(function (item) {
 
 						if (item.itemType === 'note') {
-							return React.createElement("img", {key: item.noteId, src: "dist/images/paper.png", className: "paper usernote-item", onClick: self.handleNoteClick.bind(self, item.noteId)});
+							return  React.createElement("span", {className: "generic-transition usernote-item"}, 
+										React.createElement("img", {key: item.noteId, src: "dist/images/paper.png", className: "paper", onClick: self.handleNoteClick.bind(self, item.noteId)}), 
+										React.createElement("span", {className: "usernote-title"}, item.noteTitle || 'New Note')
+									);
 						}
 
 						if (item.itemType === 'notebook') {

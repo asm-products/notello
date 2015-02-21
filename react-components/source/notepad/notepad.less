@@ -11,13 +11,23 @@
 	border-radius: 5px;
 	max-width: 900px;
 
-	& .notepad-date
+	& .notepad-gear
 	{
 		font-family: Arial;
 		color: #a9a9a9;
 		position: absolute;
 		top: 10px;
 		right: 10px;
+		font-size: 1.5em;
+		cursor: pointer;
+		text-align: center;
+		width: 30px;
+		height: 28px;
+		padding-top: 2px;
+
+		&:hover {
+			transform: rotate(90deg);
+		}
 	}
 
 	& .notepad-header
