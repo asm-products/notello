@@ -11,6 +11,7 @@ var selectedNoteStore = require('../../../stores/selectedNoteStore');
 var bookShelfStore = require('../../../stores/bookshelfStore');
 var modalStore = require('../../../stores/modalStore');
 var ModalForm = require('../modal-form/modalForm');
+var deleteNoteAction = require('../../../actions/deleteNote');
 
 var cursor = null;
 
@@ -158,11 +159,43 @@ var notepadComponent = React.createClass({
 	handleSettingClick: function (event) {
 
 		this.refs.settingsModal.open();
+
+		// TODO: This is due to a bug in safari
+		if (domUtils.isSafari) {
+			$('html').css('overflow', 'hidden');
+		}
+
+		this.setState({
+			settingsOpened: true
+		});
+	},
+
+	handleSettingsClosed: function (event) {
+
+		// TODO: This is due to a bug in safari
+		if (domUtils.isSafari) {
+			$('html').removeAttr('style');
+		}
+
+		this.setState({
+			settingsOpened: false
+		});
+
 	},
 
 	handleSettingsSaved: function (event) {
 
+		var self = this;
 
+		deleteNoteAction(selectedNoteStore.noteId);
+
+		bookShelfStore.userNotes = bookShelfStore.userNotes.filter(function (userNoteItem) {
+			return userNoteItem.noteId !== self.state.noteId;
+		});
+
+		updateUserNotesAction(bookShelfStore.userNotes);
+		
+		this.refs.settingsModal.close();
 	},
 
 	render: function () {
@@ -184,18 +217,23 @@ var notepadComponent = React.createClass({
 
 		var shouldBeDisabled = (modalStore.numberOfModalsOpened > 0) || (domUtils.isMobile && bookShelfStore.isViewingBookshelf);
 
-		return 	<div className="notepad" style={{ height: calculatedNotepadHeight + 'px' }}>
+		var notepadStyle = {
+			height: calculatedNotepadHeight + 'px',
+			position: this.state.settingsOpened && domUtils.isSafari ? 'static' : 'relative'
+		};
+
+		return 	<div className="notepad" style={notepadStyle}>
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
 						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 
 						disabled={shouldBeDisabled} value={this.state.noteTitle} />
-						<span className="generic-transition notepad-gear ion-gear-b" onClick={this.handleSettingClick}></span>
+						<span className="generic-transition notepad-gear ion-gear-b" onTouchEnd={this.handleSettingClick} onClick={this.handleSettingClick}></span>
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
 					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled} defaultValue={sanitizedText}></textarea>
 					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={sanitizedText} />
-					<ModalForm ref="settingsModal" btnSubmitText="DELETE NOTE" modalTitle="SETTINGS" onSubmit={this.handleSettingsSaved}>
+					<ModalForm ref="settingsModal" btnSubmitText="DELETE NOTE" modalTitle="SETTINGS" onSubmit={this.handleSettingsSaved} onClose={this.handleSettingsClosed}>
 					</ModalForm>
 				</div>;
 	}

@@ -615,7 +615,39 @@ var createNotebookAction = function (userNotes, notebookName) {
 
 module.exports = createNotebookAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/getUserNotes.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/deleteNote.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+var api = require('../common/api');
+var lscache = require('ls-cache');
+
+var deleteNoteAction = function (noteId) {
+
+	if (lscache.get('isAuthenticated')) {
+
+		api({
+			url: 'api/note',
+			method: 'post',
+			data: {
+				'_METHOD': 'DELETE',
+				noteId: noteId
+			},
+			success: function () {
+				
+				dispatcher.dispatchDiscrete('deleteNoteCompleted');
+		    }
+		});
+
+	} else {
+
+		lscache.remove('unAuthNote_' + noteId);
+		dispatcher.dispatchDiscrete('deleteNoteCompleted');
+	}
+};
+
+module.exports = deleteNoteAction;
+
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/getUserNotes.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -1130,6 +1162,8 @@ var publicMembers = {
 	iOS: ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false ),
 
 	isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+
+	isSafari: navigator.userAgent.toLowerCase().indexOf('safari') !== -1 && navigator.userAgent.toLowerCase().indexOf('chrome') <= -1,
 
 	randomUUID: function () {
 		
@@ -58043,6 +58077,7 @@ var selectedNoteStore = require('../../../stores/selectedNoteStore');
 var bookShelfStore = require('../../../stores/bookshelfStore');
 var modalStore = require('../../../stores/modalStore');
 var ModalForm = require('../modal-form/modalForm');
+var deleteNoteAction = require('../../../actions/deleteNote');
 
 var cursor = null;
 
@@ -58190,11 +58225,43 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 	handleSettingClick: function (event) {
 
 		this.refs.settingsModal.open();
+
+		// TODO: This is due to a bug in safari
+		if (domUtils.isSafari) {
+			$('html').css('overflow', 'hidden');
+		}
+
+		this.setState({
+			settingsOpened: true
+		});
+	},
+
+	handleSettingsClosed: function (event) {
+
+		// TODO: This is due to a bug in safari
+		if (domUtils.isSafari) {
+			$('html').removeAttr('style');
+		}
+
+		this.setState({
+			settingsOpened: false
+		});
+
 	},
 
 	handleSettingsSaved: function (event) {
 
+		var self = this;
 
+		deleteNoteAction(selectedNoteStore.noteId);
+
+		bookShelfStore.userNotes = bookShelfStore.userNotes.filter(function (userNoteItem) {
+			return userNoteItem.noteId !== self.state.noteId;
+		});
+
+		updateUserNotesAction(bookShelfStore.userNotes);
+		
+		this.refs.settingsModal.close();
 	},
 
 	render: function () {
@@ -58216,18 +58283,23 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		var shouldBeDisabled = (modalStore.numberOfModalsOpened > 0) || (domUtils.isMobile && bookShelfStore.isViewingBookshelf);
 
-		return 	React.createElement("div", {className: "notepad", style: { height: calculatedNotepadHeight + 'px'}}, 
+		var notepadStyle = {
+			height: calculatedNotepadHeight + 'px',
+			position: this.state.settingsOpened && domUtils.isSafari ? 'static' : 'relative'
+		};
+
+		return 	React.createElement("div", {className: "notepad", style: notepadStyle}, 
 					React.createElement("div", {className: "pink-divider"}), 
 					React.createElement("div", {className: "notepad-header"}, 
 						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange, 
 						disabled: shouldBeDisabled, value: this.state.noteTitle}), 
-						React.createElement("span", {className: "generic-transition notepad-gear ion-gear-b", onClick: this.handleSettingClick})
+						React.createElement("span", {className: "generic-transition notepad-gear ion-gear-b", onTouchEnd: this.handleSettingClick, onClick: this.handleSettingClick})
 					), 
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
 					React.createElement("textarea", {id: "txtArea", ref: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
 					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange, disabled: shouldBeDisabled, defaultValue: sanitizedText}), 
 					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: sanitizedText}), 
-					React.createElement(ModalForm, {ref: "settingsModal", btnSubmitText: "DELETE NOTE", modalTitle: "SETTINGS", onSubmit: this.handleSettingsSaved}
+					React.createElement(ModalForm, {ref: "settingsModal", btnSubmitText: "DELETE NOTE", modalTitle: "SETTINGS", onSubmit: this.handleSettingsSaved, onClose: this.handleSettingsClosed}
 					)
 				);
 	}
@@ -58236,7 +58308,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 module.exports = notepadComponent;
 
-},{"../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../actions/updateUserNotes":"/var/www/actions/updateUserNotes.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
+},{"../../../actions/deleteNote":"/var/www/actions/deleteNote.js","../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../actions/updateUserNotes":"/var/www/actions/updateUserNotes.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;

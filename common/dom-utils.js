@@ -32,6 +32,8 @@ var publicMembers = {
 
 	isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
 
+	isSafari: navigator.userAgent.toLowerCase().indexOf('safari') !== -1 && navigator.userAgent.toLowerCase().indexOf('chrome') <= -1,
+
 	randomUUID: function () {
 		
 		var s = [], itoh = '0123456789ABCDEF';
