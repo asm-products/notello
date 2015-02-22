@@ -837,7 +837,8 @@ module.exports = assign(new Dispatcher(), {
 		'createNotebookCompleted',
 		'createBoxCompleted',
 		'modalClosed',
-		'modalOpened'
+		'modalOpened',
+		'search'
 	]
 });
 
@@ -873,7 +874,18 @@ var resetTokenAction = function () {
 
 module.exports = resetTokenAction;
 
-},{"../common/api":"/var/www/common/api.js","./getUserNotes":"/var/www/actions/getUserNotes.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/selectNote.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./getUserNotes":"/var/www/actions/getUserNotes.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/search.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+
+var searchAction = function (searchText) {
+
+	dispatcher.dispatchDiscrete('search', searchText);
+};
+
+module.exports = searchAction;
+
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/selectNote.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var lscache = require('ls-cache');
@@ -58354,6 +58366,7 @@ var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var domUtils = require('../../../common/dom-utils');
 var bookShelfStore = require('../../../stores/bookshelfStore');
+var searchAction = require('../../../actions/search');
 
 var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 
@@ -58377,6 +58390,11 @@ var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 		});
 	},
 
+	handleChange: function (event) {
+
+		searchAction(event.target.value);
+	},
+
 	render: function () {
 
 		var classes = cx({
@@ -58389,7 +58407,8 @@ var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 						React.createElement("label", {htmlFor: "txtSearch"}, 
 							React.createElement("span", {className: "search ion-android-search", title: "Search notes"})
 						), 
-						React.createElement("input", {id: "txtSearch", type: "text", placeholder: "Search your notes", className: "search-text generic-transition", onBlur: this.handleBlur, onFocus: this.handleFocus, disabled: domUtils.isMobile && !bookShelfStore.isViewingBookshelf})
+						React.createElement("input", {id: "txtSearch", type: "text", placeholder: "Search your notes", className: "search-text generic-transition", 
+						onBlur: this.handleBlur, onFocus: this.handleFocus, disabled: domUtils.isMobile && !bookShelfStore.isViewingBookshelf, onChange: this.handleChange})
 					)
 				);
 	}
@@ -58398,7 +58417,7 @@ var searchbarComponent = React.createClass({displayName: 'searchbarComponent',
 
 module.exports = searchbarComponent;
 
-},{"../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/usernotes/usernotes.jsx":[function(require,module,exports){
+},{"../../../actions/search":"/var/www/actions/search.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/react-components/source/usernotes/usernotes.jsx":[function(require,module,exports){
 
 var React = require('react');
 var ReactAddons = require('react-addons');
@@ -58415,8 +58434,19 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
 	_haveUsernotes: function () {
 
+		var filteredUserNotes = [];
+
+		if (bookshelfStore.userNotes) {
+
+			filteredUserNotes = bookshelfStore.userNotes.filter(function (userNote) {
+
+				return userNote.noteTitle.indexOf(bookshelfStore.searchText) !== -1;
+			});
+
+		}
+
 		this.setState({
-			userNotes: bookshelfStore.userNotes
+			userNotes: filteredUserNotes
 		});
 	},
 
@@ -58494,7 +58524,8 @@ var bookShelfStore = assign(new Store(), {
 
 	isViewingBookshelf: false,
 	isDoneAnimating: true,
-	userNotes: null
+	userNotes: null,
+	searchText: null
 });
 
 notelloDispatcher.registerDiscrete('viewBookshelf', function () {
@@ -58532,6 +58563,12 @@ notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNote
 notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes) {
 
 	bookShelfStore.userNotes = userNotes;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('search', function (searchText) {
+
+	bookShelfStore.searchText = searchText;
 	bookShelfStore.save();
 });
 

@@ -3,6 +3,7 @@ var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var domUtils = require('../../../common/dom-utils');
 var bookShelfStore = require('../../../stores/bookshelfStore');
+var searchAction = require('../../../actions/search');
 
 var searchbarComponent = React.createClass({
 
@@ -26,6 +27,11 @@ var searchbarComponent = React.createClass({
 		});
 	},
 
+	handleChange: function (event) {
+
+		searchAction(event.target.value);
+	},
+
 	render: function () {
 
 		var classes = cx({
@@ -38,7 +44,8 @@ var searchbarComponent = React.createClass({
 						<label htmlFor="txtSearch">
 							<span className="search ion-android-search" title="Search notes"></span>
 						</label>
-						<input id="txtSearch" type="text" placeholder="Search your notes" className="search-text generic-transition" onBlur={this.handleBlur} onFocus={this.handleFocus} disabled={domUtils.isMobile && !bookShelfStore.isViewingBookshelf} />
+						<input id="txtSearch" type="text" placeholder="Search your notes" className="search-text generic-transition" 
+						onBlur={this.handleBlur} onFocus={this.handleFocus} disabled={domUtils.isMobile && !bookShelfStore.isViewingBookshelf} onChange={this.handleChange} />
 					</div>
 				</div>;
 	}

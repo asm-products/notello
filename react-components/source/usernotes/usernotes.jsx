@@ -14,8 +14,19 @@ var usernotesComponent = React.createClass({
 
 	_haveUsernotes: function () {
 
+		var filteredUserNotes = [];
+
+		if (bookshelfStore.userNotes) {
+
+			filteredUserNotes = bookshelfStore.userNotes.filter(function (userNote) {
+
+				return userNote.noteTitle.indexOf(bookshelfStore.searchText) !== -1;
+			});
+
+		}
+
 		this.setState({
-			userNotes: bookshelfStore.userNotes
+			userNotes: filteredUserNotes
 		});
 	},
 
