@@ -145,3 +145,31 @@
     50% { opacity: 0.0; }
     100% { opacity: 1.0; }
 }
+
+.slidenote {
+
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+}
+
+.slidenote-in {
+    animation-timing-function: linear;
+    animation-duration: .2s;
+    animation-name: slideIn;
+}
+
+.slidenote-out {
+    animation-timing-function: ease-in;
+    animation-duration: .5s;
+    animation-name: slideOut;
+}
+
+@keyframes slideIn {
+	0% { transform: translateX(200%); }
+	100% { transform: translateX(0); }
+}
+
+@keyframes slideOut {
+	0% { transform: translateX(0); }
+	100% { transform: translateX(-200%); }
+}

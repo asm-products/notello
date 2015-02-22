@@ -111,7 +111,6 @@ var App = React.createClass({displayName: 'App',
 	    if (tempAuthToken && (tempAuthToken === 'invalid' || tempAuthToken === 'expired')) {
 
 	    	app.refs.mainModalForm.open();
-
 	    }
 
 	    // If user is authenticated, we need a client side session interval to auto logout the user eventually.
@@ -58123,17 +58122,51 @@ var sanitizeHTML = function (html) {
 
 var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
+	_slideTimeout: null,
+
 	_selectedNote: function () {
 
-		if (this.state.noteId !== selectedNoteStore.noteId) {
-			$(this.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+		var self = this;
+
+		// This is a different note
+		if (self.state.noteId !== selectedNoteStore.noteId) {
+			$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+
+			clearTimeout(self._slideTimeout);
+
+			self.setState({
+				noteSelectionAnimating: true
+			});
+
+			self._slideTimeout = setTimeout(function () {
+
+				self.setState({
+					noteSelectionAnimating: false,
+					noteId: selectedNoteStore.noteId,
+					noteTitle: selectedNoteStore.noteTitle,
+					noteText: selectedNoteStore.noteText
+				});
+
+				self._slideTimeout = setTimeout(function () {
+
+					self.setState({
+						noteSelectionAnimating: null
+					});
+
+				}, 250);
+
+			}, 550);
+
+		} else {
+
+			self.setState({
+				noteSelectionAnimating: null,
+				noteId: selectedNoteStore.noteId,
+				noteTitle: selectedNoteStore.noteTitle,
+				noteText: selectedNoteStore.noteText
+			});
 		}
 
-		this.setState({
-			noteId: selectedNoteStore.noteId,
-			noteTitle: selectedNoteStore.noteTitle,
-			noteText: selectedNoteStore.noteText
-		});
 	},
 
 	_modalOpened: function () {
@@ -58145,7 +58178,8 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
     	return {
     		noteId: null,
     		noteTitle: '',
-    		noteText: ''
+    		noteText: '',
+    		noteSelectionAnimating: null
     	};
 	},
 
@@ -58288,7 +58322,13 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 			position: this.state.settingsOpened && domUtils.isSafari ? 'static' : 'relative'
 		};
 
-		return 	React.createElement("div", {className: "notepad", style: notepadStyle}, 
+		var notepadClasses = cx({
+			'notepad': true,
+			'slidenote slidenote-in': this.state.noteSelectionAnimating === false,
+			'slidenote slidenote-out': this.state.noteSelectionAnimating === true
+		});
+
+		return 	React.createElement("div", {className: notepadClasses, style: notepadStyle}, 
 					React.createElement("div", {className: "pink-divider"}), 
 					React.createElement("div", {className: "notepad-header"}, 
 						React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange, 
@@ -58367,6 +58407,7 @@ var bookshelfStore = require('../../../stores/bookshelfStore');
 var Sortable = require('../../../common/sortable');
 var SortableMixin = require('../../../common/sortable-mixin');
 var selectNoteAction = require('../../../actions/selectNote');
+var selectedNoteStore = require('../../../stores/selectedNoteStore');
 
 var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
@@ -58379,6 +58420,13 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 		});
 	},
 
+	_selectedNoteChange: function () {
+
+		this.setState({
+			selectedNoteId: selectedNoteStore.noteId
+		});
+	},
+
 	sortableOptions: {
         ref: 'userNoteContainer',
         model: 'userNotes'
@@ -58387,12 +58435,14 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 	getInitialState: function () {
 
 		return {
+			selectedNoteId: null,
 			userNotes: bookshelfStore.userNotes || []
 		};
 	},
 
 	componentDidMount: function () {
 
+		selectedNoteStore.onChange(this._selectedNoteChange);
 		bookshelfStore.onChange(this._haveUsernotes);
 	},
 
@@ -58408,10 +58458,15 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 		return 	React.createElement("div", {ref: "userNoteContainer", className: "usernotes-wrapper"}, 
 					this.state.userNotes && this.state.userNotes.map(function (item) {
 
+						var usernoteTitleClasses = cx({
+							'usernote-title': true,
+							'usernote-title-selected': item.noteId === self.state.selectedNoteId
+						});
+
 						if (item.itemType === 'note') {
-							return  React.createElement("span", {className: "generic-transition usernote-item"}, 
-										React.createElement("img", {key: item.noteId, src: "dist/images/paper.png", className: "paper", onClick: self.handleNoteClick.bind(self, item.noteId)}), 
-										React.createElement("span", {className: "usernote-title"}, item.noteTitle || 'New Note')
+							return  React.createElement("span", {key: item.noteId, className: "generic-transition usernote-item", onClick: self.handleNoteClick.bind(self, item.noteId)}, 
+										React.createElement("img", {src: "dist/images/paper.png", className: "paper"}), 
+										React.createElement("span", {className: usernoteTitleClasses}, item.noteTitle || 'New Note')
 									);
 						}
 
@@ -58430,7 +58485,7 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
 module.exports = usernotesComponent;
 
-},{"../../../actions/selectNote":"/var/www/actions/selectNote.js","../../../common/sortable":"/var/www/common/sortable.js","../../../common/sortable-mixin":"/var/www/common/sortable-mixin.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
+},{"../../../actions/selectNote":"/var/www/actions/selectNote.js","../../../common/sortable":"/var/www/common/sortable.js","../../../common/sortable-mixin":"/var/www/common/sortable-mixin.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js"}],"/var/www/stores/bookshelfStore.js":[function(require,module,exports){
 var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');

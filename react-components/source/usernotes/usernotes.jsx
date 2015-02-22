@@ -6,6 +6,7 @@ var bookshelfStore = require('../../../stores/bookshelfStore');
 var Sortable = require('../../../common/sortable');
 var SortableMixin = require('../../../common/sortable-mixin');
 var selectNoteAction = require('../../../actions/selectNote');
+var selectedNoteStore = require('../../../stores/selectedNoteStore');
 
 var usernotesComponent = React.createClass({
 
@@ -18,6 +19,13 @@ var usernotesComponent = React.createClass({
 		});
 	},
 
+	_selectedNoteChange: function () {
+
+		this.setState({
+			selectedNoteId: selectedNoteStore.noteId
+		});
+	},
+
 	sortableOptions: {
         ref: 'userNoteContainer',
         model: 'userNotes'
@@ -26,12 +34,14 @@ var usernotesComponent = React.createClass({
 	getInitialState: function () {
 
 		return {
+			selectedNoteId: null,
 			userNotes: bookshelfStore.userNotes || []
 		};
 	},
 
 	componentDidMount: function () {
 
+		selectedNoteStore.onChange(this._selectedNoteChange);
 		bookshelfStore.onChange(this._haveUsernotes);
 	},
 
@@ -47,10 +57,15 @@ var usernotesComponent = React.createClass({
 		return 	<div ref="userNoteContainer" className="usernotes-wrapper">
 					{this.state.userNotes && this.state.userNotes.map(function (item) {
 
+						var usernoteTitleClasses = cx({
+							'usernote-title': true,
+							'usernote-title-selected': item.noteId === self.state.selectedNoteId
+						});
+
 						if (item.itemType === 'note') {
-							return  <span className="generic-transition usernote-item">
-										<img key={item.noteId} src="dist/images/paper.png" className="paper" onClick={self.handleNoteClick.bind(self, item.noteId)} />
-										<span className="usernote-title">{item.noteTitle || 'New Note'}</span>
+							return  <span key={item.noteId} className="generic-transition usernote-item" onClick={self.handleNoteClick.bind(self, item.noteId)}>
+										<img src="dist/images/paper.png" className="paper" />
+										<span className={usernoteTitleClasses}>{item.noteTitle || 'New Note'}</span>
 									</span>;
 						}
 

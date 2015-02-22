@@ -110,7 +110,6 @@ var App = React.createClass({
 	    if (tempAuthToken && (tempAuthToken === 'invalid' || tempAuthToken === 'expired')) {
 
 	    	app.refs.mainModalForm.open();
-
 	    }
 
 	    // If user is authenticated, we need a client side session interval to auto logout the user eventually.

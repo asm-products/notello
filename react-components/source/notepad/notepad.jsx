@@ -57,17 +57,51 @@ var sanitizeHTML = function (html) {
 
 var notepadComponent = React.createClass({
 
+	_slideTimeout: null,
+
 	_selectedNote: function () {
 
-		if (this.state.noteId !== selectedNoteStore.noteId) {
-			$(this.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+		var self = this;
+
+		// This is a different note
+		if (self.state.noteId !== selectedNoteStore.noteId) {
+			$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+
+			clearTimeout(self._slideTimeout);
+
+			self.setState({
+				noteSelectionAnimating: true
+			});
+
+			self._slideTimeout = setTimeout(function () {
+
+				self.setState({
+					noteSelectionAnimating: false,
+					noteId: selectedNoteStore.noteId,
+					noteTitle: selectedNoteStore.noteTitle,
+					noteText: selectedNoteStore.noteText
+				});
+
+				self._slideTimeout = setTimeout(function () {
+
+					self.setState({
+						noteSelectionAnimating: null
+					});
+
+				}, 250);
+
+			}, 550);
+
+		} else {
+
+			self.setState({
+				noteSelectionAnimating: null,
+				noteId: selectedNoteStore.noteId,
+				noteTitle: selectedNoteStore.noteTitle,
+				noteText: selectedNoteStore.noteText
+			});
 		}
 
-		this.setState({
-			noteId: selectedNoteStore.noteId,
-			noteTitle: selectedNoteStore.noteTitle,
-			noteText: selectedNoteStore.noteText
-		});
 	},
 
 	_modalOpened: function () {
@@ -79,7 +113,8 @@ var notepadComponent = React.createClass({
     	return {
     		noteId: null,
     		noteTitle: '',
-    		noteText: ''
+    		noteText: '',
+    		noteSelectionAnimating: null
     	};
 	},
 
@@ -222,7 +257,13 @@ var notepadComponent = React.createClass({
 			position: this.state.settingsOpened && domUtils.isSafari ? 'static' : 'relative'
 		};
 
-		return 	<div className="notepad" style={notepadStyle}>
+		var notepadClasses = cx({
+			'notepad': true,
+			'slidenote slidenote-in': this.state.noteSelectionAnimating === false,
+			'slidenote slidenote-out': this.state.noteSelectionAnimating === true
+		});
+
+		return 	<div className={notepadClasses} style={notepadStyle}>
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
 						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 

@@ -356,6 +356,7 @@ input {
   width: 100%;
   height: 100%;
   transition: all .5s;
+  overflow-x: hidden;
 }
 
 .header {
@@ -749,6 +750,36 @@ input {
     opacity: 1.0;
   }
 }
+.slidenote {
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.slidenote-in {
+  animation-timing-function: linear;
+  animation-duration: .2s;
+  animation-name: slideIn;
+}
+.slidenote-out {
+  animation-timing-function: ease-in;
+  animation-duration: .5s;
+  animation-name: slideOut;
+}
+@keyframes slideIn {
+  0% {
+    transform: translateX(200%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-200%);
+  }
+}
 
 .search {
   display: inline-block;
@@ -871,4 +902,8 @@ input {
   width: 108px;
   text-align: center;
   border: 1px solid #443115;
+  overflow: hidden;
+}
+.usernote-item .usernote-title-selected {
+  background-color: #009388;
 }
