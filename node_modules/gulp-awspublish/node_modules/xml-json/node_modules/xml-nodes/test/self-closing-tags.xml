@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<body copyright="All data copyright AC Transit 2014.">
+<Error shouldRetry="false">
+  last time "t" parameter must be specified in query string
+</Error>
+<vehicle id="5131" routeTag="85" dirTag="85_39_0" lat="37.6337661" lon="-122.0650787" secsSinceReport="7" predictable="true" heading="150" speedKmHr="11"/>
+<vehicle id="1406" routeTag="239" dirTag="239_14_0" lat="37.5480232" lon="-121.9709091" secsSinceReport="7" predictable="true" heading="120" speedKmHr="26"/>
+<vehicle id="5005" routeTag="49" dirTag="49_19_1" lat="37.8520088" lon="-122.2913131" secsSinceReport="7" predictable="true" heading="165" speedKmHr="0"/>
+<lastTime time="1407284160919"/>
+</body>

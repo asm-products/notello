@@ -177,7 +177,7 @@ var App = React.createClass({
 					<ModalForm ref="mainModalForm" modalTitle="ERROR" btnSubmitText="OK" onSubmit={this.handleModalSubmit} >
 						<p className="p-modal-text">
 							<span className="span-modal-text">{tempAuthToken === 'expired' && 'This login token has expired.'}</span>
-							<span className="span-modal-text">{tempAuthToken === 'invalid' && 'That login token has either already been used or is invalid.'}</span>
+							<span className="span-modal-text">{(!tempAuthToken || tempAuthToken === 'invalid') && 'That login token has either already been used or is invalid.'}</span>
 						</p>
 					</ModalForm>
 					<ModalForm ref="sessionTimerModalForm" modalTitle="AUTOMATED LOGOUT" btnSubmitText="STAY LOGGED IN" onClose={this.handleAutomatedLogoutClose} onSubmit={this.handleAutomatedLogoutSubmit}>
@@ -206,5 +206,15 @@ $(function () {
 
 	hideBookshelfAction();
 	resetTokenAction();
-	getUserNotesAction();
+
+	if (lscache.get('authToken') !== 'invalid') {
+
+		getUserNotesAction();
+	}
+
+	setTimeout(function () {
+
+  		$.removeCookie('tempAuthToken',  { path: '/', secure: true, domain: 'notello.com' });
+	}, 1);
+
 });

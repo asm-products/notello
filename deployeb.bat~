@@ -1,0 +1,11 @@
+#!/bin/bash
+# My first script
+
+cp /var/www/index.php /home/chris/ship/index.php
+cp /var/www/email.html /home/chris/ship/email.html
+cp /var/www/favicon.ico /home/chris/ship/favicon.ico
+cp /var/www/composer.json /home/chris/ship/composer.json
+cp /var/www/templates /home/chris/ship/templates
+cp /var/www/code /home/chris/ship/code
+cp /var/www/dist /home/chris/ship/dist
+cp /var/www/.ebextensions /home/chris/ship/.ebextensions

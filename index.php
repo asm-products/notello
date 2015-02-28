@@ -8,12 +8,78 @@ use Aws\Ses\SesClient;
 use Aws\DynamoDb\DynamoDbClient;
 
 // Set timezone
-date_default_timezone_set("UTC"); 
+date_default_timezone_set("UTC");
+
+// Let's the system know this is in the dev environment
+$dev = true;
 
 // Prepare Slim PHP app
 $app = new \Slim\Slim(array(
-    'templates.path' => 'templates'
+    'templates.path' => 'templates',
+   	'debug' => $dev
 ));
+
+$app->error(function (\Exception $e) use ($app) {
+
+	// Get AWS DynamoDB Client
+	$dbClient = DynamoDBClient::factory(array(
+    	'region'  => 'us-west-2'
+	));
+
+	// Make insert into errors table in database
+	$errorDate = new DateTime();
+	$dbClient->putItem(array(
+	    'TableName' => 'errors',
+	    'Item'       => array(
+	        'errorId'   => array('S' => uniqid()), // Primary Key
+	        'errorDate'   => array('N' => $errorDate->getTimestamp, // Range Key
+	        'message' => array('S' => $e->message),
+	        'code' => array('N' => $e->code),
+	        'fileName' => array('S' => $e->file),
+	        'line' => array('N' => $noteText)
+	    )
+	));
+
+    $app->render('error.php');
+});
+
+if ($dev === false) {
+
+	$secureProtocol = false;
+	$httpHost = filter_input(INPUT_SERVER, "HTTP_HOST");
+	$requestURI = filter_input(INPUT_SERVER, "REQUEST_URI");
+	$https = filter_input(INPUT_SERVER, "HTTPS");
+	$serverPort = filter_input(INPUT_SERVER, "SERVER_PORT");
+	$proto = filter_input(INPUT_SERVER, "HTTP_X_FORWARDED_PROTO");
+
+	if (substr($httpHost, 0, 4) === 'www.') {
+	    header('Location: https://' . substr($httpHost, 4) . $requestURI);
+	    exit();
+	}
+
+	if (!empty($https) && $https !== 'off' || $serverPort == 443) {
+
+		$secureProtocol = true;
+
+	} else if (!empty($proto) && $proto === "https") {
+
+		$secureProtocol = true;
+	}
+
+	$hasPHPAtEnd = strrpos($requestURI, ".php");
+
+	if ($hasPHPAtEnd !== false) {
+
+	    $requestURI = str_replace($requestURI, ".php", "");
+	    header('Location: https://' . $httpHost . $requestURI);
+	    exit();
+
+	} else if ($secureProtocol === false) {
+
+	    header('Location: https://' . $httpHost . $requestURI);
+	    exit();
+	}
+}
 
 function isValid ($app) {
 
@@ -23,7 +89,7 @@ function isValid ($app) {
 	$app->response->headers->set('Content-Type', 'application/json');
 
 	// If the user had a token in their local storage, refresh it and send the new one back.
-	if (isset($token)) {
+	if (isset($token) && $token !== 'invalid') {
 
 		// Get email, expiration timestamp, and signature from old token
 		$oldToken = explode(':', $token);
@@ -38,7 +104,7 @@ function isValid ($app) {
 
 		// Setup expected signature for purposes of comparison.
 		$rawToken = $email . ':' . $expirationTimestamp;
-		$expectedSignature = hash_hmac('ripemd160', $rawToken, 'secret');
+		$expectedSignature = hash_hmac('ripemd160', $rawToken, getenv('notellosecret'));
 
 		if ($currentDate >= $expirationDate) {
 
@@ -50,7 +116,7 @@ function isValid ($app) {
 
 			// All is well and we can finally refresh the auth token
 			$newRawToken = $email . ':' . strtotime('+7 days');
-			$newSignature = hash_hmac('ripemd160', $newRawToken, 'secret');
+			$newSignature = hash_hmac('ripemd160', $newRawToken, getenv('notellosecret'));
 			$newAuthToken = $newRawToken . ':' . $newSignature;
                         
 			$app->response->headers->set('X-Authorization', $newAuthToken);
@@ -281,7 +347,7 @@ $app->get('/api/token', function () use ($app) {
 	$app->response->headers->set('Content-Type', 'application/json');
 
 	// If the user had a token in their local storage, refresh it and send the new one back.
-	if (isset($token)) {
+	if (isset($token) && $token !== 'invalid') {
 
 		// Get email, expiration timestamp, and signature from old token
 		$oldToken = explode(':', $token);
@@ -296,7 +362,7 @@ $app->get('/api/token', function () use ($app) {
 
 		// Setup expected signature for purposes of comparison.
 		$rawToken = $email . ':' . $expirationTimestamp;
-		$expectedSignature = hash_hmac('ripemd160', $rawToken, 'secret');
+		$expectedSignature = hash_hmac('ripemd160', $rawToken, getenv('notellosecret'));
 
 		if ($currentDate >= $expirationDate) {
 
@@ -307,7 +373,7 @@ $app->get('/api/token', function () use ($app) {
 
 			// All is well and we can finally refresh the auth token
 			$newRawToken = $email . ':' . strtotime('+7 days');
-			$newSignature = hash_hmac('ripemd160', $newRawToken, 'secret');
+			$newSignature = hash_hmac('ripemd160', $newRawToken, getenv('notellosecret'));
 			$newAuthToken = $newRawToken . ':' . $newSignature;
                         
             $app->response->setBody(json_encode(array('token' => $newAuthToken)));
@@ -341,7 +407,7 @@ $app->post('/api/login', function () use ($app) {
 	$tokenId = Helper::GUID();
 
 	$msg = array();
-	$msg['Source'] = "ny2244111@hotmail.com";
+	$msg['Source'] = '"Notello"<noreply@notello.com>';
 	//ToAddresses must be an array
 	$msg['Destination']['ToAddresses'][] = $email;
 
@@ -435,22 +501,22 @@ $app->get('/authenticate', function () use ($app) {
 			// If the token is over 1 hour old then it is considered invalid and we don't authenticate the user
 			if (date_diff($insertedDate, $currentTime)->h > 1) {
 
-				$app->setCookie('tempAuthToken', 'expired', '5 minutes', '/', null, true);
+				$app->setCookie('tempAuthToken', 'expired', '5 minutes', '/', 'notello.com', true);
 
 			} else {
 
 				$rawToken = $email . ':' . strtotime('+7 days');
-				$signature = hash_hmac('ripemd160', $rawToken, 'secret');
+				$signature = hash_hmac('ripemd160', $rawToken, getenv('notellosecret'));
 				$authToken = $rawToken . ':' . $signature;
 
-				$app->setCookie('tempAuthToken', $authToken, '5 minutes', '/', null, true);
+				$app->setCookie('tempAuthToken', $authToken, '5 minutes', '/', 'notello.com', true);
 
 			}
 
 		} else {
 
 			// Invalid or deleted token
-			$app->setCookie('tempAuthToken', 'invalid', '5 minutes', '/', null, true);
+			$app->setCookie('tempAuthToken', 'invalid', '5 minutes', '/', 'notello.com', true);
 		}
 
 	}

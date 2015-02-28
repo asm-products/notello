@@ -142,14 +142,16 @@ var bookcaseComponent = React.createClass({
 								<img src="dist/images/paper-icon.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW NOTE</span>
 							</button>
 						</div>
-						<div className="input-wrapper">
-							<button ref="btnNewNoteBook" type="button" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewNoteBook}>
-								<img src="dist/images/notebook-icon.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW NOTEBOOK</span>
+						<div className="input-wrapper disabled-wrapper" title="Coming soon">
+							<button ref="btnNewNoteBook" type="button" disabled={true} className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewNoteBook}>
+								<img src="dist/images/notebook-icon.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW NOTEBOOK</span> 
+								<span className="coming-soon">(COMING SOON)</span>
 							</button>
 						</div>
-						<div className="input-wrapper">
-							<button ref="btnNewBox" type="button" className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewBox}>
-								<img src="dist/images/archivebox.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW BOX</span>
+						<div className="input-wrapper disabled-wrapper" title="Coming soon">
+							<button ref="btnNewBox" type="button" disabled={true} className={buttonClasses} style={{ height: '50px' }} onClick={this.handleNewBox}>
+								<img src="dist/images/archivebox.png" className="item-icon" /> <span className="valign-middle new-button-text">NEW BOX</span> 
+								<span className="coming-soon">(COMING SOON)</span>
 							</button>
 						</div>
 					</div>

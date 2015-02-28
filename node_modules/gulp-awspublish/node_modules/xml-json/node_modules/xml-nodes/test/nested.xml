@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
+<channel>
+<title>Entertainment News Headlines - Yahoo! News</title>
+<link>http://news.yahoo.com/entertainment/</link>
+<description>Get the latest entertainment news headlines from Yahoo! News. Find breaking entertainment news, including analysis and opinion on top entertainment stories.</description>
+<language>en-US</language>
+<copyright>Copyright (c) 2013 Yahoo! Inc. All rights reserved</copyright>
+<pubDate>Mon, 19 Aug 2013 10:52:46 -0400</pubDate>
+<ttl>5</ttl>
+<image>
+<title>Entertainment News Headlines - Yahoo! News</title>
+<link>http://news.yahoo.com/entertainment/</link>
+<url>http://l.yimg.com/a/i/us/nws/th/main_142c.gif</url>
+</image>
+<item>
+  <title>Al-Jazeera America prepares for Tuesday launch</title>
+  <item>Look at me, I'm nested!</item>
+</item>
+<item>
+  <title>Al-Jazeera America prepares for Tuesday launch</title>
+  <item>
+    <item>Look at me, I'm hella nested!</item>
+  </item>
+</item>
+</channel>
+</rss>

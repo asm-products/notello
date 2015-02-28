@@ -178,7 +178,7 @@ var App = React.createClass({displayName: 'App',
 					React.createElement(ModalForm, {ref: "mainModalForm", modalTitle: "ERROR", btnSubmitText: "OK", onSubmit: this.handleModalSubmit}, 
 						React.createElement("p", {className: "p-modal-text"}, 
 							React.createElement("span", {className: "span-modal-text"}, tempAuthToken === 'expired' && 'This login token has expired.'), 
-							React.createElement("span", {className: "span-modal-text"}, tempAuthToken === 'invalid' && 'That login token has either already been used or is invalid.')
+							React.createElement("span", {className: "span-modal-text"}, (!tempAuthToken || tempAuthToken === 'invalid') && 'That login token has either already been used or is invalid.')
 						)
 					), 
 					React.createElement(ModalForm, {ref: "sessionTimerModalForm", modalTitle: "AUTOMATED LOGOUT", btnSubmitText: "STAY LOGGED IN", onClose: this.handleAutomatedLogoutClose, onSubmit: this.handleAutomatedLogoutSubmit}, 
@@ -207,7 +207,17 @@ $(function () {
 
 	hideBookshelfAction();
 	resetTokenAction();
-	getUserNotesAction();
+
+	if (lscache.get('authToken') !== 'invalid') {
+
+		getUserNotesAction();
+	}
+
+	setTimeout(function () {
+
+  		$.removeCookie('tempAuthToken',  { path: '/', secure: true, domain: 'notello.com' });
+	}, 1);
+
 });
 
 },{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/getUserNotes":"/var/www/actions/getUserNotes.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
@@ -58044,14 +58054,16 @@ var bookcaseComponent = React.createClass({displayName: 'bookcaseComponent',
 								React.createElement("img", {src: "dist/images/paper-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTE")
 							)
 						), 
-						React.createElement("div", {className: "input-wrapper"}, 
-							React.createElement("button", {ref: "btnNewNoteBook", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNoteBook}, 
-								React.createElement("img", {src: "dist/images/notebook-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTEBOOK")
+						React.createElement("div", {className: "input-wrapper disabled-wrapper", title: "Coming soon"}, 
+							React.createElement("button", {ref: "btnNewNoteBook", type: "button", disabled: true, className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewNoteBook}, 
+								React.createElement("img", {src: "dist/images/notebook-icon.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW NOTEBOOK"), 
+								React.createElement("span", {className: "coming-soon"}, "(COMING SOON)")
 							)
 						), 
-						React.createElement("div", {className: "input-wrapper"}, 
-							React.createElement("button", {ref: "btnNewBox", type: "button", className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewBox}, 
-								React.createElement("img", {src: "dist/images/archivebox.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW BOX")
+						React.createElement("div", {className: "input-wrapper disabled-wrapper", title: "Coming soon"}, 
+							React.createElement("button", {ref: "btnNewBox", type: "button", disabled: true, className: buttonClasses, style: { height: '50px'}, onClick: this.handleNewBox}, 
+								React.createElement("img", {src: "dist/images/archivebox.png", className: "item-icon"}), " ", React.createElement("span", {className: "valign-middle new-button-text"}, "NEW BOX"), 
+								React.createElement("span", {className: "coming-soon"}, "(COMING SOON)")
 							)
 						)
 					), 
@@ -58440,8 +58452,14 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
 			filteredUserNotes = bookshelfStore.userNotes.filter(function (userNote) {
 
-				return userNote.noteTitle.indexOf(bookshelfStore.searchText) !== -1;
+				if (!bookshelfStore.searchText || bookshelfStore.searchText === '') {
+					return true;
+				}
+
+				return userNote.noteTitle && userNote.noteTitle.indexOf(bookshelfStore.searchText) !== -1;
 			});
+
+			console.log(filteredUserNotes);
 
 		}
 
