@@ -1,6 +1,8 @@
 
 var publicMembers = {
 
+	isDebug: true,
+
 	getCaret: function(node) {
 
 	  	if (node.selectionStart) {

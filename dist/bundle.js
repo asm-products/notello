@@ -1034,6 +1034,21 @@ var lscache = require('ls-cache');
 var preProcessingCallbacks = [];
 var postProcessingCallbacks = [];
 
+var domUtils = require('../common/dom-utils');
+
+var handleError = function (errorText) {
+
+	if (!domUtils.isDebug) {
+
+		window.location = 'error';
+
+	} else {
+
+		document.body.style.background = 'white';
+		document.body.innerHTML = errorText;
+	}
+};
+
 var api = function (options) {
 
 	preProcessingCallbacks.map(function (callback) {
@@ -1042,10 +1057,7 @@ var api = function (options) {
 
 	options.error = function (resp) {
 
-		// Error should already have been logged on server side
-		// TODO: Make sure this doesn't happen in production
-		document.body.style.background = 'white';
-		document.body.innerHTML = resp.responseText;
+		handleError(resp.responseText);
 	};
 
 	options.success = _.wrap(options.success, function (successFunction, data, textStatus, jqXHR) {
@@ -1053,8 +1065,7 @@ var api = function (options) {
 		// This should always be JSON so if HTML came back we can assume there was an unhandled error
 		if(jqXHR.getResponseHeader('content-type') === 'text/html') {
 
-			document.body.style.background = 'white';
-			document.body.innerHTML = data;
+			handleError(data);
 
 		} else {
 
@@ -1086,7 +1097,7 @@ api.register = function (preProcessingCallback, postProcessingCallback) {
 
 module.exports = api;
 
-},{"jquery":"/var/www/node_modules/jquery/dist/jquery.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/common/buffer-loader.js":[function(require,module,exports){
+},{"../common/dom-utils":"/var/www/common/dom-utils.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/common/buffer-loader.js":[function(require,module,exports){
 
 var BufferLoader = function (context, urlList, callback) {
     'use strict';
@@ -1152,6 +1163,8 @@ module.exports = BufferLoader;
 },{}],"/var/www/common/dom-utils.js":[function(require,module,exports){
 
 var publicMembers = {
+
+	isDebug: true,
 
 	getCaret: function(node) {
 
@@ -58458,8 +58471,6 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
 				return userNote.noteTitle && userNote.noteTitle.indexOf(bookshelfStore.searchText) !== -1;
 			});
-
-			console.log(filteredUserNotes);
 
 		}
 

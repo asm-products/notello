@@ -27,8 +27,6 @@ var usernotesComponent = React.createClass({
 				return userNote.noteTitle && userNote.noteTitle.indexOf(bookshelfStore.searchText) !== -1;
 			});
 
-			console.log(filteredUserNotes);
-
 		}
 
 		this.setState({

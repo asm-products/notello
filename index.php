@@ -19,7 +19,7 @@ $app = new \Slim\Slim(array(
    	'debug' => $dev
 ));
 
-$app->error(function (\Exception $e) use ($app) {
+function logError($e, $errorType) {
 
 	// Get AWS DynamoDB Client
 	$dbClient = DynamoDBClient::factory(array(
@@ -32,15 +32,26 @@ $app->error(function (\Exception $e) use ($app) {
 	    'TableName' => 'errors',
 	    'Item'       => array(
 	        'errorId'   => array('S' => uniqid()), // Primary Key
-	        'errorDate'   => array('N' => $errorDate->getTimestamp, // Range Key
-	        'message' => array('S' => $e->message),
-	        'code' => array('N' => $e->code),
-	        'fileName' => array('S' => $e->file),
-	        'line' => array('N' => $noteText)
+	        'errorDate'   => array('N' => $errorDate->getTimestamp()), // Range Key
+	        'errorType' => array('S' => $errorType),
+	        'message' => array('S' => $e->getMessage()),
+	        'code' => array('N' => $e->getCode()),
+	        'fileName' => array('S' => $e->getFile()),
+	        'line' => array('N' => $e->getLine())
 	    )
 	));
 
-    $app->render('error.php');
+    echo json_encode(array('message' => 'error'));
+}
+
+function myPHPExceptionHandler($e) {
+	logError($e, 'PHPError');
+}
+
+set_exception_handler('myPHPExceptionHandler');
+
+$app->error(function (\Exception $e) use ($app) {
+	logError($e, 'SlimError');
 });
 
 if ($dev === false) {
@@ -427,7 +438,7 @@ $app->post('/api/login', function () use ($app) {
 	    $msg_id = $result->get('MessageId');
 
 	    //view sample output
-            echo json_encode(true);
+        echo json_encode(true);
 
 	} catch (Exception $e) {
 	    //An error happened and the email did not get sent

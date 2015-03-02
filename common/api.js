@@ -6,6 +6,21 @@ var lscache = require('ls-cache');
 var preProcessingCallbacks = [];
 var postProcessingCallbacks = [];
 
+var domUtils = require('../common/dom-utils');
+
+var handleError = function (errorText) {
+
+	if (!domUtils.isDebug) {
+
+		window.location = 'error';
+
+	} else {
+
+		document.body.style.background = 'white';
+		document.body.innerHTML = errorText;
+	}
+};
+
 var api = function (options) {
 
 	preProcessingCallbacks.map(function (callback) {
@@ -14,10 +29,7 @@ var api = function (options) {
 
 	options.error = function (resp) {
 
-		// Error should already have been logged on server side
-		// TODO: Make sure this doesn't happen in production
-		document.body.style.background = 'white';
-		document.body.innerHTML = resp.responseText;
+		handleError(resp.responseText);
 	};
 
 	options.success = _.wrap(options.success, function (successFunction, data, textStatus, jqXHR) {
@@ -25,8 +37,7 @@ var api = function (options) {
 		// This should always be JSON so if HTML came back we can assume there was an unhandled error
 		if(jqXHR.getResponseHeader('content-type') === 'text/html') {
 
-			document.body.style.background = 'white';
-			document.body.innerHTML = data;
+			handleError(data);
 
 		} else {
 
