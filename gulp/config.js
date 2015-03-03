@@ -40,14 +40,5 @@ module.exports = {
     ],
     bucket: 'notello.com',
     region: 'us-west-2'
-  },
-  ship: {
-    filesToMove: [
-      './index.php'
-      // './icons/**/*.*',
-      // './src/page_action/**/*.*',
-      // './manifest.json'
-    ],
-    base: './'
   }
 };

@@ -154,6 +154,21 @@ $app->get('/', function () use ($app) {
     $app->render('index.html');
 });
 
+$app->get('/error', function () use ($app) {
+
+    $app->render('error.html');
+});
+
+$app->get('/404', function () use ($app) {
+
+    $app->render('404.html');
+});
+
+$app->notFound(function () use ($app) {
+
+    $app->render('404.html');
+});
+
 $app->get('/assuresign', function () use ($app) {
 
     // Render index view

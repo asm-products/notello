@@ -16,7 +16,17 @@ gulp.task('publish', function () {
 
 	var iteratorMarker = 0;
 
+	var contentType = {
+
+		jpg: 'image/jpeg',
+		png: 'image/png',
+		css: 'text/css',
+		js: 'application/javascript'	
+	};
+
 	config.src.map(function (source) {
+
+		var extension = source.key.split('.').pop();
 
 		fs.readFile(source.path, function (err, data) {
 
@@ -27,7 +37,8 @@ gulp.task('publish', function () {
 		    	CacheControl: 'max-age=86400, no-transform, public',
 				Key: source.key,
 				Body: data,
-				ACL: 'public-read'
+				ACL: 'public-read',
+				ContentType: contentType[extension]
 			};
 
 			s3.putObject(params, function(err, data) {

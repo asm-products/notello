@@ -1164,7 +1164,7 @@ module.exports = BufferLoader;
 
 var publicMembers = {
 
-	isDebug: true,
+	isDebug: false,
 
 	getCaret: function(node) {
 
