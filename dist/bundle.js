@@ -26,6 +26,7 @@ var resetTokenAction = require('../../../actions/resetToken');
 var hideBookshelfAction = require('../../../actions/hideBookshelf');
 var logoutAction = require('../../../actions/logout');
 var getUserNotesAction = require('../../../actions/getUserNotes');
+var selectNoteAction = require('../../../actions/selectNote');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -205,22 +206,31 @@ var appComponent = React.render(
 
 $(function () {
 
+	// Mostly for setup reasons. Not sure if it's really needed.
 	hideBookshelfAction();
+
+	// Reset authentication token
 	resetTokenAction();
 
+	// If the auth token is not available or is valid then go get the user notes
 	if (lscache.get('authToken') !== 'invalid') {
 
 		getUserNotesAction();
 	}
 
+	if (lscache.get('lastSelectedNote')) {
+		selectNoteAction(lscache.get('lastSelectedNote'));
+	}
+
 	setTimeout(function () {
 
   		$.removeCookie('tempAuthToken',  { path: '/', secure: true, domain: 'notello.com' });
+
 	}, 1);
 
 });
 
-},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/getUserNotes":"/var/www/actions/getUserNotes.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
+},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/getUserNotes":"/var/www/actions/getUserNotes.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../actions/selectNote":"/var/www/actions/selectNote.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -661,6 +671,7 @@ module.exports = deleteNoteAction;
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
 var lscache = require('ls-cache');
+var createNoteAction = require('./createNote')
 
 var getUserNotesAction = function () {
 
@@ -682,12 +693,17 @@ var getUserNotesAction = function () {
 	} else if (unAuthUserNotes) {
 
 		dispatcher.dispatchDiscrete('getUserNotesCompleted', unAuthUserNotes);
+
+	} else {
+
+		// Create a default document
+		createNoteAction([], '', '');
 	}
 };
 
 module.exports = getUserNotesAction;
 
-},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/hideBookshelf.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./createNote":"/var/www/actions/createNote.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/hideBookshelf.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var _ = require('underscore');
@@ -904,7 +920,7 @@ var selectNoteAction = function (noteId) {
 
 	if (lscache.get('isAuthenticated')) {
 
-		
+		// TODO: Get from db
 
 	} else {
 
@@ -58614,7 +58630,12 @@ var domUtils = require('../common/dom-utils');
 // an in memory object. This is because authentication details should persist on page refreshes, etc.
 var loginStore = new Store();
 
-if (!lscache.get('isAuthenticated')) {
+if (lscache.get('isAuthenticated')) {
+
+	// TODO: I feel like something should happen here
+	lscache.remove('lastSelectedNote');
+
+} else {
 
 	loginStore.pendingLogin = false;
 	lscache.set('isAuthenticated', false);
@@ -58635,6 +58656,7 @@ notelloDispatcher.registerDiscrete('loggedIn', function (payload) {
 	lscache.set('isAuthenticated', true);
 	lscache.set('email', payload.email);
 	lscache.set('authToken', payload.authToken);
+	lscache.remove('lastSelectedNote');
 
 	loginStore.save();
 });
@@ -58686,6 +58708,7 @@ module.exports = modalStore;
 var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');
+var lscache = require('ls-cache');
 
 var selectedNoteStore = assign(new Store(), {
 
@@ -58700,6 +58723,10 @@ notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload)
 	selectedNoteStore.noteTitle = notePayload.newNote.noteTitle;
 	selectedNoteStore.noteText = notePayload.newNote.noteText;
 
+	if (!lscache.get('isAuthenticated')) {
+		lscache.set('lastSelectedNote', selectedNoteStore.noteId);
+	}
+
 	selectedNoteStore.save();
 });
 
@@ -58708,6 +58735,10 @@ notelloDispatcher.registerDiscrete('updateNoteCompleted', function (notePayload)
 	selectedNoteStore.noteId = notePayload.noteId;
 	selectedNoteStore.noteTitle = notePayload.noteTitle;
 	selectedNoteStore.noteText = notePayload.noteText;
+
+	if (!lscache.get('isAuthenticated')) {
+		lscache.set('lastSelectedNote', selectedNoteStore.noteId);
+	}
 
 	selectedNoteStore.save();
 });
@@ -58718,9 +58749,13 @@ notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 	selectedNoteStore.noteTitle = note.noteTitle;
 	selectedNoteStore.noteText = note.noteText;
 
+	if (!lscache.get('isAuthenticated')) {
+		lscache.set('lastSelectedNote', selectedNoteStore.noteId);
+	}
+
 	selectedNoteStore.save();
 });
 
 module.exports = selectedNoteStore;
 
-},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/store":"/var/www/common/store.js","object-assign":"/var/www/node_modules/object-assign/index.js"}]},{},["./react-components/source/app/app.jsx"]);
+},{"../actions/notelloDispatcher":"/var/www/actions/notelloDispatcher.js","../common/store":"/var/www/common/store.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js"}]},{},["./react-components/source/app/app.jsx"]);

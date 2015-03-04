@@ -25,6 +25,7 @@ var resetTokenAction = require('../../../actions/resetToken');
 var hideBookshelfAction = require('../../../actions/hideBookshelf');
 var logoutAction = require('../../../actions/logout');
 var getUserNotesAction = require('../../../actions/getUserNotes');
+var selectNoteAction = require('../../../actions/selectNote');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -204,17 +205,26 @@ var appComponent = React.render(
 
 $(function () {
 
+	// Mostly for setup reasons. Not sure if it's really needed.
 	hideBookshelfAction();
+
+	// Reset authentication token
 	resetTokenAction();
 
+	// If the auth token is not available or is valid then go get the user notes
 	if (lscache.get('authToken') !== 'invalid') {
 
 		getUserNotesAction();
 	}
 
+	if (lscache.get('lastSelectedNote')) {
+		selectNoteAction(lscache.get('lastSelectedNote'));
+	}
+
 	setTimeout(function () {
 
   		$.removeCookie('tempAuthToken',  { path: '/', secure: true, domain: 'notello.com' });
+
 	}, 1);
 
 });

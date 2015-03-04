@@ -2,6 +2,7 @@
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
 var lscache = require('ls-cache');
+var createNoteAction = require('./createNote')
 
 var getUserNotesAction = function () {
 
@@ -23,6 +24,11 @@ var getUserNotesAction = function () {
 	} else if (unAuthUserNotes) {
 
 		dispatcher.dispatchDiscrete('getUserNotesCompleted', unAuthUserNotes);
+
+	} else {
+
+		// Create a default document
+		createNoteAction([], '', '');
 	}
 };
 

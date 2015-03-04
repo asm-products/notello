@@ -6,7 +6,7 @@ var selectNoteAction = function (noteId) {
 
 	if (lscache.get('isAuthenticated')) {
 
-		
+		// TODO: Get from db
 
 	} else {
 

@@ -8,7 +8,12 @@ var domUtils = require('../common/dom-utils');
 // an in memory object. This is because authentication details should persist on page refreshes, etc.
 var loginStore = new Store();
 
-if (!lscache.get('isAuthenticated')) {
+if (lscache.get('isAuthenticated')) {
+
+	// TODO: I feel like something should happen here
+	lscache.remove('lastSelectedNote');
+
+} else {
 
 	loginStore.pendingLogin = false;
 	lscache.set('isAuthenticated', false);
@@ -29,6 +34,7 @@ notelloDispatcher.registerDiscrete('loggedIn', function (payload) {
 	lscache.set('isAuthenticated', true);
 	lscache.set('email', payload.email);
 	lscache.set('authToken', payload.authToken);
+	lscache.remove('lastSelectedNote');
 
 	loginStore.save();
 });
