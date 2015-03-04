@@ -3,7 +3,7 @@ var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
 var lscache = require('ls-cache');
 
-var deleteNoteAction = function (noteId) {
+var deleteNoteAction = function (noteId, userNotes) {
 
 	if (lscache.get('isAuthenticated')) {
 
@@ -15,7 +15,7 @@ var deleteNoteAction = function (noteId) {
 				noteId: noteId
 			},
 			success: function () {
-				
+		
 				dispatcher.dispatchDiscrete('deleteNoteCompleted');
 		    }
 		});

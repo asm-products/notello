@@ -10,6 +10,19 @@ var selectedNoteStore = assign(new Store(), {
 	noteText: ''
 });
 
+notelloDispatcher.registerDiscrete('deleteNoteCompleted', function () {
+
+	selectedNoteStore.noteId = null;
+	selectedNoteStore.noteTitle = '';
+	selectedNoteStore.noteText = '';
+
+	if (!lscache.get('isAuthenticated')) {
+		lscache.remove('lastSelectedNote');
+	}
+
+	selectedNoteStore.save();
+});
+
 notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload) {
 
 	selectedNoteStore.noteId = notePayload.newNote.noteId;
@@ -38,15 +51,19 @@ notelloDispatcher.registerDiscrete('updateNoteCompleted', function (notePayload)
 
 notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 
-	selectedNoteStore.noteId = note.noteId;
-	selectedNoteStore.noteTitle = note.noteTitle;
-	selectedNoteStore.noteText = note.noteText;
+	if (note) {
 
-	if (!lscache.get('isAuthenticated')) {
-		lscache.set('lastSelectedNote', selectedNoteStore.noteId);
+		selectedNoteStore.noteId = note.noteId;
+		selectedNoteStore.noteTitle = note.noteTitle;
+		selectedNoteStore.noteText = note.noteText;
+
+		if (!lscache.get('isAuthenticated')) {
+			lscache.set('lastSelectedNote', selectedNoteStore.noteId);
+		}
+
+		selectedNoteStore.save();
+
 	}
-
-	selectedNoteStore.save();
 });
 
 module.exports = selectedNoteStore;

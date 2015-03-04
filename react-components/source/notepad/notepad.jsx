@@ -63,8 +63,9 @@ var notepadComponent = React.createClass({
 
 		var self = this;
 
-		// This is a different note
-		if (self.state.noteId !== selectedNoteStore.noteId) {
+		// This is a different note so we need to animate it in
+		if (selectedNoteStore.noteId && self.state.noteId !== selectedNoteStore.noteId) {
+
 			$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
 
 			clearTimeout(self._slideTimeout);
@@ -92,13 +93,21 @@ var notepadComponent = React.createClass({
 
 			}, 550);
 
-		} else {
+		} else if (selectedNoteStore.noteId) { // This is the same note
 
 			self.setState({
 				noteSelectionAnimating: null,
 				noteId: selectedNoteStore.noteId,
 				noteTitle: selectedNoteStore.noteTitle,
 				noteText: selectedNoteStore.noteText
+			});
+
+		} else { // There is no note so we need to hide the notepad
+
+			clearTimeout(self._slideTimeout);
+
+			self.setState({
+				noteSelectionAnimating: true
 			});
 		}
 
@@ -120,6 +129,7 @@ var notepadComponent = React.createClass({
 
 	componentDidMount: function () {
 
+		this._selectedNote();
 		selectedNoteStore.onChange(this._selectedNote);
 		modalStore.onChange(this._modalOpened);
 	},

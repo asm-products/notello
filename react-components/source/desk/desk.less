@@ -28,3 +28,26 @@
     transition: all .5s;
     overflow-x: hidden;
 }
+
+.noselected-item {
+	top: 120px;
+	position: fixed;
+	left: 50%;
+	z-index: 999999;
+	text-shadow: #fff 0 2px 0;
+	font-family: Nunito,sans-serif;
+	color: #804313;
+	opacity: .4;
+	cursor: pointer;
+	font-size: 2em;
+	width: 500px;
+	margin-left: -250px;
+	text-align: center;
+}
+
+@media all and (max-width: 600px) {
+	
+	.noselected-item {
+		font-size: 1.4em;
+	}
+}

@@ -640,7 +640,7 @@ var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
 var lscache = require('ls-cache');
 
-var deleteNoteAction = function (noteId) {
+var deleteNoteAction = function (noteId, userNotes) {
 
 	if (lscache.get('isAuthenticated')) {
 
@@ -652,7 +652,7 @@ var deleteNoteAction = function (noteId) {
 				noteId: noteId
 			},
 			success: function () {
-				
+		
 				dispatcher.dispatchDiscrete('deleteNoteCompleted');
 		    }
 		});
@@ -864,7 +864,8 @@ module.exports = assign(new Dispatcher(), {
 		'createBoxCompleted',
 		'modalClosed',
 		'modalOpened',
-		'search'
+		'search',
+		'deleteNoteCompleted'
 	]
 });
 
@@ -57561,7 +57562,8 @@ var cx = ReactAddons.classSet;
 var Header = require('../header/header');
 var _ = require('underscore');
 var $ = require('jquery');
-var bookshelf
+var selectedNoteStore = require('../../../stores/selectedNoteStore');
+var viewBookShelfAction = require('../../../actions/viewBookshelf');
 
 var deskComponent = React.createClass({displayName: 'deskComponent',
 
@@ -57590,8 +57592,18 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 
 	componentDidMount: function () {
 
+		var self = this;
+
+		selectedNoteStore.onChange(function () {
+			self.forceUpdate();
+		});
 		this._adjustMinHeight();
 		$(window).resize(this._adjustMinHeight);
+	},
+
+	handleBlankUserNotesClick: function (event) {
+
+		viewBookShelfAction();
 	},
 
 	render: function () {
@@ -57605,7 +57617,10 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 		return 	React.createElement("div", {className: "desk-container"}, 
 					React.createElement("div", {id: "divDesk", ref: "divDesk", className: classes, onTouchEnd: this.handleClick, onClick: this.handleClick}, 
 						React.createElement(Header, {isViewingBookshelf: this.props.isViewingBookshelf}), 
-						React.createElement(Notepad, {isViewingBookshelf: this.props.isViewingBookshelf})
+						React.createElement(Notepad, {isViewingBookshelf: this.props.isViewingBookshelf}), 
+						!selectedNoteStore.noteId && React.createElement("div", {className: "noselected-item", onClick: this.handleBlankUserNotesClick, onTouchEnd: this.handleBlankUserNotesClick}, 
+							"CREATE OR SELECT A NOTE"
+						)
 					)
 				)
 	}
@@ -57614,7 +57629,7 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 
 module.exports = deskComponent;
 
-},{"../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../header/header":"/var/www/react-components/source/header/header.jsx","../notepad/notepad":"/var/www/react-components/source/notepad/notepad.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/react-components/source/header/header.jsx":[function(require,module,exports){
+},{"../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/viewBookshelf":"/var/www/actions/viewBookshelf.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../header/header":"/var/www/react-components/source/header/header.jsx","../notepad/notepad":"/var/www/react-components/source/notepad/notepad.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/react-components/source/header/header.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
@@ -58181,8 +58196,9 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		var self = this;
 
-		// This is a different note
-		if (self.state.noteId !== selectedNoteStore.noteId) {
+		// This is a different note so we need to animate it in
+		if (selectedNoteStore.noteId && self.state.noteId !== selectedNoteStore.noteId) {
+
 			$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
 
 			clearTimeout(self._slideTimeout);
@@ -58210,13 +58226,21 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 			}, 550);
 
-		} else {
+		} else if (selectedNoteStore.noteId) { // This is the same note
 
 			self.setState({
 				noteSelectionAnimating: null,
 				noteId: selectedNoteStore.noteId,
 				noteTitle: selectedNoteStore.noteTitle,
 				noteText: selectedNoteStore.noteText
+			});
+
+		} else { // There is no note so we need to hide the notepad
+
+			clearTimeout(self._slideTimeout);
+
+			self.setState({
+				noteSelectionAnimating: true
 			});
 		}
 
@@ -58238,6 +58262,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 	componentDidMount: function () {
 
+		this._selectedNote();
 		selectedNoteStore.onChange(this._selectedNote);
 		modalStore.onChange(this._modalOpened);
 	},
@@ -58717,6 +58742,19 @@ var selectedNoteStore = assign(new Store(), {
 	noteText: ''
 });
 
+notelloDispatcher.registerDiscrete('deleteNoteCompleted', function () {
+
+	selectedNoteStore.noteId = null;
+	selectedNoteStore.noteTitle = '';
+	selectedNoteStore.noteText = '';
+
+	if (!lscache.get('isAuthenticated')) {
+		lscache.remove('lastSelectedNote');
+	}
+
+	selectedNoteStore.save();
+});
+
 notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload) {
 
 	selectedNoteStore.noteId = notePayload.newNote.noteId;
@@ -58745,15 +58783,19 @@ notelloDispatcher.registerDiscrete('updateNoteCompleted', function (notePayload)
 
 notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 
-	selectedNoteStore.noteId = note.noteId;
-	selectedNoteStore.noteTitle = note.noteTitle;
-	selectedNoteStore.noteText = note.noteText;
+	if (note) {
 
-	if (!lscache.get('isAuthenticated')) {
-		lscache.set('lastSelectedNote', selectedNoteStore.noteId);
+		selectedNoteStore.noteId = note.noteId;
+		selectedNoteStore.noteTitle = note.noteTitle;
+		selectedNoteStore.noteText = note.noteText;
+
+		if (!lscache.get('isAuthenticated')) {
+			lscache.set('lastSelectedNote', selectedNoteStore.noteId);
+		}
+
+		selectedNoteStore.save();
+
 	}
-
-	selectedNoteStore.save();
 });
 
 module.exports = selectedNoteStore;

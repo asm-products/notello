@@ -7,7 +7,8 @@ var cx = ReactAddons.classSet;
 var Header = require('../header/header');
 var _ = require('underscore');
 var $ = require('jquery');
-var bookshelf
+var selectedNoteStore = require('../../../stores/selectedNoteStore');
+var viewBookShelfAction = require('../../../actions/viewBookshelf');
 
 var deskComponent = React.createClass({
 
@@ -36,8 +37,18 @@ var deskComponent = React.createClass({
 
 	componentDidMount: function () {
 
+		var self = this;
+
+		selectedNoteStore.onChange(function () {
+			self.forceUpdate();
+		});
 		this._adjustMinHeight();
 		$(window).resize(this._adjustMinHeight);
+	},
+
+	handleBlankUserNotesClick: function (event) {
+
+		viewBookShelfAction();
 	},
 
 	render: function () {
@@ -52,6 +63,9 @@ var deskComponent = React.createClass({
 					<div id="divDesk" ref="divDesk" className={classes} onTouchEnd={this.handleClick} onClick={this.handleClick}>
 						<Header isViewingBookshelf={this.props.isViewingBookshelf} />
 						<Notepad isViewingBookshelf={this.props.isViewingBookshelf} />
+						{!selectedNoteStore.noteId && <div className="noselected-item" onClick={this.handleBlankUserNotesClick} onTouchEnd={this.handleBlankUserNotesClick}>
+							CREATE OR SELECT A NOTE
+						</div>}
 					</div>
 				</div>
 	}

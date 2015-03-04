@@ -55,6 +55,7 @@ module.exports = assign(new Dispatcher(), {
 		'createBoxCompleted',
 		'modalClosed',
 		'modalOpened',
-		'search'
+		'search',
+		'deleteNoteCompleted'
 	]
 });
