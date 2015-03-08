@@ -315,6 +315,46 @@ $app->post('/api/note', function () use ($app) {
 
 });
 
+// Bulk insert notes
+$app->post('/api/notes', function () use ($app) {
+
+	if (isValid($app)) {
+
+		$notes = json_decode($app->request->post('notes'));
+		$putRequestArray = array();
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		foreach ($notes as &$note) {
+
+			array_push($putRequestArray, array(
+                'PutRequest' => array(
+                    'Item' => array(
+                        'noteId'    => array('S' => $note->noteId),
+                        'noteTitle' => array('S' => $note->noteTitle),
+                        'noteText'  => array('S' => $note->noteText)
+                    )
+                )
+            ));
+		}
+		unset($note);
+
+		// Make bulk insert into user notes in database
+		$dbClient->batchWriteItem(array(
+		    'RequestItems' => array(
+		        'notes' => $putRequestArray
+		    )
+		));
+
+        $app->response->setBody(json_encode(array('success' => true)));
+	}
+
+});
+
+
 $app->put('/api/note/:noteId', function ($noteId) use ($app) {
 
 	if (isValid($app)) {

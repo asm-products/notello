@@ -4,10 +4,14 @@ var api = require('../common/api');
 
 var sendLoginEmailAction = function (email) {
 
+	var data = {
+		email: email
+	};
+
 	api({
 		url: 'api/login',
 		method: 'post',
-		data: { email: email },
+		data: data,
 		success: function (resp) {
 			
 			dispatcher.dispatchDiscrete('attemptedLogin');

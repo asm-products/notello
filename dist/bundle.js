@@ -19,6 +19,7 @@ var $ = require('jquery');
 var cookie = require('jquery.cookie');
 var domUtils= require('../../../common/dom-utils');
 var lscache = require('ls-cache');
+var assign = require('object-assign');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
@@ -222,6 +223,27 @@ $(function () {
 		selectNoteAction(lscache.get('lastSelectedNote'));
 	}
 
+	// If user is authenticated but they also have offline items, we need to add the offline items to the database
+	if (lscache.get('isAuthenticated') && lscache.get('unAuthUserNotes')) {
+
+		var offlineUserNotes = lscache.get('unAuthUserNotes');
+		var existingUserNotes = bookshelfStore.userNotes;
+		var mergedUserNotes = existingUserNotes.concat(offlineNotes);
+		var outputOffLineNotes = [];
+
+		// Upload the data for each of the notes
+		offlineUserNotes.map(function (offlineUserNote) {
+
+			outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
+
+			lscache.remove('unAuthNote_' + offlineUserNote.noteId);
+		});
+		lscache.remove('unAuthUserNotes');
+
+		bulkCreateNotes(mergedUserNotes, outputOffLineNotes);
+	}
+
+	// After react is done doing it's thing we can clean up the temporary cookie used for authentication
 	setTimeout(function () {
 
   		$.removeCookie('tempAuthToken',  { path: '/', secure: true, domain: 'notello.com' });
@@ -230,7 +252,7 @@ $(function () {
 
 });
 
-},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/getUserNotes":"/var/www/actions/getUserNotes.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../actions/selectNote":"/var/www/actions/selectNote.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
+},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/getUserNotes":"/var/www/actions/getUserNotes.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../actions/selectNote":"/var/www/actions/selectNote.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -921,7 +943,19 @@ var selectNoteAction = function (noteId) {
 
 	if (lscache.get('isAuthenticated')) {
 
-		// TODO: Get from db
+		api({
+			url: 'api/note/' + noteId,
+			method: 'get',
+			cache: false,
+			success: function (resp) {
+				
+				dispatcher.dispatchDiscrete('selectedNote', {
+
+					noteId: resp.noteId,
+					noteText: resp.noteText
+				});
+		    }
+		});
 
 	} else {
 
@@ -939,10 +973,14 @@ var api = require('../common/api');
 
 var sendLoginEmailAction = function (email) {
 
+	var data = {
+		email: email
+	};
+
 	api({
 		url: 'api/login',
 		method: 'post',
-		data: { email: email },
+		data: data,
 		success: function (resp) {
 			
 			dispatcher.dispatchDiscrete('attemptedLogin');

@@ -6,7 +6,19 @@ var selectNoteAction = function (noteId) {
 
 	if (lscache.get('isAuthenticated')) {
 
-		// TODO: Get from db
+		api({
+			url: 'api/note/' + noteId,
+			method: 'get',
+			cache: false,
+			success: function (resp) {
+				
+				dispatcher.dispatchDiscrete('selectedNote', {
+
+					noteId: resp.noteId,
+					noteText: resp.noteText
+				});
+		    }
+		});
 
 	} else {
 

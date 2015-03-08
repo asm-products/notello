@@ -18,6 +18,7 @@ var $ = require('jquery');
 var cookie = require('jquery.cookie');
 var domUtils= require('../../../common/dom-utils');
 var lscache = require('ls-cache');
+var assign = require('object-assign');
 // Actions and other stuff
 var api = require('../../../common/api');
 var authenticateAction = require('../../../actions/authenticate');
@@ -221,6 +222,27 @@ $(function () {
 		selectNoteAction(lscache.get('lastSelectedNote'));
 	}
 
+	// If user is authenticated but they also have offline items, we need to add the offline items to the database
+	if (lscache.get('isAuthenticated') && lscache.get('unAuthUserNotes')) {
+
+		var offlineUserNotes = lscache.get('unAuthUserNotes');
+		var existingUserNotes = bookshelfStore.userNotes;
+		var mergedUserNotes = existingUserNotes.concat(offlineNotes);
+		var outputOffLineNotes = [];
+
+		// Upload the data for each of the notes
+		offlineUserNotes.map(function (offlineUserNote) {
+
+			outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
+
+			lscache.remove('unAuthNote_' + offlineUserNote.noteId);
+		});
+		lscache.remove('unAuthUserNotes');
+
+		bulkCreateNotes(mergedUserNotes, outputOffLineNotes);
+	}
+
+	// After react is done doing it's thing we can clean up the temporary cookie used for authentication
 	setTimeout(function () {
 
   		$.removeCookie('tempAuthToken',  { path: '/', secure: true, domain: 'notello.com' });
