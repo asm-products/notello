@@ -81,6 +81,11 @@ var modalFormComponent = React.createClass({
 		this._modalContainer.find('input').first().focus();
 	},
 
+	_isOpened: function () {
+
+		return this._isOpened;
+	},
+
 	close: function () {
 
 		modalToggle.closed();

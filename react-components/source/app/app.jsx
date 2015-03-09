@@ -202,7 +202,7 @@ var appComponent = React.render(
 		</Route>
 	</Routes>,
 
-    document.body
+    document.getElementById('divMaster')
 );
 
 $(function () {
@@ -237,19 +237,26 @@ $(function () {
 			lscache.remove('unAuthUserNotes');
 
 			// Finally make the database call
-			debugger;
 			bulkCreateNotesAction(mergedUserNotes, outputOffLineNotes);
 
+			// TODO: Pretty sure this is wrong
 			if (lscache.get('lastSelectedNote')) {
 				selectNoteAction(lscache.get('lastSelectedNote'));
 			}
 		}
+
+		domUtils.hideSpinner();
 
 	});
 
 	// If the auth token not invalid, then go get the user notes
 	if (lscache.get('authToken') !== 'invalid') {
 		getUserNotesAction();
+	}
+
+	// If were not authenticated go ahead and hide the loader
+	if (!lscache.get('isAuthenticated')) {
+		domUtils.hideSpinner();
 	}
 
 	// After react is done doing it's thing we can clean up the temporary cookie used for authentication

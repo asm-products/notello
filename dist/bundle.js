@@ -203,7 +203,7 @@ var appComponent = React.render(
 		)
 	),
 
-    document.body
+    document.getElementById('divMaster')
 );
 
 $(function () {
@@ -238,19 +238,26 @@ $(function () {
 			lscache.remove('unAuthUserNotes');
 
 			// Finally make the database call
-			debugger;
 			bulkCreateNotesAction(mergedUserNotes, outputOffLineNotes);
 
+			// TODO: Pretty sure this is wrong
 			if (lscache.get('lastSelectedNote')) {
 				selectNoteAction(lscache.get('lastSelectedNote'));
 			}
 		}
+
+		domUtils.hideSpinner();
 
 	});
 
 	// If the auth token not invalid, then go get the user notes
 	if (lscache.get('authToken') !== 'invalid') {
 		getUserNotesAction();
+	}
+
+	// If were not authenticated go ahead and hide the loader
+	if (!lscache.get('isAuthenticated')) {
+		domUtils.hideSpinner();
 	}
 
 	// After react is done doing it's thing we can clean up the temporary cookie used for authentication
@@ -1260,8 +1267,21 @@ BufferLoader.prototype.load = function () {
 module.exports = BufferLoader;
 
 },{}],"/var/www/common/dom-utils.js":[function(require,module,exports){
+var $ = require('jquery');
 
 var publicMembers = {
+
+	hideSpinner: function () {
+		
+		setTimeout(function () {
+
+  			$('#divSpinner').addClass('opaque');
+	  		setTimeout(function () {
+				$('#divSpinner').remove();
+	  		}, 300);
+
+		}, 300);
+	},
 
 	getCaret: function(node) {
 
@@ -1320,7 +1340,7 @@ var publicMembers = {
 
 module.exports = publicMembers;
 
-},{}],"/var/www/common/sortable-mixin.js":[function(require,module,exports){
+},{"jquery":"/var/www/node_modules/jquery/dist/jquery.js"}],"/var/www/common/sortable-mixin.js":[function(require,module,exports){
 /**
  * @author RubaXa <trash@rubaxa.org>
  * @licence MIT
@@ -57937,6 +57957,11 @@ var modalFormComponent = React.createClass({displayName: 'modalFormComponent',
 		this._modalContainer.find('input').first().focus();
 	},
 
+	_isOpened: function () {
+
+		return this._isOpened;
+	},
+
 	close: function () {
 
 		modalToggle.closed();
@@ -58298,11 +58323,16 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 					noteText: selectedNoteStore.noteText
 				});
 
+				$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+				$(self.refs.txtHiddenTextArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+
 				self._slideTimeout = setTimeout(function () {
 
 					self.setState({
 						noteSelectionAnimating: null
 					});
+
+					hideCaret();
 
 				}, 250);
 
@@ -58325,8 +58355,6 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 				noteSelectionAnimating: true
 			});
 		}
-
-		
 
 	},
 
@@ -58396,9 +58424,6 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		var self = this;
 
-		console.log('hh');
-		console.log(event.target.value);
-
 		bookShelfStore.userNotes.map(function (userNoteItem) {
 
 			if (userNoteItem.noteId === self.state.noteId) {
@@ -58465,6 +58490,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 	render: function () {
 
+		// txtHiddenTextArea is used to calculate number of lines.
 		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.noteText.split(/\r\n|\r|\n/g).length;
 
 		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
@@ -58503,7 +58529,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 					React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
 					React.createElement("textarea", {id: "txtArea", ref: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
 					onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange, disabled: shouldBeDisabled, defaultValue: sanitizedText}), 
-					React.createElement("textarea", {id: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: sanitizedText}), 
+					React.createElement("textarea", {id: "txtHiddenTextArea", ref: "txtHiddenTextArea", style: { display: 'none'}, defaultValue: sanitizedText}), 
 					React.createElement(ModalForm, {ref: "settingsModal", btnSubmitText: "DELETE NOTE", modalTitle: "SETTINGS", onSubmit: this.handleSettingsSaved, onClose: this.handleSettingsClosed}
 					)
 				);
@@ -58635,7 +58661,14 @@ var usernotesComponent = React.createClass({displayName: 'usernotesComponent',
 
 	handleNoteClick: function (noteId) {
 
-		selectNoteAction(noteId);
+		if (this.state.selectedNoteId !== noteId) {
+
+			selectNoteAction(noteId);
+
+			this.setState({
+				selectedNoteId: noteId
+			});
+		}
 	},
 
 	render: function () {

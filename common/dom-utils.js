@@ -1,5 +1,18 @@
+var $ = require('jquery');
 
 var publicMembers = {
+
+	hideSpinner: function () {
+		
+		setTimeout(function () {
+
+  			$('#divSpinner').addClass('opaque');
+	  		setTimeout(function () {
+				$('#divSpinner').remove();
+	  		}, 300);
+
+		}, 300);
+	},
 
 	getCaret: function(node) {
 

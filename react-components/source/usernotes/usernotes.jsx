@@ -62,7 +62,14 @@ var usernotesComponent = React.createClass({
 
 	handleNoteClick: function (noteId) {
 
-		selectNoteAction(noteId);
+		if (this.state.selectedNoteId !== noteId) {
+
+			selectNoteAction(noteId);
+
+			this.setState({
+				selectedNoteId: noteId
+			});
+		}
 	},
 
 	render: function () {

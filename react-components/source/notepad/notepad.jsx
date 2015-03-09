@@ -85,11 +85,16 @@ var notepadComponent = React.createClass({
 					noteText: selectedNoteStore.noteText
 				});
 
+				$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+				$(self.refs.txtHiddenTextArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
+
 				self._slideTimeout = setTimeout(function () {
 
 					self.setState({
 						noteSelectionAnimating: null
 					});
+
+					hideCaret();
 
 				}, 250);
 
@@ -112,8 +117,6 @@ var notepadComponent = React.createClass({
 				noteSelectionAnimating: true
 			});
 		}
-
-		
 
 	},
 
@@ -183,9 +186,6 @@ var notepadComponent = React.createClass({
 
 		var self = this;
 
-		console.log('hh');
-		console.log(event.target.value);
-
 		bookShelfStore.userNotes.map(function (userNoteItem) {
 
 			if (userNoteItem.noteId === self.state.noteId) {
@@ -252,6 +252,7 @@ var notepadComponent = React.createClass({
 
 	render: function () {
 
+		// txtHiddenTextArea is used to calculate number of lines.
 		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.noteText.split(/\r\n|\r|\n/g).length;
 
 		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
@@ -290,7 +291,7 @@ var notepadComponent = React.createClass({
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
 					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled} defaultValue={sanitizedText}></textarea>
-					<textarea id="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={sanitizedText} />
+					<textarea id="txtHiddenTextArea" ref="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={sanitizedText} />
 					<ModalForm ref="settingsModal" btnSubmitText="DELETE NOTE" modalTitle="SETTINGS" onSubmit={this.handleSettingsSaved} onClose={this.handleSettingsClosed}>
 					</ModalForm>
 				</div>;

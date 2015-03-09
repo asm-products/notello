@@ -216,17 +216,14 @@ html,
 body {
   padding: 0;
   margin: 0;
+}
+body {
+  height: 100%;
   background: #3f3f3f;
-  background: linear-gradient(to bottom, #3f3f3f 0%, #2d2d2d 47%, #000000 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3f3f3f', endColorstr='#000000', GradientType=0);
-  /* IE6-9 */
 }
 html {
   overflow-y: scroll;
   min-height: 100%;
-}
-body {
-  height: 100%;
 }
 input {
   -webkit-appearance: none;
@@ -237,6 +234,9 @@ input {
 .stop-scrolling {
   height: 100%;
   overflow: hidden;
+}
+.opaque {
+  opacity: 0;
 }
 .invisible {
   display: none;
