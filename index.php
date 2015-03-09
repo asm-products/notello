@@ -239,7 +239,7 @@ $app->put('/api/usernotes', function () use ($app) {
 		$oldToken = explode(':', $token);
 		$email = $oldToken[0];
 
-		$userNotes = hydrateId($app->request->post('userNotes'));
+		$userNotes = hydrateId($app->request->put('usernotes'));
 
 		$userNotesEncoded = json_encode($userNotes);
 
@@ -276,13 +276,18 @@ $app->get('/api/note/:noteId', function ($noteId) use ($app) {
 		    'ConsistentRead' => true,
 		    'TableName' => 'notes',
 		    'Key'       => array(
-		        'noteId' => array('S' => $noteId)
+		        'noteId' => array('S' => $noteId) // Primary Key
 		    )
 		));
 
-		$note = $result['Item']['noteText']['S'];
+		$noteText = Helper::NAToBlank($result['Item']['noteText']['S']);
+		$noteTitle = Helper::NAToBlank($result['Item']['noteTitle']['S']);
 
-        $app->response->setBody(json_encode(array('noteText' => $note)));
+        $app->response->setBody(json_encode(array(
+        	'noteId'    => $noteId,
+        	'noteTitle' => $noteTitle,
+        	'noteText'  => $noteText
+        )));
 	}
 
 });
@@ -291,8 +296,8 @@ $app->post('/api/note', function () use ($app) {
 
 	if (isValid($app)) {
 
-		$noteTitle = json_encode($app->request->post('noteTitle'));
-		$noteText = json_encode($app->request->post('noteText'));
+		$noteTitle = $app->request->post('noteTitle');
+		$noteText = $app->request->post('noteText');
 		$noteId = uniqid();
 
 		// Get AWS DynamoDB Client
@@ -304,13 +309,17 @@ $app->post('/api/note', function () use ($app) {
 		$dbClient->putItem(array(
 		    'TableName' => 'notes',
 		    'Item'       => array(
-		        'noteId'   => array('S' => $noteId), // Primary Key
-		        'noteTitle' => array('S' => $noteTitle),
-		        'noteText' => array('S' => $noteText)
+		        'noteId'    => array('S' => $noteId), // Primary Key
+		        'noteTitle' => array('S' => Helper::blankToNA($noteTitle)),
+		        'noteText'  => array('S' => Helper::blankToNA($noteText))
 		    )
 		));
 
-        $app->response->setBody(json_encode(array('noteId' => $noteId)));
+        $app->response->setBody(json_encode(array(
+        	'noteId'    => $noteId,
+        	'noteTitle' => $noteTitle,
+        	'noteText'  => $noteText
+        )));
 	}
 
 });
@@ -320,7 +329,7 @@ $app->post('/api/notes', function () use ($app) {
 
 	if (isValid($app)) {
 
-		$notes = json_decode($app->request->post('notes'));
+		$notes = $app->request->post('notes');
 		$putRequestArray = array();
 
 		// Get AWS DynamoDB Client
@@ -330,13 +339,15 @@ $app->post('/api/notes', function () use ($app) {
 
 		foreach ($notes as &$note) {
 
-			array_push($putRequestArray, array(
-                'PutRequest' => array(
-                    'Item' => array(
-                        'noteId'    => array('S' => $note->noteId),
-                        'noteTitle' => array('S' => $note->noteTitle),
-                        'noteText'  => array('S' => $note->noteText)
-                    )
+			$putRequestArray = array_merge_recursive($putRequestArray, array(
+				array (
+	                'PutRequest' => array(
+	                    'Item' => array(
+	                        'noteId'    => array('S' => Helper::blankToNA($note['noteId'])),
+	                        'noteTitle' => array('S' => Helper::blankToNA($note['noteTitle'])),
+	                        'noteText'  => array('S' => Helper::blankToNA($note['noteText']))
+	                    )
+	                )
                 )
             ));
 		}
@@ -349,7 +360,7 @@ $app->post('/api/notes', function () use ($app) {
 		    )
 		));
 
-        $app->response->setBody(json_encode(array('success' => true)));
+        $app->response->setBody(json_encode(array('message' => 'Successful')));
 	}
 
 });
@@ -359,8 +370,8 @@ $app->put('/api/note/:noteId', function ($noteId) use ($app) {
 
 	if (isValid($app)) {
 
-		$noteTitle = json_encode($app->request->post('noteTitle'));
-		$noteText = json_encode($app->request->post('noteText'));
+		$noteTitle = $app->request->put('noteTitle');
+		$noteText = $app->request->put('noteText');
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
@@ -371,13 +382,17 @@ $app->put('/api/note/:noteId', function ($noteId) use ($app) {
 		$dbClient->putItem(array(
 		    'TableName' => 'notes',
 		    'Item'       => array(
-		        'noteId'   => array('S' => $noteId), // Primary Key
-		        'noteTitle' => array('S' => $noteTitle),
-		        'noteText' => array('S' => $noteText)
+		        'noteId'    => array('S' => $noteId), // Primary Key
+		        'noteTitle' => array('S' => Helper::blankToNA($noteTitle)),
+		        'noteText'  => array('S' => Helper::blankToNA($noteText))
 		    )
 		));
 
-        $app->response->setBody(json_encode(array('message' => 'Successful')));
+		$app->response->setBody(json_encode(array(
+        	'noteId'    => $noteId,
+        	'noteTitle' => $noteTitle,
+        	'noteText'  => $noteText
+        )));
 	}
 
 });
@@ -395,7 +410,7 @@ $app->delete('/api/note/:noteId', function ($noteId) use ($app) {
 		$dbClient->deleteItem(array(
 		    'TableName' => 'notes',
 		    'Key'       => array(
-		        'noteId'   => array('S' => $noteId) // Primary Key
+		        'noteId' => array('S' => $noteId) // Primary Key
 		    )
 		));
 

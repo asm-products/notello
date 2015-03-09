@@ -44,7 +44,7 @@ notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNote
 
 notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes) {
 
-	bookShelfStore.userNotes = userNotes;
+	bookShelfStore.userNotes = userNotes || [];
 	bookShelfStore.save();
 });
 

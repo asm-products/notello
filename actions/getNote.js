@@ -13,6 +13,7 @@ var getNoteAction = function (noteId) {
 			dispatcher.dispatchDiscrete('getNoteCompleted', {
 
 				noteId: resp.noteId,
+				noteTitle: resp.noteTitle,
 				noteText: resp.noteText
 			});
 	    }

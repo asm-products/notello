@@ -1,8 +1,11 @@
 
 var dispatcher = require('./notelloDispatcher');
 var lscache = require('ls-cache');
+var api = require('../common/api');
 
 var selectNoteAction = function (noteId) {
+
+	dispatcher.dispatchDiscrete('selectedNoteChange');
 
 	if (lscache.get('isAuthenticated')) {
 
@@ -15,6 +18,7 @@ var selectNoteAction = function (noteId) {
 				dispatcher.dispatchDiscrete('selectedNote', {
 
 					noteId: resp.noteId,
+					noteTitle: resp.noteTitle,
 					noteText: resp.noteText
 				});
 		    }

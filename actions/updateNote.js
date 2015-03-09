@@ -28,6 +28,8 @@ var updateNoteAction = function (updatedNote) {
 	if (!updatedNote.noteId) {
 		return false;
 	}
+		
+	dispatcher.dispatchDiscrete('updateNoteCompleted', updatedNote);
 	
 	if (lscache.get('isAuthenticated')) {
 
@@ -36,8 +38,6 @@ var updateNoteAction = function (updatedNote) {
 	} else {
 
 		lscache.set('unAuthNote_' + updatedNote.noteId, updatedNote);
-		
-		dispatcher.dispatchDiscrete('updateNoteCompleted', updatedNote);
 	}
 };
 

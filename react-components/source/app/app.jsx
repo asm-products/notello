@@ -27,6 +27,7 @@ var hideBookshelfAction = require('../../../actions/hideBookshelf');
 var logoutAction = require('../../../actions/logout');
 var getUserNotesAction = require('../../../actions/getUserNotes');
 var selectNoteAction = require('../../../actions/selectNote');
+var bulkCreateNotesAction = require('../../../actions/bulkCreateNotes');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -212,34 +213,43 @@ $(function () {
 	// Reset authentication token
 	resetTokenAction();
 
-	// If the auth token is not available or is valid then go get the user notes
+	// Bookshelf store changed
+	bookshelfStore.onChange(function () {
+
+		// If user is authenticated but they also have offline items, we need to add the offline items to the database
+
+		// Make sure the store is ready with the usernotes from the database
+		if (lscache.get('isAuthenticated') && lscache.get('unAuthUserNotes') && bookshelfStore.userNotes) {
+
+			var offlineUserNotes = lscache.get('unAuthUserNotes');
+			var existingUserNotes = bookshelfStore.userNotes;
+			var mergedUserNotes = existingUserNotes.concat(offlineUserNotes);
+			var outputOffLineNotes = [];
+
+			// In order to upload the data for each of the notes we create an array to prepare for bulk insert into the database.
+			// Then we remove the offline note from local storage
+			offlineUserNotes.map(function (offlineUserNote) {
+
+				outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
+
+				lscache.remove('unAuthNote_' + offlineUserNote.noteId);
+			});
+			lscache.remove('unAuthUserNotes');
+
+			// Finally make the database call
+			debugger;
+			bulkCreateNotesAction(mergedUserNotes, outputOffLineNotes);
+
+			if (lscache.get('lastSelectedNote')) {
+				selectNoteAction(lscache.get('lastSelectedNote'));
+			}
+		}
+
+	});
+
+	// If the auth token not invalid, then go get the user notes
 	if (lscache.get('authToken') !== 'invalid') {
-
 		getUserNotesAction();
-	}
-
-	if (lscache.get('lastSelectedNote')) {
-		selectNoteAction(lscache.get('lastSelectedNote'));
-	}
-
-	// If user is authenticated but they also have offline items, we need to add the offline items to the database
-	if (lscache.get('isAuthenticated') && lscache.get('unAuthUserNotes')) {
-
-		var offlineUserNotes = lscache.get('unAuthUserNotes');
-		var existingUserNotes = bookshelfStore.userNotes;
-		var mergedUserNotes = existingUserNotes.concat(offlineNotes);
-		var outputOffLineNotes = [];
-
-		// Upload the data for each of the notes
-		offlineUserNotes.map(function (offlineUserNote) {
-
-			outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
-
-			lscache.remove('unAuthNote_' + offlineUserNote.noteId);
-		});
-		lscache.remove('unAuthUserNotes');
-
-		bulkCreateNotes(mergedUserNotes, outputOffLineNotes);
 	}
 
 	// After react is done doing it's thing we can clean up the temporary cookie used for authentication

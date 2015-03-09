@@ -12,8 +12,8 @@ function getNewEmailToken($email, $tokenId) {
     'TableName' => 'tokens',
     'Item' => array(
 	        'tokenId'      => array('S' => $tokenId),
-	        'insertedDate'    => array('N' => time()),
-	        'email'   => array('S' => $email)
+	        'insertedDate' => array('N' => time()),
+	        'email'        => array('S' => $email)
 	    )
 	));
 

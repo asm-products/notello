@@ -7,7 +7,8 @@ var selectedNoteStore = assign(new Store(), {
 
 	noteId: null,
 	noteTitle: '',
-	noteText: ''
+	noteText: '',
+	isChanging: false
 });
 
 notelloDispatcher.registerDiscrete('deleteNoteCompleted', function () {
@@ -53,6 +54,7 @@ notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 
 	if (note) {
 
+		selectedNoteStore.isChanging = false;
 		selectedNoteStore.noteId = note.noteId;
 		selectedNoteStore.noteTitle = note.noteTitle;
 		selectedNoteStore.noteText = note.noteText;
@@ -64,6 +66,13 @@ notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 		selectedNoteStore.save();
 
 	}
+});
+
+notelloDispatcher.registerDiscrete('selectedNoteChange', function () {
+
+	selectedNoteStore.isChanging = true;
+
+	selectedNoteStore.save();
 });
 
 module.exports = selectedNoteStore;

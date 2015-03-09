@@ -28,6 +28,7 @@ var hideBookshelfAction = require('../../../actions/hideBookshelf');
 var logoutAction = require('../../../actions/logout');
 var getUserNotesAction = require('../../../actions/getUserNotes');
 var selectNoteAction = require('../../../actions/selectNote');
+var bulkCreateNotesAction = require('../../../actions/bulkCreateNotes');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -213,34 +214,43 @@ $(function () {
 	// Reset authentication token
 	resetTokenAction();
 
-	// If the auth token is not available or is valid then go get the user notes
+	// Bookshelf store changed
+	bookshelfStore.onChange(function () {
+
+		// If user is authenticated but they also have offline items, we need to add the offline items to the database
+
+		// Make sure the store is ready with the usernotes from the database
+		if (lscache.get('isAuthenticated') && lscache.get('unAuthUserNotes') && bookshelfStore.userNotes) {
+
+			var offlineUserNotes = lscache.get('unAuthUserNotes');
+			var existingUserNotes = bookshelfStore.userNotes;
+			var mergedUserNotes = existingUserNotes.concat(offlineUserNotes);
+			var outputOffLineNotes = [];
+
+			// In order to upload the data for each of the notes we create an array to prepare for bulk insert into the database.
+			// Then we remove the offline note from local storage
+			offlineUserNotes.map(function (offlineUserNote) {
+
+				outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
+
+				lscache.remove('unAuthNote_' + offlineUserNote.noteId);
+			});
+			lscache.remove('unAuthUserNotes');
+
+			// Finally make the database call
+			debugger;
+			bulkCreateNotesAction(mergedUserNotes, outputOffLineNotes);
+
+			if (lscache.get('lastSelectedNote')) {
+				selectNoteAction(lscache.get('lastSelectedNote'));
+			}
+		}
+
+	});
+
+	// If the auth token not invalid, then go get the user notes
 	if (lscache.get('authToken') !== 'invalid') {
-
 		getUserNotesAction();
-	}
-
-	if (lscache.get('lastSelectedNote')) {
-		selectNoteAction(lscache.get('lastSelectedNote'));
-	}
-
-	// If user is authenticated but they also have offline items, we need to add the offline items to the database
-	if (lscache.get('isAuthenticated') && lscache.get('unAuthUserNotes')) {
-
-		var offlineUserNotes = lscache.get('unAuthUserNotes');
-		var existingUserNotes = bookshelfStore.userNotes;
-		var mergedUserNotes = existingUserNotes.concat(offlineNotes);
-		var outputOffLineNotes = [];
-
-		// Upload the data for each of the notes
-		offlineUserNotes.map(function (offlineUserNote) {
-
-			outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
-
-			lscache.remove('unAuthNote_' + offlineUserNote.noteId);
-		});
-		lscache.remove('unAuthUserNotes');
-
-		bulkCreateNotes(mergedUserNotes, outputOffLineNotes);
 	}
 
 	// After react is done doing it's thing we can clean up the temporary cookie used for authentication
@@ -252,7 +262,7 @@ $(function () {
 
 });
 
-},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/getUserNotes":"/var/www/actions/getUserNotes.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../actions/selectNote":"/var/www/actions/selectNote.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
+},{"../../../actions/authenticate":"/var/www/actions/authenticate.js","../../../actions/bulkCreateNotes":"/var/www/actions/bulkCreateNotes.js","../../../actions/getUserNotes":"/var/www/actions/getUserNotes.js","../../../actions/hideBookshelf":"/var/www/actions/hideBookshelf.js","../../../actions/logout":"/var/www/actions/logout.js","../../../actions/resetToken":"/var/www/actions/resetToken.js","../../../actions/selectNote":"/var/www/actions/selectNote.js","../../../common/api":"/var/www/common/api.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../node_modules/es5-shim/es5-sham":"/var/www/node_modules/es5-shim/es5-sham.js","../../../node_modules/es5-shim/es5-shim":"/var/www/node_modules/es5-shim/es5-shim.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/loginStore":"/var/www/stores/loginStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../bookcase/bookcase":"/var/www/react-components/source/bookcase/bookcase.jsx","../desk/desk":"/var/www/react-components/source/desk/desk.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","datejs":"/var/www/node_modules/datejs/index.js","jquery":"/var/www/node_modules/jquery/dist/jquery.js","jquery.cookie":"/var/www/node_modules/jquery.cookie/jquery.cookie.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js","object-assign":"/var/www/node_modules/object-assign/index.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","react-router":"/var/www/node_modules/react-router/modules/index.js","underscore":"/var/www/node_modules/underscore/underscore.js"}],"/var/www/actions/Dispatcher.js":[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -519,7 +529,36 @@ var authenticate = function (email, authToken) {
 
 module.exports = authenticate;
 
-},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/createBox.js":[function(require,module,exports){
+},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js"}],"/var/www/actions/bulkCreateNotes.js":[function(require,module,exports){
+
+var dispatcher = require('./notelloDispatcher');
+var api = require('../common/api');
+var lscache = require('ls-cache');
+var updateUserNotesAction = require('../actions/updateUserNotes');
+var domUtility = require('../common/dom-utils');
+
+var bulkCreateNotesAction = function (userNotes, notes) {
+
+	if (!notes || notes.length === 0) {
+		return;
+	}
+
+	api({
+		url: 'api/notes',
+		method: 'post',
+		data: {
+			notes: notes
+		},
+		success: function () {
+
+			updateUserNotesAction(userNotes);
+		}
+	});
+};
+
+module.exports = bulkCreateNotesAction;
+
+},{"../actions/updateUserNotes":"/var/www/actions/updateUserNotes.js","../common/api":"/var/www/common/api.js","../common/dom-utils":"/var/www/common/dom-utils.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/createBox.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -881,6 +920,7 @@ module.exports = assign(new Dispatcher(), {
 		'updateUserNotesCompleted',
 		'updateNoteCompleted',
 		'createNoteCompleted',
+		'selectedNoteChange',
 		'selectedNote',
 		'createNotebookCompleted',
 		'createBoxCompleted',
@@ -938,8 +978,11 @@ module.exports = searchAction;
 
 var dispatcher = require('./notelloDispatcher');
 var lscache = require('ls-cache');
+var api = require('../common/api');
 
 var selectNoteAction = function (noteId) {
+
+	dispatcher.dispatchDiscrete('selectedNoteChange');
 
 	if (lscache.get('isAuthenticated')) {
 
@@ -952,6 +995,7 @@ var selectNoteAction = function (noteId) {
 				dispatcher.dispatchDiscrete('selectedNote', {
 
 					noteId: resp.noteId,
+					noteTitle: resp.noteTitle,
 					noteText: resp.noteText
 				});
 		    }
@@ -966,7 +1010,7 @@ var selectNoteAction = function (noteId) {
 
 module.exports = selectNoteAction;
 
-},{"./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
+},{"../common/api":"/var/www/common/api.js","./notelloDispatcher":"/var/www/actions/notelloDispatcher.js","ls-cache":"/var/www/node_modules/ls-cache/lib/ls-cache.js"}],"/var/www/actions/sendLoginEmail.js":[function(require,module,exports){
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
@@ -1021,6 +1065,8 @@ var updateNoteAction = function (updatedNote) {
 	if (!updatedNote.noteId) {
 		return false;
 	}
+		
+	dispatcher.dispatchDiscrete('updateNoteCompleted', updatedNote);
 	
 	if (lscache.get('isAuthenticated')) {
 
@@ -1029,8 +1075,6 @@ var updateNoteAction = function (updatedNote) {
 	} else {
 
 		lscache.set('unAuthNote_' + updatedNote.noteId, updatedNote);
-		
-		dispatcher.dispatchDiscrete('updateNoteCompleted', updatedNote);
 	}
 };
 
@@ -1093,7 +1137,7 @@ var domUtils = require('../common/dom-utils');
 
 var handleError = function (errorText) {
 
-	if (!domUtils.isDebug) {
+	if (!window.isDebug) {
 
 		window.location = 'error';
 
@@ -1218,8 +1262,6 @@ module.exports = BufferLoader;
 },{}],"/var/www/common/dom-utils.js":[function(require,module,exports){
 
 var publicMembers = {
-
-	isDebug: false,
 
 	getCaret: function(node) {
 
@@ -58234,8 +58276,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		var self = this;
 
-		// This is a different note so we need to animate it in
-		if (selectedNoteStore.noteId && self.state.noteId !== selectedNoteStore.noteId) {
+		if (selectedNoteStore.isChanging) {
 
 			$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
 
@@ -58245,6 +58286,9 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 				noteSelectionAnimating: true
 			});
 
+		} else if (selectedNoteStore.noteId && self.state.noteId !== selectedNoteStore.noteId) {
+			
+			// This is a different note so we need to animate it in
 			self._slideTimeout = setTimeout(function () {
 
 				self.setState({
@@ -58281,6 +58325,8 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 				noteSelectionAnimating: true
 			});
 		}
+
+		
 
 	},
 
@@ -58349,6 +58395,9 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 	handleTitleChange: function (event) {
 
 		var self = this;
+
+		console.log('hh');
+		console.log(event.target.value);
 
 		bookShelfStore.userNotes.map(function (userNoteItem) {
 
@@ -58670,7 +58719,7 @@ notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNote
 
 notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes) {
 
-	bookShelfStore.userNotes = userNotes;
+	bookShelfStore.userNotes = userNotes || [];
 	bookShelfStore.save();
 });
 
@@ -58777,7 +58826,8 @@ var selectedNoteStore = assign(new Store(), {
 
 	noteId: null,
 	noteTitle: '',
-	noteText: ''
+	noteText: '',
+	isChanging: false
 });
 
 notelloDispatcher.registerDiscrete('deleteNoteCompleted', function () {
@@ -58823,6 +58873,7 @@ notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 
 	if (note) {
 
+		selectedNoteStore.isChanging = false;
 		selectedNoteStore.noteId = note.noteId;
 		selectedNoteStore.noteTitle = note.noteTitle;
 		selectedNoteStore.noteText = note.noteText;
@@ -58834,6 +58885,13 @@ notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 		selectedNoteStore.save();
 
 	}
+});
+
+notelloDispatcher.registerDiscrete('selectedNoteChange', function () {
+
+	selectedNoteStore.isChanging = true;
+
+	selectedNoteStore.save();
 });
 
 module.exports = selectedNoteStore;

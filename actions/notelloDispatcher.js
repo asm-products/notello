@@ -50,6 +50,7 @@ module.exports = assign(new Dispatcher(), {
 		'updateUserNotesCompleted',
 		'updateNoteCompleted',
 		'createNoteCompleted',
+		'selectedNoteChange',
 		'selectedNote',
 		'createNotebookCompleted',
 		'createBoxCompleted',

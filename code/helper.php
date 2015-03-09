@@ -1,6 +1,25 @@
 <?php
 
 class Helper {
+
+	// Stupid dynamodb doesn't allows blank strings
+	public static function blankToNA ($input) {
+
+		if ($input === '') {
+			return '::NA::';
+		} else {
+			return $input;
+		}
+	}
+
+	public static function NAToBlank ($input) {
+
+		if ($input === '::NA::') {
+			return '';
+		} else {
+			return $input;
+		}
+	}
 	
 	public static function GUID() {
 

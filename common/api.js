@@ -10,7 +10,7 @@ var domUtils = require('../common/dom-utils');
 
 var handleError = function (errorText) {
 
-	if (!domUtils.isDebug) {
+	if (!window.isDebug) {
 
 		window.location = 'error';
 

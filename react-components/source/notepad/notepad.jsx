@@ -63,8 +63,7 @@ var notepadComponent = React.createClass({
 
 		var self = this;
 
-		// This is a different note so we need to animate it in
-		if (selectedNoteStore.noteId && self.state.noteId !== selectedNoteStore.noteId) {
+		if (selectedNoteStore.isChanging) {
 
 			$(self.refs.txtArea.getDOMNode()).val(sanitizeHTML(selectedNoteStore.noteText));
 
@@ -74,6 +73,9 @@ var notepadComponent = React.createClass({
 				noteSelectionAnimating: true
 			});
 
+		} else if (selectedNoteStore.noteId && self.state.noteId !== selectedNoteStore.noteId) {
+			
+			// This is a different note so we need to animate it in
 			self._slideTimeout = setTimeout(function () {
 
 				self.setState({
@@ -110,6 +112,8 @@ var notepadComponent = React.createClass({
 				noteSelectionAnimating: true
 			});
 		}
+
+		
 
 	},
 
@@ -178,6 +182,9 @@ var notepadComponent = React.createClass({
 	handleTitleChange: function (event) {
 
 		var self = this;
+
+		console.log('hh');
+		console.log(event.target.value);
 
 		bookShelfStore.userNotes.map(function (userNoteItem) {
 
