@@ -28,6 +28,7 @@ var logoutAction = require('../../../actions/logout');
 var getUserNotesAction = require('../../../actions/getUserNotes');
 var selectNoteAction = require('../../../actions/selectNote');
 var bulkCreateNotesAction = require('../../../actions/bulkCreateNotes');
+var getSelectedNoteAction = require('../../../actions/getSelectedNote');
 // Components
 var Desk = require('../desk/desk');
 var Bookcase = require('../bookcase/bookcase');
@@ -207,13 +208,14 @@ var appComponent = React.render(
 
 $(function () {
 
-	// Mostly for setup reasons. Not sure if it's really needed.
+	var tempAuthToken = $.cookie('tempAuthToken'),
+	tempAuthTokenArray = tempAuthToken && tempAuthToken.split(':'),
+	email =  tempAuthTokenArray && tempAuthTokenArray[0];
+
+	// This was mostly for setup reasons early in development. Not sure if it's really needed anymore.
 	hideBookshelfAction();
 
-	// Reset authentication token
-	resetTokenAction();
-
-	// Bookshelf store changed
+	// Bookshelf store changed, this is usually when usernotes was hydrated
 	bookshelfStore.onChange(function () {
 
 		// If user is authenticated but they also have offline items, we need to add the offline items to the database
@@ -222,12 +224,15 @@ $(function () {
 		if (lscache.get('isAuthenticated') && lscache.get('unAuthUserNotes') && bookshelfStore.userNotes) {
 
 			var offlineUserNotes = lscache.get('unAuthUserNotes');
-			var existingUserNotes = bookshelfStore.userNotes;
-			var mergedUserNotes = existingUserNotes.concat(offlineUserNotes);
+			var mergedUserNotes = bookshelfStore.userNotes.concat(offlineUserNotes);
+			mergedUserNotes = _.uniq(mergedUserNotes, function (item) {
+				return item.noteId;
+			});
+			
 			var outputOffLineNotes = [];
 
-			// In order to upload the data for each of the notes we create an array to prepare for bulk insert into the database.
-			// Then we remove the offline note from local storage
+			// In order to upload the local storage data, for each of the notes we create an object and push into
+			// an array to prepare for bulk insert into the database. Then we remove the offline note from local storage.
 			offlineUserNotes.map(function (offlineUserNote) {
 
 				outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
@@ -239,25 +244,30 @@ $(function () {
 			// Finally make the database call
 			bulkCreateNotesAction(mergedUserNotes, outputOffLineNotes);
 
-			// TODO: Pretty sure this is wrong
-			if (lscache.get('lastSelectedNote')) {
-				selectNoteAction(lscache.get('lastSelectedNote'));
-			}
 		}
 
 		domUtils.hideSpinner();
 
 	});
 
-	// If the auth token not invalid, then go get the user notes
+	// Reset authentication token
+	resetTokenAction();
+
+	// If the auth token is not invalid, then go get the user notes
 	if (lscache.get('authToken') !== 'invalid') {
 		getUserNotesAction();
+		getSelectedNoteAction();
 	}
 
 	// If were not authenticated go ahead and hide the loader
 	if (!lscache.get('isAuthenticated')) {
 		domUtils.hideSpinner();
 	}
+
+	// If the temp auth token is truthy set the lscache email and authToken
+	if (tempAuthToken) {
+		authenticateAction(email, tempAuthToken);
+    }
 
 	// After react is done doing it's thing we can clean up the temporary cookie used for authentication
 	setTimeout(function () {

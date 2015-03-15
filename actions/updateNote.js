@@ -5,7 +5,7 @@ var _ = require('underscore');
 var lscache = require('ls-cache');
 var updateUserNotes = require('./updateUserNotes');
 
-_updateNoteDatabase = _.debounce(function (updatedNote) {
+var _updateNoteDatabase = _.debounce(function (updatedNote) {
 
 	api({
 		url: 'api/note/' + updatedNote.noteId,
@@ -21,7 +21,7 @@ _updateNoteDatabase = _.debounce(function (updatedNote) {
 	    }
 	});
 
-}, 5000);
+}, 3000);
 
 var updateNoteAction = function (updatedNote) {
 

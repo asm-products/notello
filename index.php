@@ -206,27 +206,33 @@ $app->get('/api/usernotes', function () use ($app) {
 
 function hydrateId ($userNotes) {
 
-	foreach ($userNotes as $userNoteKey => $userNoteValue) {
+	if (isset($userNotes)) {
 
-		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'notebook' && !isset($userNoteValue['notebookId'])) {
+		foreach ($userNotes as $userNoteKey => $userNoteValue) {
 
-			$userNotes[$userNoteKey]['notebookId'] = uniqid();
+			if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'notebook' && !isset($userNoteValue['notebookId'])) {
 
-			$userNotes[$userNoteKey]['notes'] = hydrateId($userNoteValue['notes']);
+				$userNotes[$userNoteKey]['notebookId'] = uniqid();
+
+				$userNotes[$userNoteKey]['notes'] = hydrateId($userNoteValue['notes']);
+			}
+
+			if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'box' && !isset($userNoteValue['boxId'])) {
+
+				$userNotes[$userNoteKey]['boxId'] = uniqid();
+			}
+
+			if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'note' && !isset($userNoteValue['noteId'])) {
+
+				$userNotes[$userNoteKey]['noteId'] = uniqid();
+			}
+
 		}
+		unset($userNoteValue);
+	} else {
 
-		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'box' && !isset($userNoteValue['boxId'])) {
-
-			$userNotes[$userNoteKey]['boxId'] = uniqid();
-		}
-
-		if (isset($userNoteValue['itemType']) && $userNoteValue['itemType'] === 'note' && !isset($userNoteValue['noteId'])) {
-
-			$userNotes[$userNoteKey]['noteId'] = uniqid();
-		}
-
+		$userNotes = array();
 	}
-	unset($userNoteValue);
         
     return $userNotes;
 }
@@ -258,6 +264,68 @@ $app->put('/api/usernotes', function () use ($app) {
 		));
 
         $app->response->setBody(json_encode(array('userNotes' => $userNotes)));
+	}
+
+});
+
+$app->put('/api/selected/:noteId', function ($noteId) use ($app) {
+
+	if (isValid($app)) {
+
+		$token = $app->request->headers->get('X-Authorization');
+		$oldToken = explode(':', $token);
+		$email = $oldToken[0];
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2',
+
+		));
+
+		// Make update or insert to selected note in database
+		$dbClient->putItem(array(
+		    'TableName' => 'selected',
+	        'Item' => array(
+	        	'email' 	=> array('S' => $email), // Primary Key
+	        	'selected' => array('S' => $noteId)
+	        )
+		));
+
+        $app->response->setBody(json_encode(array('message' => 'Successful')));
+	}
+
+});
+
+$app->get('/api/selected', function () use ($app) {
+
+	if (isValid($app)) {
+
+		$token = $app->request->headers->get('X-Authorization');
+		$oldToken = explode(':', $token);
+		$email = $oldToken[0];
+
+		// Get AWS DynamoDB Client
+		$dbClient = DynamoDBClient::factory(array(
+        	'region'  => 'us-west-2'
+		));
+
+		// Query usernotes from database
+		$result = $dbClient->getItem(array(
+		    'ConsistentRead' => true,
+		    'TableName' => 'selected',
+		    'Key'       => array(
+		        'email' => array('S' => $email) // Primary Key
+		    )
+		));
+
+		$noteId = '';
+		if (isset($result['Item']['selected'])) {
+			$noteId = Helper::NAToBlank($result['Item']['selected']['S']);
+		}
+
+		$app->response->setBody(json_encode(array(
+        	'noteId' => $noteId
+        )));
 	}
 
 });

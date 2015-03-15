@@ -8,11 +8,10 @@ var deleteNoteAction = function (noteId, userNotes) {
 	if (lscache.get('isAuthenticated')) {
 
 		api({
-			url: 'api/note',
+			url: 'api/note/' + noteId,
 			method: 'post',
 			data: {
-				'_METHOD': 'DELETE',
-				noteId: noteId
+				'_METHOD': 'DELETE'
 			},
 			success: function () {
 		

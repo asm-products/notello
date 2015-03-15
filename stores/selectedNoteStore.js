@@ -2,6 +2,7 @@ var notelloDispatcher = require('../actions/notelloDispatcher');
 var Store = require('../common/store');
 var assign = require('object-assign');
 var lscache = require('ls-cache');
+var updateSelectedNoteAction = require('../actions/updateSelectedNote');
 
 var selectedNoteStore = assign(new Store(), {
 
@@ -30,9 +31,7 @@ notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload)
 	selectedNoteStore.noteTitle = notePayload.newNote.noteTitle;
 	selectedNoteStore.noteText = notePayload.newNote.noteText;
 
-	if (!lscache.get('isAuthenticated')) {
-		lscache.set('lastSelectedNote', selectedNoteStore.noteId);
-	}
+	updateSelectedNoteAction(selectedNoteStore.noteId);
 
 	selectedNoteStore.save();
 });
@@ -43,29 +42,23 @@ notelloDispatcher.registerDiscrete('updateNoteCompleted', function (notePayload)
 	selectedNoteStore.noteTitle = notePayload.noteTitle;
 	selectedNoteStore.noteText = notePayload.noteText;
 
-	if (!lscache.get('isAuthenticated')) {
-		lscache.set('lastSelectedNote', selectedNoteStore.noteId);
-	}
-
 	selectedNoteStore.save();
 });
 
 notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 
-	if (note) {
+	if (note && note.noteId !== selectedNoteStore.noteId) {
 
 		selectedNoteStore.isChanging = false;
 		selectedNoteStore.noteId = note.noteId;
 		selectedNoteStore.noteTitle = note.noteTitle;
 		selectedNoteStore.noteText = note.noteText;
 
-		if (!lscache.get('isAuthenticated')) {
-			lscache.set('lastSelectedNote', selectedNoteStore.noteId);
-		}
+		updateSelectedNoteAction(selectedNoteStore.noteId);
 
 		selectedNoteStore.save();
-
 	}
+
 });
 
 notelloDispatcher.registerDiscrete('selectedNoteChange', function () {

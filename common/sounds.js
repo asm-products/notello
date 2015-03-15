@@ -29,21 +29,20 @@ var play = (function () {
     // Fix up prefixing
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-    context = new AudioContext();
+    if (window.AudioContext) {
 
-    bufferLoader = new BufferLoader(
-        context,
-        [
-            'https://s3-us-west-2.amazonaws.com/static-omaj/bongos.mp3'
-            // 'https://s3-us-west-2.amazonaws.com/static-omaj/scifi.mp3',
-            // 'https://s3-us-west-2.amazonaws.com/static-omaj/scifi2.mp3',
-            // 'https://s3-us-west-2.amazonaws.com/static-omaj/birds.mp3',
-            // 'https://s3-us-west-2.amazonaws.com/static-omaj/mysterious.mp3'
-        ],
-        finishedLoading
-    );
+        context = new AudioContext();
 
-    bufferLoader.load();
+        bufferLoader = new BufferLoader(
+            context,
+            [
+                'https://s3-us-west-2.amazonaws.com/static-omaj/bongos.mp3'
+            ],
+            finishedLoading
+        );
+
+        bufferLoader.load();
+    }
 
     return retVal;
 

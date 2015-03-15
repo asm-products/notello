@@ -7,6 +7,11 @@ var selectNoteAction = function (noteId) {
 
 	dispatcher.dispatchDiscrete('selectedNoteChange');
 
+	if (!noteId || noteId === '') {
+		dispatcher.dispatchDiscrete('selectedNote', null);
+		return;
+	}
+
 	if (lscache.get('isAuthenticated')) {
 
 		api({

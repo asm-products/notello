@@ -6,7 +6,7 @@ var fs = require('fs');
 var config = require('../config').publish;
 var Q = require('../../node_modules/q');
 
-gulp.task('publish', function () {
+gulp.task('publish', ['css', 'browserify'], function () {
 
 	var deferred = Q.defer();
 

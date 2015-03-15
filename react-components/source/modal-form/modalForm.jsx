@@ -4,6 +4,7 @@ var cx = ReactAddons.classSet;
 var $ = require('jquery');
 var sounds = require('../../../common/sounds');
 var modalToggle = require('../../../actions/modalToggle');
+var _ = require('underscore');
 
 var modalFormComponent = React.createClass({
 
@@ -120,10 +121,7 @@ var modalFormComponent = React.createClass({
   		});
 	},
 
-	handleSubmit: function (event) {
-
-  		event.preventDefault();
-  		event.stopPropagation();
+	_handleSubmit: _.debounce(function () {
 
   		var validationMessage = this._checkValidation();
 
@@ -142,6 +140,14 @@ var modalFormComponent = React.createClass({
   			isValid: validationMessage === '',
   			validationMessage: validationMessage
   		});
+	}, 3000, true),
+
+	handleSubmit: function (event) {
+
+  		event.preventDefault();
+  		event.stopPropagation();
+
+		this._handleSubmit(event);
 	},
 
 	handleClick: function (event) {

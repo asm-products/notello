@@ -63,8 +63,6 @@ var bookcaseComponent = React.createClass({
 		this.refs.addNewItemModal.close();
 
 		createNoteAction(bookshelfStore.userNotes || [], '', '');
-
-		hideBookshelfAction();
 	},
 
 	handleNewNoteBook: function (event) {

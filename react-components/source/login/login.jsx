@@ -9,7 +9,7 @@ var lscache = require('ls-cache');
 var $ = require('jquery');
 var cookie = require('jquery.cookie');
 var domUtils = require('../../../common/dom-utils');
-var authenticateAction = require('../../../actions/authenticate');
+var getUserNotesAction = require('../../../actions/getUserNotes');
 
 var loginComponent = React.createClass({
 
@@ -27,19 +27,8 @@ var loginComponent = React.createClass({
 
 	componentDidMount: function () {
 
-		var self = this,
-			tempAuthToken = $.cookie('tempAuthToken'),
-			tempAuthTokenArray = tempAuthToken && tempAuthToken.split(':'),
-			email =  tempAuthTokenArray && tempAuthTokenArray[0];
-
 		// Register loginStore handler
-		loginStore.onChange(self._loginStoreUpdated);
-
-		if (tempAuthToken) {
-	    	
-			authenticateAction(email, tempAuthToken);
-	    }
-		$.removeCookie('tempAuthToken');
+		loginStore.onChange(this._loginStoreUpdated);
 	},
 
 	getInitialState: function () {
@@ -79,6 +68,8 @@ var loginComponent = React.createClass({
 	handleLogout: function (event) {
 
 		logoutAction();
+
+		getUserNotesAction();
 	},
 
 	render: function () {

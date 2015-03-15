@@ -85,17 +85,18 @@ var usernotesComponent = React.createClass({
 						});
 
 						if (item.itemType === 'note') {
+
 							return  <span key={item.noteId} className="generic-transition usernote-item" onClick={self.handleNoteClick.bind(self, item.noteId)}>
 										<img src="dist/images/paper.png" className="paper" />
 										<span className={usernoteTitleClasses}>{item.noteTitle || 'New Note'}</span>
 									</span>;
-						}
 
-						if (item.itemType === 'notebook') {
+						} else if (item.itemType === 'notebook') {
+
 							return <img key={item.notebookId} src="dist/images/notebook.png" className="notebook usernote-item" />;
-						}
 
-						if (item.itemType === 'box') {
+						} else if (item.itemType === 'box') {
+
 							return <img key={item.boxId} src="dist/images/archivebox.png" className="archive-box usernote-item" />;
 						}
 					})}

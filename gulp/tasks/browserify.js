@@ -19,10 +19,13 @@ var config       = require('../config').browserify;
 var uglify = require('gulp-uglify');
 var browserSync = require('browser-sync');
 var buffer = require('vinyl-buffer');
+var gulpif = require('gulp-if');
 
 gulp.task('browserify', function(callback) {
 
   var bundleQueue = config.bundleConfigs.length;
+
+  var isProduction = false;
 
   var browserifyThis = function(bundleConfig) {
 
@@ -51,7 +54,7 @@ gulp.task('browserify', function(callback) {
         // desired output filename here.
         .pipe(source(bundleConfig.outputName))
         .pipe(buffer()) 
-        //.pipe(uglify())
+        .pipe(gulpif(isProduction, uglify()))
         // Specify the output destination
         .pipe(gulp.dest(bundleConfig.dest))
         .on('end', reportFinished)

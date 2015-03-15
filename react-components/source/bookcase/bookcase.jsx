@@ -2,7 +2,6 @@ var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
-var $ = require('jquery');
 var NewItem = require('../newitem/newitem');
 var UserNotes = require('../usernotes/usernotes');
 
@@ -28,7 +27,7 @@ var bookcaseComponent = React.createClass({
 								<div className="logo">Notello</div>
 							</div>
 							<div className="item-container">
-								<span className="add-item ion-plus-circled" title="Add a new note, notebook, or box" onClick={this.handleAddItem} onTouchEnd={this.handleAddItem} style={{ width: '40px' }}></span>
+								<span className="add-item ion-plus-circled" title="Add a new note, notebook, or box" onClick={this.handleAddItem} onTouchEnd={this.handleAddItem}></span>
 								<UserNotes />
 							</div>
 							<div className="bottom-shelf shelf-border"></div>
