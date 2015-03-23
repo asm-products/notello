@@ -209,8 +209,8 @@ var appComponent = React.render(
 $(function () {
 
 	var tempAuthToken = $.cookie('tempAuthToken'),
-	tempAuthTokenArray = tempAuthToken && tempAuthToken.split(':'),
-	email =  tempAuthTokenArray && tempAuthTokenArray[0];
+		tempAuthTokenArray = tempAuthToken && tempAuthToken.split(':'),
+		email =  tempAuthTokenArray && tempAuthTokenArray[0];
 
 	// This was mostly for setup reasons early in development. Not sure if it's really needed anymore.
 	hideBookshelfAction();

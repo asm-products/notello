@@ -4,12 +4,25 @@ var cx = ReactAddons.classSet;
 var Searchbar = require('../searchbar/searchbar');
 var NewItem = require('../newitem/newitem');
 var UserNotes = require('../usernotes/usernotes');
+var _ = require('underscore');
+var wallIsScrollingAction = require('../../../actions/wallIsScrolling');
 
 var bookcaseComponent = React.createClass({
 
 	handleAddItem: function (event) {
 
 		this.refs.newItem.open();
+	},
+
+	_detectStoppedScrolling: _.debounce(function(){
+		wallIsScrollingAction(false);
+	}, 400),
+
+	handleScroll: function (event) {
+
+		wallIsScrollingAction(true);
+
+		this._detectStoppedScrolling();
 	},
 
 	render: function () {
@@ -20,10 +33,10 @@ var bookcaseComponent = React.createClass({
 		});
 
 		return 	<div ref="divBookcase" className={classes}>
-					<div className="wall">
+					<Searchbar />
+					<div className="wall" onScroll={this.handleScroll}>
 						<div className="shelf">
 							<div className="top-shelf shelf-border">
-								<Searchbar />
 								<div className="logo">Notello</div>
 							</div>
 							<div className="item-container">

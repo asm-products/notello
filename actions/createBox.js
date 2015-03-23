@@ -1,8 +1,10 @@
 
 var dispatcher = require('./notelloDispatcher');
 var api = require('../common/api');
+var lscache = require('ls-cache');
+var domUtility = require('../common/dom-utils');
 
-var createBoxAction = function (userNotes, boxName) {
+var createBoxAction = function (userNotes, boxTitle) {
 
 	if (!userNotes) {
 		userNotes = [];
@@ -10,24 +12,33 @@ var createBoxAction = function (userNotes, boxName) {
 
 	userNotes.push({
 
+		boxId: domUtility.randomUUID(),
 		itemType: 'box',
-		boxName: boxName
+		boxTitle: boxTitle,
+		items: []
 	});
 
-	dispatcher.dispatchDiscrete('createBoxCompleted', userNotes);
+	//dispatcher.dispatchDiscrete('createBoxCompleted', userNotes);
 
-	api({
-		url: 'api/usernotes',
-		method: 'post',
-		data: {
-			'_METHOD': 'PUT',
-			userNotes: userNotes
-		},
-		success: function (result) {
-			
-			dispatcher.dispatchDiscrete('createBoxCompleted', result.userNotes);
-	    }
-	});
+	if (lscache.get('isAuthenticated')) {	
+
+		api({
+			url: 'api/usernotes',
+			method: 'post',
+			data: {
+				'_METHOD': 'PUT',
+				userNotes: userNotes
+			},
+			success: function (result) {
+				
+				//dispatcher.dispatchDiscrete('createBoxCompleted', result.userNotes);
+		    }
+		});
+
+	} else {
+
+		lscache.set('unAuthUserNotes', userNotes);
+	}
 };
 
 module.exports = createBoxAction;

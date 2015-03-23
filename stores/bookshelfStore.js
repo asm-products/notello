@@ -7,7 +7,8 @@ var bookShelfStore = assign(new Store(), {
 	isViewingBookshelf: false,
 	isDoneAnimating: true,
 	userNotes: null,
-	searchText: null
+	searchText: null,
+	wallIsScrolling: false
 });
 
 notelloDispatcher.registerDiscrete('viewBookshelf', function () {
@@ -51,6 +52,12 @@ notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes)
 notelloDispatcher.registerDiscrete('search', function (searchText) {
 
 	bookShelfStore.searchText = searchText;
+	bookShelfStore.save();
+});
+
+notelloDispatcher.registerDiscrete('wallIsScrolling', function (isWallScrolling) {
+
+	bookShelfStore.wallIsScrolling = isWallScrolling;
 	bookShelfStore.save();
 });
 

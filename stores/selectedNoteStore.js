@@ -46,10 +46,11 @@ notelloDispatcher.registerDiscrete('updateNoteCompleted', function (notePayload)
 });
 
 notelloDispatcher.registerDiscrete('selectedNote', function (note) {
+	
+	selectedNoteStore.isChanging = false;
 
 	if (note && note.noteId !== selectedNoteStore.noteId) {
 
-		selectedNoteStore.isChanging = false;
 		selectedNoteStore.noteId = note.noteId;
 		selectedNoteStore.noteTitle = note.noteTitle;
 		selectedNoteStore.noteText = note.noteText;

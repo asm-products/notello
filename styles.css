@@ -30,6 +30,7 @@
   width: 100%;
   background: #777;
   overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   position: fixed;
   z-index: 10;
@@ -39,7 +40,7 @@
 }
 .bookcase .shelf {
   margin: 0 auto;
-  width: 100%;
+  min-width: 100%;
   display: inline-block;
   position: relative;
   background: #130f10;
@@ -224,6 +225,9 @@ html {
 }
 input {
   -webkit-appearance: none;
+}
+sup {
+  font-size: 0.5em;
 }
 .container {
   height: 100%;
@@ -731,7 +735,6 @@ input {
   position: absolute;
   z-index: 1;
   background-color: transparent;
-  /*width: 490px; TODO: see about getting rid of this */
   font-size: 1em;
   outline: none;
   border: 0;
@@ -748,7 +751,7 @@ input {
 }
 .notepad .txt-area.txt-area-hidden {
   color: transparent;
-  z-index: 2;
+  z-index: 3;
   overflow: hidden;
   height: calc(100% - 70px);
 }
@@ -825,6 +828,7 @@ input {
   width: 40px;
   height: 30px;
   padding-top: 3px;
+  padding-left: 10px;
   font-size: 1.5em;
   opacity: 0.5;
   color: white;
@@ -834,10 +838,11 @@ input {
   opacity: 0.7;
 }
 .searchbar-container {
-  max-width: 300px;
-  left: 130px;
-  position: absolute;
+  max-width: 310px;
+  left: 100px;
+  position: fixed;
   top: 5px;
+  z-index: 11;
 }
 .searchbar-container:hover .searchbar-wrapper {
   opacity: 0.8;
@@ -849,9 +854,7 @@ input {
 }
 @media all and (max-width: 400px) {
   .searchbar-container {
-    margin: 0 auto;
-    padding-top: 5px;
-    position: static;
+    left: 5px;
   }
 }
 .searchbar-wrapper {
@@ -863,7 +866,7 @@ input {
 }
 .search-text {
   height: 22px;
-  width: 220px;
+  width: 210px;
   background-color: transparent;
   border: 0;
   outline: none;
@@ -871,7 +874,7 @@ input {
   margin-top: 2px;
 }
 .search-focused input {
-  width: 250px;
+  width: 240px;
 }
 .search-focused .searchbar-wrapper {
   opacity: 1 !important;
@@ -891,10 +894,11 @@ input {
   opacity: 0.6;
 }
 .usernote-item {
-  font-size: initial !important;
+  font-size: medium !important;
   display: inline-block;
   cursor: pointer;
   margin-left: 20px;
+  position: relative;
 }
 .usernote-item:hover {
   transform: scale(1.2, 1.2);
@@ -925,7 +929,8 @@ input {
 .usernote-item .notebook {
   width: 60px;
 }
-.usernote-item .usernote-title {
+.usernote-item .usernote-title,
+.usernote-item .box-title {
   margin-top: 4px;
   margin-left: -13px;
   display: inline-block;
@@ -943,4 +948,29 @@ input {
 }
 .usernote-item .usernote-title-selected {
   background-color: #009388;
+}
+.usernote-item .box-title-selected {
+  background-color: #83b372;
+}
+.usernote-item.box-item-container-selected {
+  padding-top: 16px;
+}
+.usernote-item.box-item-container-selected .close-box-button {
+  display: block;
+}
+.usernote-item .box-item-selected {
+  transform: rotate(90deg);
+  padding-top: 10px;
+  padding-left: 12px;
+}
+.usernote-item .close-box-button {
+  position: absolute;
+  top: 20px;
+  right: 5px;
+  color: white;
+  opacity: .5;
+  display: none;
+}
+.usernote-item .close-box-button:hover {
+  opacity: .7;
 }

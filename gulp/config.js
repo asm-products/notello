@@ -38,7 +38,7 @@ module.exports = {
         key: 'styles.css.map'
       }
     ],
-    bucket: 'notello.com',
+    bucket: 'notello',
     region: 'us-west-2'
   }
 };

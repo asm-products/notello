@@ -57,6 +57,7 @@ module.exports = assign(new Dispatcher(), {
 		'modalClosed',
 		'modalOpened',
 		'search',
-		'deleteNoteCompleted'
+		'deleteNoteCompleted',
+		'wallIsScrolling'
 	]
 });

@@ -73,8 +73,8 @@ var notepadComponent = React.createClass({
 				noteSelectionAnimating: true
 			});
 
-		} else if (selectedNoteStore.noteId && self.state.noteId !== selectedNoteStore.noteId) {
-			
+		} else if (selectedNoteStore.noteId && selectedNoteStore.noteId !== self.state.noteId) {
+
 			// This is a different note so we need to animate it in
 			self._slideTimeout = setTimeout(function () {
 
@@ -110,7 +110,7 @@ var notepadComponent = React.createClass({
 			});
 
 		} else { // There is no note so we need to hide the notepad
-
+			
 			clearTimeout(self._slideTimeout);
 
 			self.setState({
@@ -134,11 +134,25 @@ var notepadComponent = React.createClass({
     	};
 	},
 
+	_renderInterval: null,
+
+	componentWillUnmount: function () {
+
+		clearInterval(this._renderInterval);
+	},
+
 	componentDidMount: function () {
 
-		this._selectedNote();
-		selectedNoteStore.onChange(this._selectedNote);
-		modalStore.onChange(this._modalOpened);
+		var self = this;
+		
+		self._selectedNote();
+
+		selectedNoteStore.onChange(self._selectedNote);
+		modalStore.onChange(self._modalOpened);
+
+		this._renderInterval = setInterval(function() {
+			self.forceUpdate();
+		}, 2000);
 	},
 
 	handleChange: function (event) {
@@ -203,6 +217,13 @@ var notepadComponent = React.createClass({
 		});
 	},
 
+	handleTitleKeyUp: function (event) {
+
+		if (event.which === 13) {
+			$(this.refs.txtArea.getDOMNode()).focus();
+		}
+	},
+
 	handleBlur: function (event) {
 
 		hideCaret();
@@ -253,9 +274,10 @@ var notepadComponent = React.createClass({
 	render: function () {
 
 		// txtHiddenTextArea is used to calculate number of lines.
-		var lineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.noteText.split(/\r\n|\r|\n/g).length;
+		var lineCount = Math.floor($('#txtArea').prop('scrollHeight') / 40) || this.state.noteText.split(/\r\n|\r|\n/g).length;
+		var oldLineCount = Math.floor($('#txtHiddenTextArea').prop('scrollHeight') / 40) || this.state.noteText.split(/\r\n|\r|\n/g).length;
 
-		var calculatedNotepadHeight = lineCount < 8 ? 360 : 360 + ((lineCount - 7) * 40);
+		var calculatedNotepadHeight = oldLineCount < 8 ? 360 : 360 + ((oldLineCount - 7) * 40);
 
 		var value = this.state.noteText.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
@@ -285,13 +307,13 @@ var notepadComponent = React.createClass({
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
 						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 
-						disabled={shouldBeDisabled} value={this.state.noteTitle} />
+						disabled={shouldBeDisabled} value={this.state.noteTitle} onKeyUp={this.handleTitleKeyUp} />
 						<span className="generic-transition notepad-gear ion-gear-b" onTouchEnd={this.handleSettingClick} onClick={this.handleSettingClick}></span>
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
 					onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled} defaultValue={sanitizedText}></textarea>
-					<textarea id="txtHiddenTextArea" ref="txtHiddenTextArea" style={{ display: 'none' }} defaultValue={sanitizedText} />
+					<textarea id="txtHiddenTextArea" ref="txtHiddenTextArea" className={txtAreaCSSClasses} style={{ height: 'auto', zIndex: 2, visibility: 'hidden' }} readOnly value={sanitizedText} />
 					<ModalForm ref="settingsModal" btnSubmitText="DELETE NOTE" modalTitle="SETTINGS" onSubmit={this.handleSettingsSaved} onClose={this.handleSettingsClosed}>
 					</ModalForm>
 				</div>;

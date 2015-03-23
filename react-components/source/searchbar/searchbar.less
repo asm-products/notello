@@ -7,6 +7,7 @@
 	width: 40px;
 	height: 30px;
 	padding-top: 3px;
+	padding-left: 10px;
 	font-size: 1.5em;
 	opacity: 0.5;
 	color: white;
@@ -20,10 +21,11 @@
 
 .searchbar-container {
 	
-	max-width: 300px;
-	left: 130px;
-	position: absolute;
+	max-width: 310px;
+	left: 100px;
+	position: fixed;
 	top: 5px;
+	z-index: 11;
 
 	&:hover .searchbar-wrapper {
 		opacity: 0.8;
@@ -38,9 +40,7 @@
 
 @media all and (max-width: 400px) {
 	.searchbar-container {
-		margin: 0 auto;
-		padding-top: 5px;
-		position: static;
+		left: 5px;
 	}
 }
 
@@ -55,7 +55,7 @@
 
 .search-text {
 	height: 22px;
-	width: 220px;
+	width: 210px;
 	background-color: transparent;
 	border: 0;
 	outline: none;
@@ -66,7 +66,7 @@
 .search-focused {
 
 	& input {
-		width: 250px;
+		width: 240px;
 	}
 
 	& .searchbar-wrapper {

@@ -15,10 +15,11 @@
 
 .usernote-item {
 	
-	font-size: initial !important;
+	font-size: medium !important;
 	display: inline-block;
 	cursor: pointer;
 	margin-left: 20px;
+	position: relative;
 
 	&:hover {
 		transform: scale(1.2, 1.2);
@@ -36,6 +37,9 @@
 		opacity: 0;
 	}
 
+	& .archive-box {
+	}
+
 	& .archive-box, & .notebook, & .paper, & .add-item {
 
 		display: block;
@@ -49,7 +53,7 @@
 		width: 60px;
 	}
 
-	& .usernote-title {
+	& .usernote-title, & .box-title {
 
 		margin-top: 4px;
 		margin-left: -13px;
@@ -69,5 +73,36 @@
 
 	& .usernote-title-selected {
 		background-color: #009388;
+	}
+
+	& .box-title-selected {
+		background-color: #83b372;
+	}
+
+	&.box-item-container-selected {
+		padding-top: 16px;
+
+		& .close-box-button {
+			display: block;
+		}
+	}
+
+	& .box-item-selected {
+    	transform: rotate(90deg);
+		padding-top: 10px;
+  		padding-left: 12px;
+	}
+
+	& .close-box-button {
+		position: absolute;
+		top: 20px;
+		right: 5px;
+		color: white;
+		opacity: .5;
+		display: none;
+
+		&:hover {
+			opacity: .7;
+		}
 	}
 }
