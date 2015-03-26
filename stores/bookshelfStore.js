@@ -49,6 +49,11 @@ notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes)
 	bookShelfStore.save();
 });
 
+notelloDispatcher.registerDiscrete('updateUserNotesCompleted', function () {
+
+	bookShelfStore.save();
+});
+
 notelloDispatcher.registerDiscrete('search', function (searchText) {
 
 	bookShelfStore.searchText = searchText;

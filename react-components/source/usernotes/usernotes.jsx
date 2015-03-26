@@ -3,14 +3,12 @@ var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
 var bookshelfStore = require('../../../stores/bookshelfStore');
-var Sortable = require('../../../common/sortable');
-var SortableMixin = require('../../../common/sortable-mixin');
 var selectNoteAction = require('../../../actions/selectNote');
 var selectedNoteStore = require('../../../stores/selectedNoteStore');
+var UserNoteItem = require('../usernote-item/usernote-item');
+var _ = require('underscore');
 
 var usernotesComponent = React.createClass({
-
-    //mixins: [SortableMixin],
 
 	_haveUsernotes: function () {
 
@@ -40,11 +38,6 @@ var usernotesComponent = React.createClass({
 			selectedNoteId: selectedNoteStore.noteId
 		});
 	},
-
-	sortableOptions: {
-        ref: 'userNoteContainer',
-        model: 'userNotes'
-    },
 
 	getInitialState: function () {
 
@@ -102,48 +95,27 @@ var usernotesComponent = React.createClass({
 
 	render: function () {
 
-		var self = this;
+		var self = this,
+			displayNotes = self.state.selectedBoxId ? [_.findWhere(self.state.userNotes, { boxId: self.state.selectedBoxId })].concat(_.findWhere(self.state.userNotes, { boxId: self.state.selectedBoxId }).items) : self.state.userNotes;
 
 		return 	<div ref="userNoteContainer" className="usernotes-wrapper">
-					{this.state.userNotes && this.state.userNotes.map(function (item) {
+					{displayNotes.map(function (item) {
 
-						var usernoteTitleClasses = cx({
-							'usernote-title': true,
-							'usernote-title-selected': item.noteId === self.state.selectedNoteId
-						});
+						var id = item.noteId || item.notebookId || item.boxId,
+							title = item.noteTitle || item.notebookTitle || item.boxTitle,
+							clickHandler;
 
-						var boxTitleClasses = cx({
-							'box-title': true,
-							'box-title-selected': item.boxId === self.state.selectedBoxId
-						}),
-							boxItemClasses = cx({
-							'archive-box': true,
-							'box-item-selected': item.boxId === self.state.selectedBoxId
-						})
-							boxContainerClasses = cx({
-							'generic-transition usernote-item': true,
-							'box-item-container-selected': item.boxId === self.state.selectedBoxId
-						});
+						if (item.itemType === 'note') {
 
-						if (item.itemType === 'note' && !self.state.selectedBoxId) {
+							clickHandler = self.handleNoteClick.bind(self, id);
 
-							return  <span key={item.noteId} className="generic-transition usernote-item" onClick={self.handleNoteClick.bind(self, item.noteId)} onTouchEnd={self.handleNoteClick.bind(self, item.noteId)}>
-										<img src="dist/images/paper.png" className="paper" />
-										<span className={usernoteTitleClasses}>{item.noteTitle || 'New Note'}</span>
-									</span>;
+						} else if (item.itemType === 'box' && (!self.state.selectedBoxId || self.state.selectedBoxId === id)) {
 
-						} else if (item.itemType === 'notebook' && !self.state.selectedBoxId) {
+							clickHandler = self.handleBoxClick.bind(self, id);
+						} 
 
-							return <img key={item.notebookId} src="dist/images/notebook.png" className="notebook usernote-item" />;
-
-						} else if (item.itemType === 'box' && 
-							(!self.state.selectedBoxId || self.state.selectedBoxId === item.boxId)) {
-
-							return <span key={item.boxId} title="You can drag and drop notes and notebooks here" className={boxContainerClasses} onClick={self.handleBoxClick.bind(self, item.boxId)} onTouchEnd={self.handleBoxClick.bind(self, item.boxId)}>
-										<img src="dist/images/archivebox.png" className={boxItemClasses} />
-										<span className={boxTitleClasses}>{item.boxTitle || 'New Box'}</span>
-										<span title="Close this box" className="ion-close-circled close-box-button" onClick={self.handleCloseBox} onTouchEnd={self.handleCloseBox}></span>
-									</span>;
+						if (clickHandler) {
+							return <UserNoteItem key={id} id={id} itemTitle={title} selectedBoxId={self.state.selectedBoxId} selectedNoteId={self.state.selectedNoteId} onCloseBox={self.handleCloseBox} clickHandler={clickHandler} itemType={item.itemType} />;
 						}
 					})}
 				</div>;

@@ -205,7 +205,17 @@ var notepadComponent = React.createClass({
 			if (userNoteItem.noteId === self.state.noteId) {
 
 				userNoteItem.noteTitle = event.target.value;
-			} 
+
+			} else if (userNoteItem.itemType === 'box') {
+
+				userNoteItem.items.map(function (boxItem) {
+					
+					if (boxItem.noteId === self.state.noteId) {
+
+						boxItem.noteTitle = event.target.value;
+					}
+				});
+			}
 		});
 
 		updateUserNotesAction(bookShelfStore.userNotes);

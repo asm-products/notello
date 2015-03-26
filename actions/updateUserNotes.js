@@ -22,6 +22,8 @@ var _updateUserNoteDatabase = _.debounce(function (updatedUserNotes) {
 }, 3000);
 
 var updateUserNotesAction = function (userNotes) {
+		
+	dispatcher.dispatchDiscrete('updateUserNotesCompleted');
 
 	if (lscache.get('isAuthenticated')) {		
 		
@@ -30,8 +32,6 @@ var updateUserNotesAction = function (userNotes) {
 	} else {
 
 		lscache.set('unAuthUserNotes', userNotes);
-		
-		dispatcher.dispatchDiscrete('updateUserNotesCompleted');
 	}
 };
 
