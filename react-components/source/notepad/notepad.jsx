@@ -12,6 +12,7 @@ var bookShelfStore = require('../../../stores/bookshelfStore');
 var modalStore = require('../../../stores/modalStore');
 var ModalForm = require('../modal-form/modalForm');
 var deleteNoteAction = require('../../../actions/deleteNote');
+var sounds = require('../../../common/sounds');
 
 var cursor = null;
 
@@ -72,6 +73,8 @@ var notepadComponent = React.createClass({
 			self.setState({
 				noteSelectionAnimating: true
 			});
+
+			sounds.play('swoosh');
 
 		} else if (selectedNoteStore.noteId && selectedNoteStore.noteId !== self.state.noteId) {
 
@@ -273,6 +276,15 @@ var notepadComponent = React.createClass({
 		deleteNoteAction(selectedNoteStore.noteId);
 
 		bookShelfStore.userNotes = bookShelfStore.userNotes.filter(function (userNoteItem) {
+
+			if (userNoteItem.itemType === 'box') {
+
+				userNoteItem.items = userNoteItem.items.filter(function (boxItem) {
+
+					return boxItem.noteId !== self.state.noteId;
+				});
+			}
+
 			return userNoteItem.noteId !== self.state.noteId;
 		});
 

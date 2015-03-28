@@ -23,7 +23,9 @@ var usernoteItemComponent = React.createClass({
     				beginDrag: function(component) {
     					return {
     						item: {
-    							id: component.props.id
+    							id: component.props.id,
+    							itemType: component.props.itemType,
+    							selectedBoxId: component.props.selectedBoxId
     						}
     					};
     				}
@@ -31,16 +33,60 @@ var usernoteItemComponent = React.createClass({
 
     			dropTarget: {
 
-    				acceptDrop: function(component, note) {
+    				acceptDrop: function(component, item) {
 
-    					var noteDragged = _.findWhere(bookshelfStore.userNotes, { noteId: note.id }),
-    						boxDropped = _.findWhere(bookshelfStore.userNotes, { boxId: component.props.id }),
-    					    newUserNotes = _.without(bookshelfStore.userNotes, noteDragged);
+    					var itemDragged,
+    						selectedBox,
+    						boxDropped,
+    						idType = item.itemType + 'Id',
+    						idFilter = {},
+    						newBoxNotes,
+    						boxIndex,
+    						newUserNotes;
 
-    					boxDropped.items.push(noteDragged);
+    					idFilter[idType] = item.id;
 
-    					updateUserNotesAction(newUserNotes);
-    					getUserNotesAction();
+    					if (item.selectedBoxId) {
+
+    						selectedBox = _.findWhere(bookshelfStore.userNotes, { boxId: item.selectedBoxId });
+    						itemDragged = _.findWhere(selectedBox.items, idFilter);
+
+    					} else {
+
+    						itemDragged = _.findWhere(bookshelfStore.userNotes, idFilter);
+    					}
+
+    					if (component.props.id === 'trashCan') {
+
+    						if (item.selectedBoxId) {
+
+    							newBoxNotes = _.without(selectedBox.items, itemDragged);
+
+    							boxIndex = _.findIndex(bookshelfStore.userNotes, {
+    								boxId: item.selectedBoxId
+    							});
+
+    							bookshelfStore.userNotes[boxIndex].items = newBoxNotes;
+
+    							newUserNotes = bookshelfStore.userNotes;
+
+    						} else {
+
+	    						newUserNotes = _.without(bookshelfStore.userNotes, itemDragged);
+    						}
+
+
+    					} else {
+
+	    					boxDropped = _.findWhere(bookshelfStore.userNotes, { boxId: component.props.id });
+	    					newUserNotes = _.without(bookshelfStore.userNotes, itemDragged);
+
+	    					boxDropped.items.push(itemDragged);
+    					}
+	    				
+	    				updateUserNotesAction(newUserNotes);
+
+	    				getUserNotesAction();
     					
     				}
     			}
@@ -71,7 +117,7 @@ var usernoteItemComponent = React.createClass({
 			boxItemClasses = cx({
 			'archive-box': true,
 			'box-item-selected': id === selectedBoxId
-		})
+		}),
 			boxContainerClasses = cx({
 			'generic-transition usernote-item': true,
 			'box-item-container-selected': id === selectedBoxId
@@ -90,11 +136,19 @@ var usernoteItemComponent = React.createClass({
 
 		} else if (itemType === 'box' && (!selectedBoxId || selectedBoxId === id)) {
 
-			return <span {...this.dropTargetFor('BOXES')} title="You can drag and drop notes and notebooks here" className={boxContainerClasses} onClick={clickHandler} onTouchEnd={clickHandler}>
-						<img src="dist/images/archivebox.png" className={boxItemClasses} />
+			return <span {...this.dropTargetFor('BOXES')} {...this.dragSourceFor('BOXES')} title="You can drag and drop notes and notebooks here" className={boxContainerClasses} onClick={clickHandler} onTouchEnd={clickHandler}>
+						<img src={selectedBoxId === id ? 'dist/images/archivebox-opened.png' :'dist/images/archivebox.png'} className={boxItemClasses} />
 						<span className={boxTitleClasses}>{itemTitle || 'New Box'}</span>
 						<span title="Close this box" className="ion-close-circled close-box-button" onClick={handleCloseBox} onTouchEnd={handleCloseBox}></span>
 					</span>;
+
+		} else if (itemType === 'trash') {
+
+			return <span {...this.dropTargetFor('BOXES')} selectedBoxId={selectedBoxId} title="You can delete stuff permanently by dragging it here" className={boxContainerClasses} style={{ marginLeft: '60px' }}>
+						<img src="dist/images/trashcan.png" className={boxItemClasses} />
+						<span className="usernote-title">Trash</span>
+					</span>;
+
 		}
 	}
 

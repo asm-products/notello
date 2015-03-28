@@ -118,6 +118,7 @@ var usernotesComponent = React.createClass({
 							return <UserNoteItem key={id} id={id} itemTitle={title} selectedBoxId={self.state.selectedBoxId} selectedNoteId={self.state.selectedNoteId} onCloseBox={self.handleCloseBox} clickHandler={clickHandler} itemType={item.itemType} />;
 						}
 					})}
+					<UserNoteItem id="trashCan" itemTitle="Trash" itemType="trash" />;
 				</div>;
 	}
 

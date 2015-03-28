@@ -9,6 +9,7 @@ var hideBookshelfAction = require('../../../actions/hideBookshelf');
 var bookshelfStore = require('../../../stores/bookshelfStore');
 var createNotebookAction = require('../../../actions/createNotebook');
 var createBoxAction = require('../../../actions/createBox');
+var domUtils = require('../../../common/dom-utils');
 
 var bookcaseComponent = React.createClass({
 
@@ -76,9 +77,11 @@ var bookcaseComponent = React.createClass({
 			itemType: 'notebook'
 		});
 
-		setTimeout(function () {
-			$(self.refs.itemName.getDOMNode()).focus();
-		}, 1);
+		if (!domUtils.isSafari) {
+			setTimeout(function () {
+				$(self.refs.itemName.getDOMNode()).focus();
+			}, 1);
+		}
 	},
 
 	handleNewBox: function (event) {
@@ -91,9 +94,11 @@ var bookcaseComponent = React.createClass({
 			itemName: ''
 		});
 
-		setTimeout(function () {
-			$(self.refs.itemName.getDOMNode()).focus();
-		}, 1);
+		if (!domUtils.isSafari) {
+			setTimeout(function () {
+				$(self.refs.itemName.getDOMNode()).focus();
+			}, 1);
+		}
 	},
 
 	handleCreate: function (event) {
@@ -164,7 +169,7 @@ var bookcaseComponent = React.createClass({
 							 disabled={!this.state.shouldSlide} />}
 						</div>
 						<div className="input-wrapper">
-							{this.state.itemType !== 'note' && <button ref="btnCreate" type="submit" onTouchEnd={this.handleCreate} className="submit-btn ion ion-load generic-transition">
+							{this.state.itemType !== 'note' && <button ref="btnCreate" type="submit" className="submit-btn ion ion-load generic-transition">
 								CREATE
 							</button>}
 						</div>

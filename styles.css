@@ -952,9 +952,6 @@ sup {
 .usernote-item .box-title-selected {
   background-color: #83b372;
 }
-.usernote-item.box-item-container-selected {
-  padding-top: 16px;
-}
 .usernote-item.box-item-container-selected .close-box-button {
   display: block;
 }

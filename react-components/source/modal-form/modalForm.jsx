@@ -176,7 +176,7 @@ var modalFormComponent = React.createClass({
 							{React.Children.map(props.children, function (child) {
 								return child.type === 'div' ? child : <div className="input-wrapper">{child}</div>;
 							})}
-							{this.props.showSubmit !== false && <button ref="btnSubmitEmail" type="submit" onTouchEnd={this.handleSubmit} className="submit-btn ion ion-load generic-transition">
+							{this.props.showSubmit !== false && <button ref="btnSubmitEmail" type="submit" onClick={this.handleClick} className="submit-btn ion ion-load generic-transition">
 								{btnSubmitText}
 							</button>}
 						</form>
