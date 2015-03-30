@@ -15,14 +15,14 @@ var deleteNoteAction = function (noteId, userNotes) {
 			},
 			success: function () {
 		
-				dispatcher.dispatchDiscrete('deleteNoteCompleted');
+				dispatcher.dispatchDiscrete('deleteNoteCompleted', noteId);
 		    }
 		});
 
 	} else {
 
 		lscache.remove('unAuthNote_' + noteId);
-		dispatcher.dispatchDiscrete('deleteNoteCompleted');
+		dispatcher.dispatchDiscrete('deleteNoteCompleted', noteId);
 	}
 };
 

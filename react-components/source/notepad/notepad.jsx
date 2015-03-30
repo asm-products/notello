@@ -325,12 +325,14 @@ var notepadComponent = React.createClass({
 			'slidenote slidenote-out': this.state.noteSelectionAnimating === true
 		});
 
+		var showSettings = false;
+
 		return 	<div className={notepadClasses} style={notepadStyle}>
 					<div className="pink-divider"></div>
 					<div className="notepad-header">
 						<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 
 						disabled={shouldBeDisabled} value={this.state.noteTitle} onKeyUp={this.handleTitleKeyUp} />
-						<span className="generic-transition notepad-gear ion-gear-b" onTouchEnd={this.handleSettingClick} onClick={this.handleSettingClick}></span>
+						{showSettings && <span className="generic-transition notepad-gear ion-gear-b" onTouchEnd={this.handleSettingClick} onClick={this.handleSettingClick}></span>}
 					</div>
 					<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 					<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 

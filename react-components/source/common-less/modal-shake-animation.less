@@ -12,3 +12,18 @@
     animation-duration: 0.4s;
     animation-timing-function: linear;
 }
+
+@keyframes stirAnimation {
+    0% { transform: translate(-4%, 0); }
+    20% { transform: translate(4%, 0) rotate(20deg); }
+    40% { transform: translate(-2%, 0); }
+    60% { transform: translate(2%, 0) rotate(-10deg); }
+    80% { transform: translate(-1%, 0); }
+    100% { transform: translate(0%, 0) rotate(0deg); }
+}
+
+.stir {
+    animation-name: stirAnimation;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+}

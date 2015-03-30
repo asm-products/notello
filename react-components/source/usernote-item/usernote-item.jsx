@@ -7,6 +7,9 @@ var bookshelfStore = require('../../../stores/bookshelfStore');
 var updateUserNotesAction = require('../../../actions/updateUserNotes');
 var getUserNotesAction = require('../../../actions/getUserNotes');
 var _ = require('underscore');
+var sounds = require('../../../common/sounds');
+var $ = require('jquery');
+var deleteNoteAction = require('../../../actions/deleteNote');
 
 var usernoteItemComponent = React.createClass({
 
@@ -56,6 +59,7 @@ var usernoteItemComponent = React.createClass({
     						itemDragged = _.findWhere(bookshelfStore.userNotes, idFilter);
     					}
 
+    					// Trash can dragged
     					if (component.props.id === 'trashCan') {
 
     						if (item.selectedBoxId) {
@@ -75,15 +79,31 @@ var usernoteItemComponent = React.createClass({
 	    						newUserNotes = _.without(bookshelfStore.userNotes, itemDragged);
     						}
 
+    						$('#spanTrashcan').addClass('stir');
+    						setTimeout(function () {
+    							$('#spanTrashcan').removeClass('stir');
+    						}, 1000);
+
+    						sounds.play('trash');
+
+		    				if (item.itemType === 'note') {
+
+		    					deleteNoteAction(item.id);
+		    				}
 
     					} else {
 
-	    					boxDropped = _.findWhere(bookshelfStore.userNotes, { boxId: component.props.id });
-	    					newUserNotes = _.without(bookshelfStore.userNotes, itemDragged);
+    						if (item.itemType === 'box') {
+    							return false;
+    						}
 
+	    					boxDropped = _.findWhere(bookshelfStore.userNotes, { boxId: component.props.id });
 	    					boxDropped.items.push(itemDragged);
+
+	    					newUserNotes = _.without(bookshelfStore.userNotes, itemDragged);
     					}
 	    				
+	    				// Updated and delete notes and usernotes
 	    				updateUserNotesAction(newUserNotes);
 
 	    				getUserNotesAction();
@@ -144,8 +164,8 @@ var usernoteItemComponent = React.createClass({
 
 		} else if (itemType === 'trash') {
 
-			return <span {...this.dropTargetFor('BOXES')} selectedBoxId={selectedBoxId} title="You can delete stuff permanently by dragging it here" className={boxContainerClasses} style={{ marginLeft: '60px' }}>
-						<img src="dist/images/trashcan.png" className={boxItemClasses} />
+			return <span {...this.dropTargetFor('BOXES')} selectedBoxId={selectedBoxId} title="You can delete stuff permanently by dragging it here" className={boxContainerClasses + ' trash-icon'} style={{ marginLeft: '60px' }}>
+						<img src="dist/images/trashcan.png" className={boxItemClasses} id="spanTrashcan" />
 						<span className="usernote-title">Trash</span>
 					</span>;
 

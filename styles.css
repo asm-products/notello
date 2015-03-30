@@ -1,142 +1,3 @@
-.bookcase {
-  width: 100%;
-  height: 150px;
-  position: fixed;
-  z-index: 0;
-  top: 0;
-  left: 0;
-}
-.bookcase .top-shelf {
-  text-align: center;
-  font-size: initial !important;
-  height: 40px !important;
-  position: relative;
-}
-.bookcase .bottom-shelf {
-  height: 40px !important;
-}
-.bookcase .logo {
-  text-shadow: rgba(255, 255, 255, 0.37) 0 2px 0;
-  font-family: Nunito, sans-serif;
-  color: #804313;
-  opacity: .6;
-  height: 40px;
-  font-size: 1.8em !important;
-  text-align: center;
-  width: 200px;
-  display: inline-block;
-}
-.bookcase .wall {
-  width: 100%;
-  background: #777;
-  overflow-x: scroll;
-  -webkit-overflow-scrolling: touch;
-  white-space: nowrap;
-  position: fixed;
-  z-index: 10;
-  font-size: 0px;
-  letter-spacing: 0px;
-  word-spacing: 0px;
-}
-.bookcase .shelf {
-  margin: 0 auto;
-  min-width: 100%;
-  display: inline-block;
-  position: relative;
-  background: #130f10;
-  /* Old browsers */
-  background: linear-gradient(to bottom, #130f10 0%, #79472e 84%);
-  /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#130f10', endColorstr='#79472e', GradientType=0);
-  /* IE6-9 */
-}
-.bookcase .img-shelf {
-  height: 100%;
-  width: 100%;
-}
-.bookcase .top-shelf {
-  background-image: url('images/shelf-border-top.png');
-}
-.bookcase .bottom-shelf {
-  background-image: url('images/shelf-border-top.png');
-}
-.bookcase .shelf-border {
-  width: 100%;
-  height: 20px;
-}
-.bookcase .add-item {
-  vertical-align: top;
-  width: 40px;
-  display: inline-block;
-  cursor: pointer;
-  transition: all .2s;
-  width: 70px;
-  padding-top: 24px;
-  font-size: 40px;
-  opacity: 0.5;
-  color: white;
-  padding-top: 30px;
-  height: 96px;
-}
-.bookcase .add-item:hover {
-  opacity: 0.7;
-}
-.bookcase-shown {
-  animation-name: bookcaseShownAnimation;
-  animation-duration: .5s;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-.item-icon {
-  width: 25px;
-  height: 32px;
-  vertical-align: middle;
-}
-.new-button-text {
-  padding-left: 20px;
-}
-.slide {
-  margin-left: -100% !important;
-}
-.slide-second-form {
-  margin: auto;
-}
-.form-one,
-.form-two {
-  opacity: 0;
-  display: inline-block;
-}
-.form-two {
-  vertical-align: top;
-}
-.item-container {
-  height: 100px;
-  padding-left: 130px;
-}
-@keyframes bookcaseShownAnimation {
-  0% {
-    z-index: 0;
-  }
-  100% {
-    z-index: 1;
-  }
-}
-@media all and (max-width: 875px) {
-  .bookcase .logo {
-    display: none;
-  }
-}
-@media all and (max-width: 1050px) {
-  .item-container {
-    padding-left: 50px;
-  }
-}
-@media all and (max-width: 400px) {
-  .item-container {
-    padding-left: 10px;
-  }
-}
-
 .generic-transition {
   transition: transform 0.3s, all 0.2s;
 }
@@ -333,6 +194,170 @@ sup {
   animation-duration: 0.4s;
   animation-timing-function: linear;
 }
+@keyframes stirAnimation {
+  0% {
+    transform: translate(-4%, 0);
+  }
+  20% {
+    transform: translate(4%, 0) rotate(20deg);
+  }
+  40% {
+    transform: translate(-2%, 0);
+  }
+  60% {
+    transform: translate(2%, 0) rotate(-10deg);
+  }
+  80% {
+    transform: translate(-1%, 0);
+  }
+  100% {
+    transform: translate(0%, 0) rotate(0deg);
+  }
+}
+.stir {
+  animation-name: stirAnimation;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+}
+
+.bookcase {
+  width: 100%;
+  height: 150px;
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+}
+.bookcase .top-shelf {
+  text-align: center;
+  font-size: initial !important;
+  height: 40px !important;
+  position: relative;
+}
+.bookcase .bottom-shelf {
+  height: 40px !important;
+}
+.bookcase .logo {
+  text-shadow: rgba(255, 255, 255, 0.37) 0 2px 0;
+  font-family: Nunito, sans-serif;
+  color: #804313;
+  opacity: .6;
+  height: 40px;
+  font-size: 1.8em !important;
+  text-align: center;
+  width: 200px;
+  display: inline-block;
+}
+.bookcase .wall {
+  width: 100%;
+  background: #777;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  position: fixed;
+  z-index: 10;
+  font-size: 0px;
+  letter-spacing: 0px;
+  word-spacing: 0px;
+}
+.bookcase .shelf {
+  margin: 0 auto;
+  min-width: 100%;
+  display: inline-block;
+  position: relative;
+  background: #130f10;
+  /* Old browsers */
+  background: linear-gradient(to bottom, #130f10 0%, #79472e 84%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#130f10', endColorstr='#79472e', GradientType=0);
+  /* IE6-9 */
+}
+.bookcase .img-shelf {
+  height: 100%;
+  width: 100%;
+}
+.bookcase .top-shelf {
+  background-image: url('images/shelf-border-top.png');
+}
+.bookcase .bottom-shelf {
+  background-image: url('images/shelf-border-top.png');
+}
+.bookcase .shelf-border {
+  width: 100%;
+  height: 20px;
+}
+.bookcase .add-item {
+  vertical-align: top;
+  width: 40px;
+  display: inline-block;
+  cursor: pointer;
+  transition: all .2s;
+  width: 70px;
+  padding-top: 24px;
+  font-size: 40px;
+  opacity: 0.5;
+  color: white;
+  padding-top: 30px;
+  height: 96px;
+}
+.bookcase .add-item:hover {
+  opacity: 0.7;
+}
+.bookcase-shown {
+  animation-name: bookcaseShownAnimation;
+  animation-duration: .5s;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+.item-icon {
+  width: 25px;
+  height: 32px;
+  vertical-align: middle;
+}
+.new-button-text {
+  padding-left: 20px;
+}
+.slide {
+  margin-left: -100% !important;
+}
+.slide-second-form {
+  margin: auto;
+}
+.form-one,
+.form-two {
+  opacity: 0;
+  display: inline-block;
+}
+.form-two {
+  vertical-align: top;
+}
+.item-container {
+  height: 100px;
+  padding-left: 130px;
+}
+@keyframes bookcaseShownAnimation {
+  0% {
+    z-index: 0;
+  }
+  100% {
+    z-index: 1;
+  }
+}
+@media all and (max-width: 875px) {
+  .bookcase .logo {
+    display: none;
+  }
+}
+@media all and (max-width: 1050px) {
+  .item-container {
+    padding-left: 50px;
+  }
+}
+@media all and (max-width: 400px) {
+  .item-container {
+    padding-left: 10px;
+  }
+}
 
 .desk-container {
   perspective: 1000px;
@@ -352,12 +377,17 @@ sup {
   z-index: 2;
 }
 .desk {
-  background-image: url(images/wood.jpg);
+  background-image: url(images/wood-small.jpg);
   background-size: cover;
   width: 100%;
   height: 100%;
   transition: all .5s;
   overflow-x: hidden;
+}
+@media all and (min-width: 600px) {
+  .desk {
+    background-image: url(images/wood.jpg);
+  }
 }
 .noselected-item {
   top: 120px;
@@ -970,4 +1000,13 @@ sup {
 }
 .usernote-item .close-box-button:hover {
   opacity: .7;
+}
+.trash-icon {
+  cursor: default !important;
+}
+.trash-icon:hover {
+  transform: initial !important;
+}
+.trash-icon:hover .usernote-title {
+  margin-top: 4px !important;
 }

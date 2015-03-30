@@ -19,6 +19,7 @@ var play = (function () {
 
             sounds.bongos = go(bufferList[0]);
             sounds.swoosh = go(bufferList[1]);
+            sounds.trash = go(bufferList[2]);
         },
         retVal = function (sound) {
 
@@ -38,7 +39,8 @@ var play = (function () {
             context,
             [
                 'https://s3-us-west-2.amazonaws.com/static-omaj/bongos.mp3',
-                'https://s3-us-west-2.amazonaws.com/static-omaj/swoosh.mp3'
+                'https://s3-us-west-2.amazonaws.com/static-omaj/swoosh.mp3',
+                'https://s3-us-west-2.amazonaws.com/static-omaj/trash.mp3'
             ],
             finishedLoading
         );

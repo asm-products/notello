@@ -12,17 +12,20 @@ var selectedNoteStore = assign(new Store(), {
 	isChanging: false
 });
 
-notelloDispatcher.registerDiscrete('deleteNoteCompleted', function () {
+notelloDispatcher.registerDiscrete('deleteNoteCompleted', function (noteId) {
 
-	selectedNoteStore.noteId = null;
-	selectedNoteStore.noteTitle = '';
-	selectedNoteStore.noteText = '';
+	if (selectedNoteStore.noteId === noteId) {
+	
+		selectedNoteStore.noteId = null;
+		selectedNoteStore.noteTitle = '';
+		selectedNoteStore.noteText = '';
 
-	if (!lscache.get('isAuthenticated')) {
-		lscache.remove('lastSelectedNote');
+		if (!lscache.get('isAuthenticated')) {
+			lscache.remove('lastSelectedNote');
+		}
+
+		selectedNoteStore.save();
 	}
-
-	selectedNoteStore.save();
 });
 
 notelloDispatcher.registerDiscrete('createNoteCompleted', function (notePayload) {

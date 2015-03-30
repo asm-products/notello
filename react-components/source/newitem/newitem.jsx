@@ -10,6 +10,7 @@ var bookshelfStore = require('../../../stores/bookshelfStore');
 var createNotebookAction = require('../../../actions/createNotebook');
 var createBoxAction = require('../../../actions/createBox');
 var domUtils = require('../../../common/dom-utils');
+var getUserNotesAction = require('../../../actions/getUserNotes');
 
 var bookcaseComponent = React.createClass({
 
@@ -119,7 +120,7 @@ var bookcaseComponent = React.createClass({
 			createNotebookAction(bookshelfStore.userNotes, this.state.itemName);
 		}
 
-		hideBookshelfAction();
+		getUserNotesAction();
 	},
 
 	handleItemNameChange: function (event) {
