@@ -235,6 +235,16 @@ $(function () {
 			// an array to prepare for bulk insert into the database. Then we remove the offline note from local storage.
 			offlineUserNotes.map(function (offlineUserNote) {
 
+				if (offlineUserNote.itemType === 'box') {
+
+					offlineUserNote.items.map(function (boxItem) {
+
+						outputOffLineNotes.push(lscache.get('unAuthNote_' + boxItem.noteId));
+
+						lscache.remove('unAuthNote_' + boxItem.noteId);
+					});
+				}
+
 				outputOffLineNotes.push(lscache.get('unAuthNote_' + offlineUserNote.noteId));
 
 				lscache.remove('unAuthNote_' + offlineUserNote.noteId);

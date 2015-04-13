@@ -96,7 +96,7 @@ var usernotesComponent = React.createClass({
 	render: function () {
 
 		var self = this,
-			displayNotes = self.state.selectedBoxId ? [_.findWhere(self.state.userNotes, { boxId: self.state.selectedBoxId })].concat(_.findWhere(self.state.userNotes, { boxId: self.state.selectedBoxId }).items) : self.state.userNotes;
+			displayNotes = self.state.selectedBoxId ? [_.findWhere(self.state.userNotes, { boxId: self.state.selectedBoxId })].concat(_.findWhere(self.state.userNotes, { boxId: self.state.selectedBoxId }).items || []) : self.state.userNotes;
 
 		return 	<div ref="userNoteContainer" className="usernotes-wrapper">
 					{displayNotes.map(function (item) {

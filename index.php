@@ -246,13 +246,34 @@ $app->put('/api/usernotes', function () use ($app) {
 		$email = $oldToken[0];
 
 		$userNotes = hydrateId($app->request->put('usernotes'));
-
-		$userNotesEncoded = json_encode($userNotes);
+		$append = $app->request->put('append');
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
         	'region'  => 'us-west-2'
 		));
+
+		if (isset($append) && $append === 'true') {
+
+			// Query user notes from database
+			$result = $dbClient->getItem(array(
+			    'ConsistentRead' => true,
+			    'TableName' => 'usernotes',
+			    'Key'       => array(
+			        'email' => array('S' => $email)
+			    )
+			));
+
+			$existingUserNotes = json_decode($result['Item']['usernotes']['S']);
+
+			if ($existingUserNotes === null) {
+				$existingUserNotes = array();
+			}
+
+			$userNotes = array_merge($existingUserNotes, $userNotes);
+		}
+
+		$userNotesEncoded = json_encode($userNotes);
 
 		// Make update or insert to user notes in database
 		$dbClient->putItem(array(
@@ -366,7 +387,7 @@ $app->post('/api/note', function () use ($app) {
 
 		$noteTitle = $app->request->post('noteTitle');
 		$noteText = $app->request->post('noteText');
-		$noteId = uniqid();
+		$noteId = $app->request->post('noteId');
 
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
@@ -407,17 +428,20 @@ $app->post('/api/notes', function () use ($app) {
 
 		foreach ($notes as &$note) {
 
-			$putRequestArray = array_merge_recursive($putRequestArray, array(
-				array (
-	                'PutRequest' => array(
-	                    'Item' => array(
-	                        'noteId'    => array('S' => Helper::blankToNA($note['noteId'])),
-	                        'noteTitle' => array('S' => Helper::blankToNA($note['noteTitle'])),
-	                        'noteText'  => array('S' => Helper::blankToNA($note['noteText']))
-	                    )
+			if (isset($note['noteId'])) {
+
+				$putRequestArray = array_merge_recursive($putRequestArray, array(
+					array (
+		                'PutRequest' => array(
+		                    'Item' => array(
+		                        'noteId'    => array('S' => Helper::blankToNA($note['noteId'])),
+		                        'noteTitle' => array('S' => Helper::blankToNA($note['noteTitle'])),
+		                        'noteText'  => array('S' => Helper::blankToNA($note['noteText']))
+		                    )
+		                )
 	                )
-                )
-            ));
+	            ));
+			}
 		}
 		unset($note);
 
@@ -469,6 +493,10 @@ $app->delete('/api/note/:noteId', function ($noteId) use ($app) {
 
 	if (isValid($app)) {
 
+		$token = $app->request->headers->get('X-Authorization');
+		$oldToken = explode(':', $token);
+		$email = $oldToken[0];
+
 		// Get AWS DynamoDB Client
 		$dbClient = DynamoDBClient::factory(array(
         	'region'  => 'us-west-2'
@@ -481,6 +509,29 @@ $app->delete('/api/note/:noteId', function ($noteId) use ($app) {
 		        'noteId' => array('S' => $noteId) // Primary Key
 		    )
 		));
+
+		$result = $dbClient->getItem(array(
+		    'ConsistentRead' => true,
+		    'TableName' => 'selected',
+		    'Key'       => array(
+		        'email' => array('S' => $email) // Primary Key
+		    )
+		));
+
+		$selectedNoteId = '';
+		if (isset($result['Item']['selected'])) {
+			$selectedNoteId = Helper::NAToBlank($result['Item']['selected']['S']);
+		}
+
+		if ($selectedNoteId === $noteId) {
+			
+			$dbClient->deleteItem(array(
+			    'TableName' => 'selected',
+			    'Key'       => array(
+			        'email' => array('S' => $email) // Primary Key
+			    )
+			));
+		}
 
         $app->response->setBody(json_encode(array('message' => 'Successful')));
 		

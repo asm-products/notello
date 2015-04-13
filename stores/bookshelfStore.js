@@ -37,6 +37,12 @@ notelloDispatcher.registerDiscrete('createNoteCompleted', function (createNotePa
 	bookShelfStore.save();
 });
 
+notelloDispatcher.registerDiscrete('createBoxCompleted', function (userNotes) {
+
+	bookShelfStore.userNotes = userNotes || [];
+	bookShelfStore.save();
+});
+
 notelloDispatcher.registerDiscrete('createNotebookCompleted', function (userNotes) {
 
 	bookShelfStore.userNotes = userNotes;
@@ -49,8 +55,9 @@ notelloDispatcher.registerDiscrete('getUserNotesCompleted', function (userNotes)
 	bookShelfStore.save();
 });
 
-notelloDispatcher.registerDiscrete('updateUserNotesCompleted', function () {
+notelloDispatcher.registerDiscrete('updateUserNotesCompleted', function (userNotes) {
 
+	bookShelfStore.userNotes = userNotes || [];
 	bookShelfStore.save();
 });
 

@@ -119,8 +119,6 @@ var bookcaseComponent = React.createClass({
 
 			createNotebookAction(bookshelfStore.userNotes, this.state.itemName);
 		}
-
-		getUserNotesAction();
 	},
 
 	handleItemNameChange: function (event) {

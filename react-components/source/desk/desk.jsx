@@ -67,6 +67,7 @@ var deskComponent = React.createClass({
 							CREATE OR SELECT A NOTE
 						</div>}
 					</div>
+					<a className="ion-social-twitter twitter-button" href="http://twitter.com/notelloapp" target="_blank" title="Follow us on Twitter"></a>
 				</div>
 	}
 

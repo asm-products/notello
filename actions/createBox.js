@@ -18,8 +18,6 @@ var createBoxAction = function (userNotes, boxTitle) {
 		items: []
 	});
 
-	//dispatcher.dispatchDiscrete('createBoxCompleted', userNotes);
-
 	if (lscache.get('isAuthenticated')) {	
 
 		api({
@@ -27,11 +25,9 @@ var createBoxAction = function (userNotes, boxTitle) {
 			method: 'post',
 			data: {
 				'_METHOD': 'PUT',
-				userNotes: userNotes
+				usernotes: userNotes
 			},
 			success: function (result) {
-				
-				//dispatcher.dispatchDiscrete('createBoxCompleted', result.userNotes);
 		    }
 		});
 
@@ -39,6 +35,9 @@ var createBoxAction = function (userNotes, boxTitle) {
 
 		lscache.set('unAuthUserNotes', userNotes);
 	}
+
+	//dispatcher.dispatchDiscrete('createBoxCompleted', userNotes);
+	dispatcher.dispatchDiscrete('updateUserNotesCompleted', userNotes);
 };
 
 module.exports = createBoxAction;

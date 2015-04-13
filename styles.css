@@ -1,3 +1,142 @@
+.bookcase {
+  width: 100%;
+  height: 150px;
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+}
+.bookcase .top-shelf {
+  text-align: center;
+  font-size: initial !important;
+  height: 40px !important;
+  position: relative;
+}
+.bookcase .bottom-shelf {
+  height: 40px !important;
+}
+.bookcase .logo {
+  text-shadow: rgba(255, 255, 255, 0.37) 0 2px 0;
+  font-family: Nunito, sans-serif;
+  color: #804313;
+  opacity: .6;
+  height: 40px;
+  font-size: 1.8em !important;
+  text-align: center;
+  width: 200px;
+  display: inline-block;
+}
+.bookcase .wall {
+  width: 100%;
+  background: #777;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  position: fixed;
+  z-index: 10;
+  font-size: 0px;
+  letter-spacing: 0px;
+  word-spacing: 0px;
+}
+.bookcase .shelf {
+  margin: 0 auto;
+  min-width: 100%;
+  display: inline-block;
+  position: relative;
+  background: #130f10;
+  /* Old browsers */
+  background: linear-gradient(to bottom, #130f10 0%, #79472e 84%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#130f10', endColorstr='#79472e', GradientType=0);
+  /* IE6-9 */
+}
+.bookcase .img-shelf {
+  height: 100%;
+  width: 100%;
+}
+.bookcase .top-shelf {
+  background-image: url('images/shelf-border-top.png');
+}
+.bookcase .bottom-shelf {
+  background-image: url('images/shelf-border-top.png');
+}
+.bookcase .shelf-border {
+  width: 100%;
+  height: 20px;
+}
+.bookcase .add-item {
+  vertical-align: top;
+  width: 40px;
+  display: inline-block;
+  cursor: pointer;
+  transition: all .2s;
+  width: 70px;
+  padding-top: 24px;
+  font-size: 40px;
+  opacity: 0.5;
+  color: white;
+  padding-top: 30px;
+  height: 96px;
+}
+.bookcase .add-item:hover {
+  opacity: 0.7;
+}
+.bookcase-shown {
+  animation-name: bookcaseShownAnimation;
+  animation-duration: .5s;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+.item-icon {
+  width: 25px;
+  height: 32px;
+  vertical-align: middle;
+}
+.new-button-text {
+  padding-left: 20px;
+}
+.slide {
+  margin-left: -100% !important;
+}
+.slide-second-form {
+  margin: auto;
+}
+.form-one,
+.form-two {
+  opacity: 0;
+  display: inline-block;
+}
+.form-two {
+  vertical-align: top;
+}
+.item-container {
+  height: 100px;
+  padding-left: 130px;
+}
+@keyframes bookcaseShownAnimation {
+  0% {
+    z-index: 0;
+  }
+  100% {
+    z-index: 1;
+  }
+}
+@media all and (max-width: 875px) {
+  .bookcase .logo {
+    display: none;
+  }
+}
+@media all and (max-width: 1050px) {
+  .item-container {
+    padding-left: 50px;
+  }
+}
+@media all and (max-width: 400px) {
+  .item-container {
+    padding-left: 10px;
+  }
+}
+
 .generic-transition {
   transition: transform 0.3s, all 0.2s;
 }
@@ -220,145 +359,6 @@ sup {
   animation-timing-function: linear;
 }
 
-.bookcase {
-  width: 100%;
-  height: 150px;
-  position: fixed;
-  z-index: 0;
-  top: 0;
-  left: 0;
-}
-.bookcase .top-shelf {
-  text-align: center;
-  font-size: initial !important;
-  height: 40px !important;
-  position: relative;
-}
-.bookcase .bottom-shelf {
-  height: 40px !important;
-}
-.bookcase .logo {
-  text-shadow: rgba(255, 255, 255, 0.37) 0 2px 0;
-  font-family: Nunito, sans-serif;
-  color: #804313;
-  opacity: .6;
-  height: 40px;
-  font-size: 1.8em !important;
-  text-align: center;
-  width: 200px;
-  display: inline-block;
-}
-.bookcase .wall {
-  width: 100%;
-  background: #777;
-  overflow-x: scroll;
-  -webkit-overflow-scrolling: touch;
-  white-space: nowrap;
-  position: fixed;
-  z-index: 10;
-  font-size: 0px;
-  letter-spacing: 0px;
-  word-spacing: 0px;
-}
-.bookcase .shelf {
-  margin: 0 auto;
-  min-width: 100%;
-  display: inline-block;
-  position: relative;
-  background: #130f10;
-  /* Old browsers */
-  background: linear-gradient(to bottom, #130f10 0%, #79472e 84%);
-  /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#130f10', endColorstr='#79472e', GradientType=0);
-  /* IE6-9 */
-}
-.bookcase .img-shelf {
-  height: 100%;
-  width: 100%;
-}
-.bookcase .top-shelf {
-  background-image: url('images/shelf-border-top.png');
-}
-.bookcase .bottom-shelf {
-  background-image: url('images/shelf-border-top.png');
-}
-.bookcase .shelf-border {
-  width: 100%;
-  height: 20px;
-}
-.bookcase .add-item {
-  vertical-align: top;
-  width: 40px;
-  display: inline-block;
-  cursor: pointer;
-  transition: all .2s;
-  width: 70px;
-  padding-top: 24px;
-  font-size: 40px;
-  opacity: 0.5;
-  color: white;
-  padding-top: 30px;
-  height: 96px;
-}
-.bookcase .add-item:hover {
-  opacity: 0.7;
-}
-.bookcase-shown {
-  animation-name: bookcaseShownAnimation;
-  animation-duration: .5s;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-.item-icon {
-  width: 25px;
-  height: 32px;
-  vertical-align: middle;
-}
-.new-button-text {
-  padding-left: 20px;
-}
-.slide {
-  margin-left: -100% !important;
-}
-.slide-second-form {
-  margin: auto;
-}
-.form-one,
-.form-two {
-  opacity: 0;
-  display: inline-block;
-}
-.form-two {
-  vertical-align: top;
-}
-.item-container {
-  height: 100px;
-  padding-left: 130px;
-}
-@keyframes bookcaseShownAnimation {
-  0% {
-    z-index: 0;
-  }
-  100% {
-    z-index: 1;
-  }
-}
-@media all and (max-width: 875px) {
-  .bookcase .logo {
-    display: none;
-  }
-}
-@media all and (max-width: 1050px) {
-  .item-container {
-    padding-left: 50px;
-  }
-}
-@media all and (max-width: 400px) {
-  .item-container {
-    padding-left: 10px;
-  }
-}
-
 .desk-container {
   perspective: 1000px;
   height: 100%;
@@ -409,6 +409,16 @@ sup {
     font-size: 1.4em;
   }
 }
+.twitter-button {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  color: #333;
+  font-size: 1.2em;
+}
 
 .header {
   width: 100%;
@@ -448,6 +458,19 @@ sup {
   left: 50%;
   width: 200px;
   margin-left: -100px;
+}
+
+.links-container {
+  width: 100%;
+  height: 100px;
+  max-width: 900px;
+  margin: 0 auto;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  margin-top: -25px;
+  background-image: url('images/gray-gradient.png');
+  background-color: #4f5160;
+  background-repeat: repeat-x;
 }
 
 .login-container {
@@ -850,6 +873,11 @@ sup {
     transform: translateX(-200%);
   }
 }
+.link-match {
+  position: fixed;
+  z-index: 999999999999;
+  display: inline-block;
+}
 
 .search {
   display: inline-block;
@@ -997,6 +1025,7 @@ sup {
   color: white;
   opacity: .5;
   display: none;
+  font-size: 2em;
 }
 .usernote-item .close-box-button:hover {
   opacity: .7;

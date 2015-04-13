@@ -55,8 +55,8 @@ notelloDispatcher.registerDiscrete('selectedNote', function (note) {
 	if (note && note.noteId !== selectedNoteStore.noteId) {
 
 		selectedNoteStore.noteId = note.noteId;
-		selectedNoteStore.noteTitle = note.noteTitle;
-		selectedNoteStore.noteText = note.noteText;
+		selectedNoteStore.noteTitle = note.noteTitle === null ? '': note.noteTitle;
+		selectedNoteStore.noteText = note.noteText === null ? '': note.noteText;
 
 		updateSelectedNoteAction(selectedNoteStore.noteId);
 

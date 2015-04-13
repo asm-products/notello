@@ -19,7 +19,7 @@ var bulkCreateNotesAction = function (userNotes, notes) {
 		},
 		success: function () {
 
-			updateUserNotesAction(userNotes);
+			updateUserNotesAction(userNotes, true);
 		}
 	});
 };

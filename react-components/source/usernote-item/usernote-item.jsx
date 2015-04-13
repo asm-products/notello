@@ -98,6 +98,9 @@ var usernoteItemComponent = React.createClass({
     						}
 
 	    					boxDropped = _.findWhere(bookshelfStore.userNotes, { boxId: component.props.id });
+                            if (!boxDropped.items) {
+                                boxDropped.items = [];
+                            }
 	    					boxDropped.items.push(itemDragged);
 
 	    					newUserNotes = _.without(bookshelfStore.userNotes, itemDragged);
@@ -105,8 +108,6 @@ var usernoteItemComponent = React.createClass({
 	    				
 	    				// Updated and delete notes and usernotes
 	    				updateUserNotesAction(newUserNotes);
-
-	    				getUserNotesAction();
     					
     				}
     			}
@@ -146,7 +147,7 @@ var usernoteItemComponent = React.createClass({
 		if (itemType === 'note') {
 
 			return  <span {...this.dragSourceFor('BOXES')} className="generic-transition usernote-item" onClick={clickHandler} onTouchEnd={clickHandler}>
-						<img src="dist/images/paper.png" className="paper" />
+						<img src="//s3-us-west-2.amazonaws.com/notello/images/paper.png" className="paper" />
 						<span className={usernoteTitleClasses}>{itemTitle || 'New Note'}</span>
 					</span>;
 
@@ -157,15 +158,15 @@ var usernoteItemComponent = React.createClass({
 		} else if (itemType === 'box' && (!selectedBoxId || selectedBoxId === id)) {
 
 			return <span {...this.dropTargetFor('BOXES')} {...this.dragSourceFor('BOXES')} title="You can drag and drop notes and notebooks here" className={boxContainerClasses} onClick={clickHandler} onTouchEnd={clickHandler}>
-						<img src={selectedBoxId === id ? 'dist/images/archivebox-opened.png' :'dist/images/archivebox.png'} className={boxItemClasses} />
+						<img src={selectedBoxId === id ? '//s3-us-west-2.amazonaws.com/notello/images/archivebox-opened.png' :'//s3-us-west-2.amazonaws.com/notello/images/archivebox.png'} className={boxItemClasses} />
 						<span className={boxTitleClasses}>{itemTitle || 'New Box'}</span>
-						<span title="Close this box" className="ion-close-circled close-box-button" onClick={handleCloseBox} onTouchEnd={handleCloseBox}></span>
+						<span title="Back to your bookshelf" className="ion-android-arrow-dropleft-circle close-box-button" onClick={handleCloseBox} onTouchEnd={handleCloseBox}></span>
 					</span>;
 
 		} else if (itemType === 'trash') {
 
 			return <span {...this.dropTargetFor('BOXES')} selectedBoxId={selectedBoxId} title="You can delete stuff permanently by dragging it here" className={boxContainerClasses + ' trash-icon'} style={{ marginLeft: '60px' }}>
-						<img src="dist/images/trashcan.png" className={boxItemClasses} id="spanTrashcan" />
+						<img src="//s3-us-west-2.amazonaws.com/notello/images/trashcan.png" className={boxItemClasses} id="spanTrashcan" />
 						<span className="usernote-title">Trash</span>
 					</span>;
 

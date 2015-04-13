@@ -82,7 +82,7 @@ var modalFormComponent = React.createClass({
 		this._modalContainer.find('input').first().focus();
 	},
 
-	_isOpened: function () {
+	isOpened: function () {
 
 		return this._isOpened;
 	},
@@ -129,6 +129,10 @@ var modalFormComponent = React.createClass({
   		
   			this._shake();
 
+  			if (this.props.onInvalid) {
+  				this.props.onInvalid(event);
+  			}
+
   		} else {
 
   			if (this.props.onSubmit) {
@@ -140,7 +144,8 @@ var modalFormComponent = React.createClass({
   			isValid: validationMessage === '',
   			validationMessage: validationMessage
   		});
-	}, 3000, true),
+
+	}, 50, true),
 
 	handleSubmit: function (event) {
 
@@ -176,7 +181,7 @@ var modalFormComponent = React.createClass({
 							{React.Children.map(props.children, function (child) {
 								return child.type === 'div' ? child : <div className="input-wrapper">{child}</div>;
 							})}
-							{this.props.showSubmit !== false && <button ref="btnSubmitEmail" type="submit" onClick={this.handleClick} className="submit-btn ion ion-load generic-transition">
+							{this.props.showSubmit !== false && <button ref="btnSubmitEmail" type="submit" onClick={this.handleClick} onTouchEnd={this.handleClick} className="submit-btn ion ion-load generic-transition">
 								{btnSubmitText}
 							</button>}
 						</form>
