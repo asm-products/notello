@@ -61276,20 +61276,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 					word = '<span class="hashtag">' + word + '</span>';
 
-				} else if (/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/.test(word)) {
-
-					if (_s.endsWith(word, 'D258DC19ED0D4065AAB60FEAAC8029A6')) {
-
-						word = '<a class="link-match" target="_blank" href="' + word.replace('D258DC19ED0D4065AAB60FEAAC8029A6', '') + '">' + word.replace('D258DC19ED0D4065AAB60FEAAC8029A6', '') + '</a>D258DC19ED0D4065AAB60FEAAC8029A6';
-
-					} else {
-
-						word = '<a class="link-match" target="_blank" href="' + word + '">' + word + '</a>';
-
-					}
-				}
-
-				console.log(word);
+				} 
 
 				styledText.push(word);
 			});
@@ -61440,6 +61427,10 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		var showSettings = false;
 
+		var links = sanitizedText.match(/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/gi) || [];
+
+		console.log(links);
+
 		return 	React.createElement("div", null, 
 					React.createElement("div", {className: notepadClasses, style: notepadStyle}, 
 						React.createElement("div", {className: "pink-divider"}), 
@@ -61455,7 +61446,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 						React.createElement(ModalForm, {ref: "settingsModal", btnSubmitText: "DELETE NOTE", modalTitle: "SETTINGS", onSubmit: this.handleSettingsSaved, onClose: this.handleSettingsClosed}
 						)
 					), 
-					React.createElement(Links, {linkArray: []})
+					React.createElement(Links, {linkArray: links})
 				);
 	}
 

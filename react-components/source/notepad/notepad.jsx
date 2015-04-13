@@ -142,20 +142,7 @@ var notepadComponent = React.createClass({
 
 					word = '<span class="hashtag">' + word + '</span>';
 
-				} else if (/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/.test(word)) {
-
-					if (_s.endsWith(word, 'D258DC19ED0D4065AAB60FEAAC8029A6')) {
-
-						word = '<a class="link-match" target="_blank" href="' + word.replace('D258DC19ED0D4065AAB60FEAAC8029A6', '') + '">' + word.replace('D258DC19ED0D4065AAB60FEAAC8029A6', '') + '</a>D258DC19ED0D4065AAB60FEAAC8029A6';
-
-					} else {
-
-						word = '<a class="link-match" target="_blank" href="' + word + '">' + word + '</a>';
-
-					}
-				}
-
-				console.log(word);
+				} 
 
 				styledText.push(word);
 			});
@@ -306,6 +293,10 @@ var notepadComponent = React.createClass({
 
 		var showSettings = false;
 
+		var links = sanitizedText.match(/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/gi) || [];
+
+		console.log(links);
+
 		return 	<div>
 					<div className={notepadClasses} style={notepadStyle}>
 						<div className="pink-divider"></div>
@@ -321,7 +312,7 @@ var notepadComponent = React.createClass({
 						<ModalForm ref="settingsModal" btnSubmitText="DELETE NOTE" modalTitle="SETTINGS" onSubmit={this.handleSettingsSaved} onClose={this.handleSettingsClosed}>
 						</ModalForm>
 					</div>
-					<Links linkArray={[]} />
+					<Links linkArray={links} />
 				</div>;
 	}
 
