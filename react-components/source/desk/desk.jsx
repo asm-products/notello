@@ -23,15 +23,18 @@ var deskComponent = React.createClass({
 
 	handleClick: function (event) {
 
-		event.preventDefault();
+		if (!event.target.className || event.target.className.indexOf('notepad-link') === -1) {
 
-		if (this.props.isViewingBookshelf) {
+			event.preventDefault();
 
-			if ('activeElement' in document) {
-		    	document.activeElement.blur();
+			if (this.props.isViewingBookshelf) {
+
+				if ('activeElement' in document) {
+			    	document.activeElement.blur();
+				}
+				
+				hideBookshelf();
 			}
-			
-			hideBookshelf();
 		}
 	},
 

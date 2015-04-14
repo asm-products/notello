@@ -1,13 +1,41 @@
 
 .links-container {
 	width: 100%;
-	height: 100px;
+	min-height: 100px;
 	max-width: 900px;
-	margin: 0 auto;
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
-	margin-top: -25px;
 	background-image: url('images/gray-gradient.png');
 	background-color: #4f5160;
 	background-repeat: repeat-x;
+  	box-shadow: 0 0 60px 1px rgba(0,0,0,.17);
+  	opacity: 0;
+}
+
+.link-show {
+	opacity: 1;
+}
+
+.links-sub-container {
+	
+	padding: 30px 6px 6px 6px;
+	width: 100%;
+	height: 100%;
+}
+
+.notepad-link {
+	display: inline-block;
+	color: white;
+	text-shadow: 1px 1px black;
+	font-family: Arial;
+	text-decoration: none;
+	background-color: #3b3d4d;
+	border: 1px solid #fff;
+	padding: 8px;
+	margin: 10px 5px;
+
+	&:hover {
+		text-decoration: underline;
+		background-color: #181923;
+	}
 }

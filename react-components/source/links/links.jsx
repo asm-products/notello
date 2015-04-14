@@ -7,15 +7,19 @@ var linksComponent = React.createClass({
 	render: function () {
 
 		var classes = cx({
-			'links-container': true,
+			'links-container generic-transition': true,
 			'link-show': this.props.linkArray.length > 0
 		});
 
-		return 	<div className="links-container">
-					{this.props.linkArray.map(function (link) {
+		var margin = Math.max(this.props.lineCount, 7) * 40;
 
-						return <a href={link} target="_blank" className="notepad-link">{link}</a>;
-					})}
+		return 	<div className={classes} style={{ marginTop: margin + 'px' }}>
+					<div className="links-sub-container">
+						{this.props.linkArray.map(function (link, index) {
+
+							return <a href={link} key={index} className="notepad-link generic-transition" target="_blank">{link}</a>;
+						})}
+					</div>
 				</div>;
 	}
 

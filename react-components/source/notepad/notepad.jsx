@@ -5,6 +5,7 @@ var cx = ReactAddons.classSet;
 var _s = require('underscore.string');
 var moment = require('moment');
 var $ = require('jquery');
+var _ = require('underscore');
 // Common code
 var domUtils = require('../../../common/dom-utils');
 var sounds = require('../../../common/sounds');
@@ -259,6 +260,26 @@ var notepadComponent = React.createClass({
 		this.refs.settingsModal.close();
 	},
 
+	handleHighlight: function (event) {
+
+		event.preventDefault();
+
+		var selectedText = window.getSelection();
+		console.log(selectedText);
+	    var userSelection = selectedText.getRangeAt(0);
+	    var newNode = document.createElement("span");
+	    newNode.setAttribute(
+	       "style",
+	       "background-color: yellow; display: inline;"
+	    );
+
+	    var newRange = document.createRange();
+	    newRange.setStart(this.refs.txtAreaContent.getDOMNode(), userSelection.startOffset);
+	    newRange.setEnd(this.refs.txtAreaContent.getDOMNode(), userSelection.startOffset + selectedText.toString().length);
+	    newRange.surroundContents(newNode);
+	
+	},
+
 	render: function () {
 
 		// txtHiddenTextArea is used to calculate number of lines.
@@ -293,9 +314,7 @@ var notepadComponent = React.createClass({
 
 		var showSettings = false;
 
-		var links = sanitizedText.match(/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/gi) || [];
-
-		console.log(links);
+		var links = _.uniq(sanitizedText.match(/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/gi) || []);
 
 		return 	<div>
 					<div className={notepadClasses} style={notepadStyle}>
@@ -304,15 +323,16 @@ var notepadComponent = React.createClass({
 							<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 
 							disabled={shouldBeDisabled} value={this.state.noteTitle} onKeyUp={this.handleTitleKeyUp} />
 							{showSettings && <span className="generic-transition notepad-gear ion-gear-b" onTouchEnd={this.handleSettingClick} onClick={this.handleSettingClick}></span>}
+							<span className="generic-transition notepad-gear ion-paintbrush" onMouseDown={this.handleHighlight}></span>
 						</div>
-						<div className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
+						<div ref="txtAreaContent" className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 						<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 
 						onKeyUp={this.handleChange} onClick={this.handleChange} onChange={this.handleChange} disabled={shouldBeDisabled} defaultValue={sanitizedText}></textarea>
 						<textarea id="txtHiddenTextArea" ref="txtHiddenTextArea" className={txtAreaCSSClasses} style={{ height: 'auto', zIndex: 2, visibility: 'hidden' }} readOnly value={sanitizedText} />
 						<ModalForm ref="settingsModal" btnSubmitText="DELETE NOTE" modalTitle="SETTINGS" onSubmit={this.handleSettingsSaved} onClose={this.handleSettingsClosed}>
 						</ModalForm>
+						<Links linkArray={links} lineCount={lineCount} />
 					</div>
-					<Links linkArray={links} />
 				</div>;
 	}
 

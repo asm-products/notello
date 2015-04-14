@@ -60534,15 +60534,18 @@ var deskComponent = React.createClass({displayName: 'deskComponent',
 
 	handleClick: function (event) {
 
-		event.preventDefault();
+		if (!event.target.className || event.target.className.indexOf('notepad-link') === -1) {
 
-		if (this.props.isViewingBookshelf) {
+			event.preventDefault();
 
-			if ('activeElement' in document) {
-		    	document.activeElement.blur();
+			if (this.props.isViewingBookshelf) {
+
+				if ('activeElement' in document) {
+			    	document.activeElement.blur();
+				}
+				
+				hideBookshelf();
 			}
-			
-			hideBookshelf();
 		}
 	},
 
@@ -60638,15 +60641,19 @@ var linksComponent = React.createClass({displayName: 'linksComponent',
 	render: function () {
 
 		var classes = cx({
-			'links-container': true,
+			'links-container generic-transition': true,
 			'link-show': this.props.linkArray.length > 0
 		});
 
-		return 	React.createElement("div", {className: "links-container"}, 
-					this.props.linkArray.map(function (link) {
+		var margin = Math.max(this.props.lineCount, 7) * 40;
 
-						return React.createElement("a", {href: link, target: "_blank", className: "notepad-link"}, link);
-					})
+		return 	React.createElement("div", {className: classes, style: { marginTop: margin + 'px'}}, 
+					React.createElement("div", {className: "links-sub-container"}, 
+						this.props.linkArray.map(function (link, index) {
+
+							return React.createElement("a", {href: link, key: index, className: "notepad-link generic-transition", target: "_blank"}, link);
+						})
+					)
 				);
 	}
 
@@ -61139,6 +61146,7 @@ var cx = ReactAddons.classSet;
 var _s = require('underscore.string');
 var moment = require('moment');
 var $ = require('jquery');
+var _ = require('underscore');
 // Common code
 var domUtils = require('../../../common/dom-utils');
 var sounds = require('../../../common/sounds');
@@ -61393,6 +61401,26 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 		this.refs.settingsModal.close();
 	},
 
+	handleHighlight: function (event) {
+
+		event.preventDefault();
+
+		var selectedText = window.getSelection();
+		console.log(selectedText);
+	    var userSelection = selectedText.getRangeAt(0);
+	    var newNode = document.createElement("span");
+	    newNode.setAttribute(
+	       "style",
+	       "background-color: yellow; display: inline;"
+	    );
+
+	    var newRange = document.createRange();
+	    newRange.setStart(this.refs.txtAreaContent.getDOMNode(), userSelection.startOffset);
+	    newRange.setEnd(this.refs.txtAreaContent.getDOMNode(), userSelection.startOffset + selectedText.toString().length);
+	    newRange.surroundContents(newNode);
+	
+	},
+
 	render: function () {
 
 		// txtHiddenTextArea is used to calculate number of lines.
@@ -61427,9 +61455,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 		var showSettings = false;
 
-		var links = sanitizedText.match(/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/gi) || [];
-
-		console.log(links);
+		var links = _.uniq(sanitizedText.match(/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[A-Z0-9+&@#\/%=~_|]/gi) || []);
 
 		return 	React.createElement("div", null, 
 					React.createElement("div", {className: notepadClasses, style: notepadStyle}, 
@@ -61437,16 +61463,17 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 						React.createElement("div", {className: "notepad-header"}, 
 							React.createElement("input", {className: "notepad-title", type: "text", maxLength: "25", placeholder: "Enter a title", onChange: this.handleTitleChange, 
 							disabled: shouldBeDisabled, value: this.state.noteTitle, onKeyUp: this.handleTitleKeyUp}), 
-							showSettings && React.createElement("span", {className: "generic-transition notepad-gear ion-gear-b", onTouchEnd: this.handleSettingClick, onClick: this.handleSettingClick})
+							showSettings && React.createElement("span", {className: "generic-transition notepad-gear ion-gear-b", onTouchEnd: this.handleSettingClick, onClick: this.handleSettingClick}), 
+							React.createElement("span", {className: "generic-transition notepad-gear ion-paintbrush", onMouseDown: this.handleHighlight})
 						), 
-						React.createElement("div", {className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
+						React.createElement("div", {ref: "txtAreaContent", className: "txt-area txt-area-div", dangerouslySetInnerHTML: {__html: value}}), 
 						React.createElement("textarea", {id: "txtArea", ref: "txtArea", className: txtAreaCSSClasses, onBlur: this.handleBlur, onFocus: this.handleChange, onKeyDown: this.handleChange, 
 						onKeyUp: this.handleChange, onClick: this.handleChange, onChange: this.handleChange, disabled: shouldBeDisabled, defaultValue: sanitizedText}), 
 						React.createElement("textarea", {id: "txtHiddenTextArea", ref: "txtHiddenTextArea", className: txtAreaCSSClasses, style: { height: 'auto', zIndex: 2, visibility: 'hidden'}, readOnly: true, value: sanitizedText}), 
 						React.createElement(ModalForm, {ref: "settingsModal", btnSubmitText: "DELETE NOTE", modalTitle: "SETTINGS", onSubmit: this.handleSettingsSaved, onClose: this.handleSettingsClosed}
-						)
-					), 
-					React.createElement(Links, {linkArray: links})
+						), 
+						React.createElement(Links, {linkArray: links, lineCount: lineCount})
+					)
 				);
 	}
 
@@ -61454,7 +61481,7 @@ var notepadComponent = React.createClass({displayName: 'notepadComponent',
 
 module.exports = notepadComponent;
 
-},{"../../../actions/deleteNote":"/var/www/actions/deleteNote.js","../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../actions/updateUserNotes":"/var/www/actions/updateUserNotes.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../common/notepadDOMCode":"/var/www/common/notepadDOMCode.js","../../../common/sounds":"/var/www/common/sounds.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","../links/links":"/var/www/react-components/source/links/links.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
+},{"../../../actions/deleteNote":"/var/www/actions/deleteNote.js","../../../actions/updateNote":"/var/www/actions/updateNote.js","../../../actions/updateUserNotes":"/var/www/actions/updateUserNotes.js","../../../common/dom-utils":"/var/www/common/dom-utils.js","../../../common/notepadDOMCode":"/var/www/common/notepadDOMCode.js","../../../common/sounds":"/var/www/common/sounds.js","../../../stores/bookshelfStore":"/var/www/stores/bookshelfStore.js","../../../stores/modalStore":"/var/www/stores/modalStore.js","../../../stores/selectedNoteStore":"/var/www/stores/selectedNoteStore.js","../links/links":"/var/www/react-components/source/links/links.jsx","../modal-form/modalForm":"/var/www/react-components/source/modal-form/modalForm.jsx","jquery":"/var/www/node_modules/jquery/dist/jquery.js","moment":"/var/www/node_modules/moment/moment.js","react":"/var/www/node_modules/react/react.js","react-addons":"/var/www/node_modules/react-addons/index.js","underscore":"/var/www/node_modules/underscore/underscore.js","underscore.string":"/var/www/node_modules/underscore.string/lib/underscore.string.js"}],"/var/www/react-components/source/searchbar/searchbar.jsx":[function(require,module,exports){
 var React = require('react');
 var ReactAddons = require('react-addons');
 var cx = ReactAddons.classSet;
