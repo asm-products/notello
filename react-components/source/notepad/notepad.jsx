@@ -6,6 +6,7 @@ var _s = require('underscore.string');
 var moment = require('moment');
 var $ = require('jquery');
 var _ = require('underscore');
+var rangy = require('rangy');
 // Common code
 var domUtils = require('../../../common/dom-utils');
 var sounds = require('../../../common/sounds');
@@ -139,11 +140,14 @@ var notepadComponent = React.createClass({
 
 			words.map(function (word) {
 
-				if (_s.startsWith(word, '#') || _s.startsWith(word, 'D258DC19ED0D4065AAB60FEAAC8029A6#')) {
+				var mockWord = word.replace('D258DC19ED0D4065AAB60FEAAC8029A6', '');
+
+				word = word.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+				if (_s.startsWith(mockWord, '#')) {
 
 					word = '<span class="hashtag">' + word + '</span>';
-
-				} 
+				}
 
 				styledText.push(word);
 			});
@@ -156,6 +160,25 @@ var notepadComponent = React.createClass({
 		});
 
 		finalText = finalTextArray.join('\r\n');
+
+		var highlights = finalText.split('*');
+		var highlightArray = [];
+
+		highlights.map(function (highlight, index) {
+
+			var mockHighlight = highlight.replace('<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>', '');
+
+			if (index !== 0 && (!_s.startsWith(mockHighlight, '&nbsp;') && 
+								!_s.startsWith(mockHighlight, '<') && 
+								!_s.startsWith(mockHighlight, '\r'))) {
+
+				highlight = '<span class="highlighted-text">' + highlight + '</span>';
+			}
+
+			highlightArray.push(highlight);
+		});
+
+		finalText = highlightArray.join('*');
 
 		updateNoteAction({
 			noteId: this.state.noteId,
@@ -260,26 +283,6 @@ var notepadComponent = React.createClass({
 		this.refs.settingsModal.close();
 	},
 
-	handleHighlight: function (event) {
-
-		event.preventDefault();
-
-		var selectedText = window.getSelection();
-		console.log(selectedText);
-	    var userSelection = selectedText.getRangeAt(0);
-	    var newNode = document.createElement("span");
-	    newNode.setAttribute(
-	       "style",
-	       "background-color: yellow; display: inline;"
-	    );
-
-	    var newRange = document.createRange();
-	    newRange.setStart(this.refs.txtAreaContent.getDOMNode(), userSelection.startOffset);
-	    newRange.setEnd(this.refs.txtAreaContent.getDOMNode(), userSelection.startOffset + selectedText.toString().length);
-	    newRange.surroundContents(newNode);
-	
-	},
-
 	render: function () {
 
 		// txtHiddenTextArea is used to calculate number of lines.
@@ -323,7 +326,6 @@ var notepadComponent = React.createClass({
 							<input className="notepad-title" type="text" maxLength="25" placeholder="Enter a title" onChange={this.handleTitleChange} 
 							disabled={shouldBeDisabled} value={this.state.noteTitle} onKeyUp={this.handleTitleKeyUp} />
 							{showSettings && <span className="generic-transition notepad-gear ion-gear-b" onTouchEnd={this.handleSettingClick} onClick={this.handleSettingClick}></span>}
-							<span className="generic-transition notepad-gear ion-paintbrush" onMouseDown={this.handleHighlight}></span>
 						</div>
 						<div ref="txtAreaContent" className="txt-area txt-area-div" dangerouslySetInnerHTML={{__html: value}}></div>
 						<textarea id="txtArea" ref="txtArea" className={txtAreaCSSClasses} onBlur={this.handleBlur} onFocus={this.handleChange} onKeyDown={this.handleChange} 

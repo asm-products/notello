@@ -40,7 +40,7 @@ var notepadDOMCode = {
 
 		var newHTML = html.replace('<span id="spanCaret" style="display: inline;" class="caret blink-me">|</span>', '');
 
-		return newHTML.replace(/(<[^>]*>)/g, '').replace(/&nbsp;/g, ' ');
+		return newHTML.replace(/(<[^>]*>)/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 	}
 
 };
